@@ -107,7 +107,7 @@ class Model(nn.Module):
         self.core = Core()
         self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024, 120))
 
-    def get_zero_state(self, batch_size, device="cuda"):
+    def get_zero_state(self, batch_size, device="cpu"):
         return (torch.zeros((1, batch_size, 1024), device=device), torch.zeros((1, batch_size, 1024), device=device))
 
     def compute_front(self, spatial, nonspatial, state):

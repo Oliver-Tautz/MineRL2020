@@ -21,6 +21,7 @@ from loader import BatchSeqLoader, absolute_file_paths
 from math import sqrt
 from kmeans import cached_kmeans
 
+
 # In ONLINE=True mode the code saves only the final version with early stopping,
 # in ONLINE=False it saves 20 intermediate versions during training.
 ONLINE = True
@@ -164,7 +165,7 @@ def main():
     if LOAD:
         model.load_state_dict(torch.load("train/model.tm"))
     model.cuda()
-    train(model, "train", 150000000, loader, logger)
+    train(model, "train", 10, loader, logger)
     
     torch.save(model.state_dict(),"train/model.tm")
     print("ok", file=sys.stderr)
