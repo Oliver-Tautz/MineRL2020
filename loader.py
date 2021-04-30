@@ -119,7 +119,7 @@ class ReplayRoller():
 
         while data == "RESET":
             self.hidden = self.model.get_zero_state(1)
-            self.hidden = (self.hidden[0].cuda(),self.hidden[1].cuda())
+            self.hidden = (self.hidden[0].cpu(),self.hidden[1].cpu())
             data = self.pipe_my.recv()
 
         return data + (self.hidden,)
@@ -188,7 +188,7 @@ class BatchSeqLoader():
         data = list(zip(*data))
         output = []
         for d in data[:-1]:
-            padded = pad_sequence(d).cuda()
+            padded = pad_sequence(d).cpu()
             #print(d[0].shape)
             #print(padded.shape)
             output.append(padded)

@@ -6,9 +6,14 @@ import logging
 import os
 import sys
 
+from tqdm import tqdm
+
 import gym
 import minerl
 import coloredlogs
+
+from torchsummary import summary
+
 coloredlogs.install(logging.DEBUG)
 
 from model import Model
@@ -24,7 +29,7 @@ from kmeans import cached_kmeans
 
 # In ONLINE=True mode the code saves only the final version with early stopping,
 # in ONLINE=False it saves 20 intermediate versions during training.
-ONLINE = True
+ONLINE = False
 
 trains_loaded = True
 try:
@@ -85,14 +90,15 @@ def train(model, mode, steps, loader, logger):
     gradsum = 0
     loss_dict = None
     modcount = 0
-    for i in range(int(steps/ BATCH_SIZE / SEQ_LEN)):
+    print(int(steps/ BATCH_SIZE / SEQ_LEN))
+    for i in tqdm(range(int(steps/ BATCH_SIZE / SEQ_LEN))):
         step+=1
-        #print(i)
+        print(i)
         spatial, nonspatial, prev_action, act, _, _, hidden = loader.get_batch(BATCH_SIZE)
         count += BATCH_SIZE*SEQ_LEN
         modcount += BATCH_SIZE*SEQ_LEN
         if mode != "pretrain":
-            loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, torch.zeros(act.shape, dtype=torch.float32, device="cuda"), act)
+            loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, torch.zeros(act.shape, dtype=torch.float32, device="cpu"), act)
         else:
             loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, act, act)
 
@@ -158,15 +164,32 @@ def main():
                   absolute_file_paths('data/MineRLTreechopVectorObf-v0')
 
     model = Model()
+
+
     shuffle(train_files)
-    
+
+
+
+
+
+
     loader = BatchSeqLoader(16, train_files, SEQ_LEN, model)
-    
+    spatial, nonspatial, prev_action, act, _, _, hidden = loader.get_batch(BATCH_SIZE)
+
+    #print(spatial.shape)
+    #print(nonspatial.shape)
+    #print(prev_action.shape)
+    #print(act.shape)
+    #print(hidden.shape)
+
+    #summary(Model)
+
     if LOAD:
         model.load_state_dict(torch.load("train/model.tm"))
-    model.cuda()
-    train(model, "train", 10, loader, logger)
-    
+    model.cpu()
+    print('Starting training!')
+    train(model, "train", 150000000, loader, logger)
+    print('training done!')
     torch.save(model.state_dict(),"train/model.tm")
     print("ok", file=sys.stderr)
 

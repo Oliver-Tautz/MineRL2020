@@ -44,6 +44,7 @@ class Episode(gym.Env):
         self.action_space = env.action_space
         self.observation_space = env.observation_space
         self._done = False
+        self._done = False
 
     def reset(self):
         if not self._done:
