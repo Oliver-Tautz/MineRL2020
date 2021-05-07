@@ -112,6 +112,8 @@ class Model(nn.Module):
 
     def compute_front(self, spatial, nonspatial, state):
         hidden, new_state = self.core(spatial, nonspatial, state)
+        #print('after core: hidden,new_state  = ',hidden[0].shape,new_state.shape)
+        print('after_selector : hidden state',self.selector(hidden)[0].shape)
         return hidden, self.selector(hidden), new_state
 
     def forward(self, spatial, nonspatial, state, target):
@@ -124,6 +126,12 @@ class Model(nn.Module):
         return l1, {"action":l1.item()}, state
 
     def sample(self, spatial, nonspatial, prev_action, state, target):
+        print('pov_input = ',spatial.shape)
+        print('obfs_input = ',nonspatial.shape)
+        print('hidden_states = ',state[0].shape)
+
+        print(self.core)
+
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
         dist = D.Categorical(logits = d)
         s = dist.sample()

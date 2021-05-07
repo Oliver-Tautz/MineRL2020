@@ -178,13 +178,21 @@ class MineRLNetworkAgent(MineRLAgentBase):
             state = self.model.get_zero_state(1, device=device)
             s = torch.zeros((1,1,64), dtype=torch.float32, device=device)
             while not done:
-                
+
+                # what is happening here?
                 spatial = torch.tensor(obs["pov"], device=device, dtype=torch.float32).unsqueeze(0).unsqueeze(0).transpose(2,4)
+
+
                 #cv2.imshow("xdd", obs["pov"])
                 # cv2.waitKey(30)
                 nonspatial = torch.cat([torch.tensor(obs["vector"], device=device, dtype=torch.float32), 
                                         torch.ones((2,), device=device,dtype=torch.float32)], dim=0).unsqueeze(0).unsqueeze(0)
+
+
+
                 s, state = self.model.sample(spatial, nonspatial, s, state, torch.zeros((1,1,64),dtype=torch.float32,device=device))
+
+
                 
                 for i in range(1):
                     obs,reward,done,_ = single_episode_env.step({"vector":s})
