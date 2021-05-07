@@ -22,6 +22,8 @@ from model import Model
 import torch
 import cv2
 
+np.random.seed(406373)
+
 # All the evaluations will be evaluated on MineRLObtainDiamondVectorObf-v0 environment
 MINERL_GYM_ENV = os.getenv('MINERL_GYM_ENV', 'MineRLObtainDiamondVectorObf-v0')
 MINERL_MAX_EVALUATION_EPISODES = int(os.getenv('MINERL_MAX_EVALUATION_EPISODES', 100))
