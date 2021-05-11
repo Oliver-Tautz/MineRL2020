@@ -21,11 +21,12 @@ coloredlogs.install(logging.DEBUG)
 from model import Model
 import torch
 import cv2
+from record_episode import EpisodeRecorder
 
-np.random.seed(406373)
+
 
 # All the evaluations will be evaluated on MineRLObtainDiamondVectorObf-v0 environment
-MINERL_GYM_ENV = os.getenv('MINERL_GYM_ENV', 'MineRLObtainDiamondVectorObf-v0')
+MINERL_GYM_ENV = os.getenv('MINERL_GYM_ENV', 'MineRLTreechopVectorObf-v0')
 MINERL_MAX_EVALUATION_EPISODES = int(os.getenv('MINERL_MAX_EVALUATION_EPISODES', 100))
 
 # Parallel testing/inference, **you can override** below value based on compute
@@ -159,21 +160,28 @@ class MineRLNetworkAgent(MineRLAgentBase):
         """
         # Some helpful constants from the environment.
         self.model = Model()
-        self.model.load_state_dict(torch.load("train/model.tm", map_location=device))
+        self.model.load_state_dict(torch.load("train/some_model.tm", map_location=device))
         # self.model.load_state_dict(torch.load("testing/m.tm", map_location=device))
         
         self.model.to(device)
 
 
-    def run_agent_on_episode(self, single_episode_env : Episode):
+    def run_agent_on_episode(self, single_episode_env : Episode,index):
         """Runs the agent on a SINGLE episode.
 
         Args:
             single_episode_env (Episode): The episode on which to run the agent.
         """
         reward_sum = 0
+        counter = 0
+        er = EpisodeRecorder()
+
+
+        max_steps = 0
+
         with torch.no_grad():
             obs = single_episode_env.reset()
+            er.record_frame(obs['pov'])
             done = False
             state = self.model.get_zero_state(1, device=device)
             s = torch.zeros((1,1,64), dtype=torch.float32, device=device)
@@ -193,15 +201,24 @@ class MineRLNetworkAgent(MineRLAgentBase):
                 s, state = self.model.sample(spatial, nonspatial, s, state, torch.zeros((1,1,64),dtype=torch.float32,device=device))
 
 
-                
+
+
+
                 for i in range(1):
                     obs,reward,done,_ = single_episode_env.step({"vector":s})
+                    er.record_frame(obs['pov'])
+
+                    counter+=1
+
                     reward_sum += reward
                     if reward > 0:
                         rewards.append(reward)
-                        print(reward_sum)
-                    if done:
+                    if done :
                         break
+                    if max_steps and counter > max_steps:
+                        done = True
+
+        er.save_vid('Original_Trained_Treechop_Obf/Original_Trained_Michael_Obf_Treechop{}.avi'.format(index))
         
         
 
@@ -237,16 +254,23 @@ def main():
 
     # Create the parallel envs (sequentially to prevent issues!)
     envs = [gym.make(MINERL_GYM_ENV) for _ in range(EVALUATION_THREAD_COUNT)]
+
+    for env in envs:
+        env.seed(406373)
+
     episodes_per_thread = [MINERL_MAX_EVALUATION_EPISODES // EVALUATION_THREAD_COUNT for _ in range(EVALUATION_THREAD_COUNT)]
     episodes_per_thread[-1] += MINERL_MAX_EVALUATION_EPISODES - EVALUATION_THREAD_COUNT *(MINERL_MAX_EVALUATION_EPISODES // EVALUATION_THREAD_COUNT)
     # A simple funciton to evaluate on episodes!
+
     def evaluate(i, env):
         print("[{}] Starting evaluator.".format(i))
+
         for i in range(episodes_per_thread[i]):
             try:
-                agent.run_agent_on_episode(Episode(env))
+                agent.run_agent_on_episode(Episode(env),i)
             except EpisodeDone:
                 print("[{}] Episode complete".format(i))
+
                 pass
     
     evaluator_threads = [threading.Thread(target=evaluate, args=(i, envs[i])) for i in range(EVALUATION_THREAD_COUNT)]

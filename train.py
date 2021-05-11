@@ -122,7 +122,7 @@ def train(model, mode, steps, loader, logger):
         
         if modcount >= steps/20:
             if ONLINE:
-                torch.save(model.state_dict(),"train/model.tm")
+                torch.save(model.state_dict(), "train/some_model.tm")
             else:
                 torch.save(model.state_dict(),f"testing/model_{count//int(steps/20)}.tm")
             modcount -= int(steps/20)
@@ -144,7 +144,7 @@ def train(model, mode, steps, loader, logger):
             if mode == "fit_selector":
                 torch.save(model.state_dict(),"train/model_fitted.tm")
             else:
-                torch.save(model.state_dict(),"train/model.tm")
+                torch.save(model.state_dict(), "train/some_model.tm")
 
 def main():
     # a bit of code that creates clearml logging (formerly trains) if clearml
@@ -185,12 +185,12 @@ def main():
     #summary(Model)
 
     if LOAD:
-        model.load_state_dict(torch.load("train/model.tm"))
+        model.load_state_dict(torch.load("train/some_model.tm"))
     model.cpu()
     print('Starting training!')
     train(model, "train", 150000000, loader, logger)
     print('training done!')
-    torch.save(model.state_dict(),"train/model.tm")
+    torch.save(model.state_dict(), "train/some_model.tm")
     print("ok", file=sys.stderr)
 
     loader.kill()
