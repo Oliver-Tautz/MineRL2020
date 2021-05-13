@@ -14,6 +14,7 @@ import gym
 import minerl
 import abc
 import numpy as np
+import random
 
 import coloredlogs
 coloredlogs.install(logging.DEBUG)
@@ -177,9 +178,14 @@ class MineRLNetworkAgent(MineRLAgentBase):
         er = EpisodeRecorder()
 
 
-        max_steps = 0
+        max_steps = 3000
+        seeds = [2, 12345, 45678, 303544, 744421, 816128, 406373, 99999, 88888, 76543,
+                 67345, 11342, 24337, 45547, 82666, 128939, 494668, 927113, 869989, 873766, 708928, 786039, 371309,
+                 281286]
 
         with torch.no_grad():
+            seed = random.sample(seeds,1)
+            single_episode_env.seed(seed)
             obs = single_episode_env.reset()
             er.record_frame(obs['pov'])
             done = False
@@ -218,7 +224,7 @@ class MineRLNetworkAgent(MineRLAgentBase):
                     if max_steps and counter > max_steps:
                         done = True
 
-        er.save_vid('Original_Trained_Treechop_Obf/Original_Trained_Michael_Obf_Treechop{}.avi'.format(index))
+        er.save_vid('Original_Trained_Treechop_Obf/Original_Trained_Michael_Obf_Treechop{}_seed={}.avi'.format(index,seed))
         
         
 
@@ -254,9 +260,11 @@ def main():
 
     # Create the parallel envs (sequentially to prevent issues!)
     envs = [gym.make(MINERL_GYM_ENV) for _ in range(EVALUATION_THREAD_COUNT)]
+    print(len(envs))
 
-    for env in envs:
-        env.seed(406373)
+
+
+
 
     episodes_per_thread = [MINERL_MAX_EVALUATION_EPISODES // EVALUATION_THREAD_COUNT for _ in range(EVALUATION_THREAD_COUNT)]
     episodes_per_thread[-1] += MINERL_MAX_EVALUATION_EPISODES - EVALUATION_THREAD_COUNT *(MINERL_MAX_EVALUATION_EPISODES // EVALUATION_THREAD_COUNT)

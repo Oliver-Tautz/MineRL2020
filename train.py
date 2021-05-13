@@ -159,10 +159,9 @@ def main():
     cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
     print("lets gooo", file=sys.stderr)
 
-    train_files = absolute_file_paths('data/MineRLObtainIronPickaxeVectorObf-v0')+\
-                  absolute_file_paths('data/MineRLObtainIronPickaxeVectorObf-v0')+\
-                  absolute_file_paths('data/MineRLTreechopVectorObf-v0')
 
+    train_files = absolute_file_paths('data/MineRLTreechopVectorObf-v0')
+   # train_files = absolute_file_paths('data/MineRLTreechop-v0')
     model = Model()
 
 
@@ -184,8 +183,8 @@ def main():
 
     #summary(Model)
 
-    if LOAD:
-        model.load_state_dict(torch.load("train/some_model.tm"))
+    #if LOAD:
+    #    model.load_state_dict(torch.load("train/some_model.tm"))
     model.cpu()
     print('Starting training!')
     train(model, "train", 150000000, loader, logger)

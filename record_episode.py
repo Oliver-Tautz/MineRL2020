@@ -30,7 +30,7 @@ class EpisodeRecorder():
     # filepath m,ust end in .avi!
     def save_vid(self,filepath):
         if self.frames:
-            out = cv2.VideoWriter(filepath, cv2.VideoWriter_fourcc(*'DIVX'), 60, self.frames[0].shape[0:2])
+            out = cv2.VideoWriter(filepath, cv2.VideoWriter_fourcc(*'DIVX'), 30, self.frames[0].shape[0:2])
             for frame in self.frames:
                 out.write(frame)
 

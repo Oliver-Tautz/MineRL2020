@@ -11,6 +11,10 @@ from kmeans import cached_kmeans
 from tqdm import tqdm
 from torch.nn.utils.rnn import pad_sequence
 
+#
+import matplotlib.pyplot as plt
+import numpy as np
+
 from queue import Queue
 
 class PPipeEnd:
@@ -40,8 +44,13 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
 
     files = cycle(files)
 
+    # added otautz
+    counter = 0
+
+
     while True:
         f = next(files)
+        print(type(f))
         
         try:
             d = DataPipeline._load_data_pyfunc(f, -1, None)
@@ -49,8 +58,46 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
             continue
         pipe.send("RESET")
         steps = 0
+
+        #pov,
         obs, act, reward, nextobs, done = d
         obs_screen = torch.tensor(obs["pov"], dtype=torch.float32).transpose(1,3).transpose(2,3)
+
+
+        ## added by otautz
+       #print('pov shape:',obs['pov'].shape)
+       #print('reward shape:', reward.shape)
+       #print('nextobs shape:', nextobs['pov'].shape)
+       #print('done shape:', done.shape)
+       #
+       #for key in act.keys():
+       #    print("{} shape: {}".format(key,act[key].shape))
+       #
+       #for key in obs.keys():
+       #    print("{} shape: {}".format(key,obs[key].shape))
+       #
+       #
+       #
+       #camera = act['camera']
+       #
+       #plt.hist(camera[:,0],'sqrt')
+       #plt.savefig('camera_action_hist/camera_action_hist_pitch_{}.pdf'.format(f.split('/')[-1]))
+       #plt.clf()
+       #
+       #plt.hist(camera[:,1],'sqrt')
+       #plt.savefig('camera_action_hist/camera_action_hist_yaw_{}.pdf'.format(f.split('/')[-1]))
+       #plt.clf()
+       #
+       #for i in  range(5):
+       #    if i in [0,1,3]:
+       #        pass
+         #       print('\n\n\n',d[i].keys(),'\n\n\n')
+
+           # print('\n\n\n', d[i], '\n\n\n')
+            #print('\n\n\n', type(d[i]), '\n\n\n')
+
+        ########################################
+
         obs_vector = torch.tensor(obs["vector"], dtype=torch.float32)
         flip_data = torch.ones((obs_vector.shape[0], 2), dtype=torch.float32)
 
