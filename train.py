@@ -7,6 +7,7 @@ import os
 import sys
 
 from tqdm import tqdm
+import cProfile as profile
 
 import gym
 import minerl
@@ -29,7 +30,7 @@ from kmeans import cached_kmeans
 
 # In ONLINE=True mode the code saves only the final version with early stopping,
 # in ONLINE=False it saves 20 intermediate versions during training.
-ONLINE = False
+ONLINE = True
 
 trains_loaded = True
 try:
@@ -72,6 +73,11 @@ def update_loss_dict(old, new):
 
 
 def train(model, mode, steps, loader, logger):
+
+    ## Profiler
+    pr = profile.Profile()
+    pr.disable()
+
     torch.set_num_threads(1)
     if mode != "fit_selector":
         optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-6)
@@ -91,17 +97,31 @@ def train(model, mode, steps, loader, logger):
     loss_dict = None
     modcount = 0
     print(int(steps/ BATCH_SIZE / SEQ_LEN))
-    for i in tqdm(range(int(steps/ BATCH_SIZE / SEQ_LEN))):
+    for i in tqdm(range(3)):#tqdm(range(int(steps/ BATCH_SIZE / SEQ_LEN))):
+
+        print('batchsize ',BATCH_SIZE)
+        print('sequence length ', SEQ_LEN)
         step+=1
         print(i)
         spatial, nonspatial, prev_action, act, _, _, hidden = loader.get_batch(BATCH_SIZE)
+
+        print('pov_shape: ',spatial.shape)
+        print('nonspatial_shape: ',nonspatial.shape)
+        print('act_shape: ',act.shape)
+
+
         count += BATCH_SIZE*SEQ_LEN
         modcount += BATCH_SIZE*SEQ_LEN
+
+        pr.enable()
+
         if mode != "pretrain":
             loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, torch.zeros(act.shape, dtype=torch.float32, device="cpu"), act)
         else:
             loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, act, act)
 
+        pr.disable()
+        pr.dump_stats('profile.pstat')
         loss_dict = update_loss_dict(loss_dict, ldict)
         loader.put_back(hidden)
 

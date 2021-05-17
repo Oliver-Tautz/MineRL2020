@@ -116,7 +116,14 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
 
         running = 1 - torch.tensor(done, dtype=torch.float32)
         rewards = torch.tensor(reward, dtype=torch.float32)
+        print('act_shape',act['vector'].shape)
         encoded = kmeans.predict(act["vector"])
+        print('encoded_shape',encoded.shape)
+        for i in range(10):
+            print(encoded[i])
+
+        print('biggest_action: ',np.max(encoded))
+        print('smallest_action: ',np.min(encoded))
         actions = torch.tensor(encoded, dtype=torch.int64)
         prev_action = torch.cat([torch.zeros((1,),dtype=torch.int64), actions[:-1]], dim=0)
         l = actions.shape[0]

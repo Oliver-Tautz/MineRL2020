@@ -4,6 +4,7 @@ from torch.nn import functional as F
 import torch.distributions as D
 import math
 from kmeans import cached_kmeans
+import cProfile as profile
 
 import numpy as np
 
@@ -26,6 +27,7 @@ class FixupResNetCNN(nn.Module):
             self.scale = nn.Parameter(torch.ones([depth, 1, 1]))
 
         def forward(self, x):
+            print('REsInput: ', x.shape)
             x = F.relu(x)
             out = x + self.bias1
             out = self.conv1(out)
@@ -35,6 +37,7 @@ class FixupResNetCNN(nn.Module):
             out = self.conv2(out)
             out = out * self.scale
             out = out + self.bias4
+            print('REsOutput: ', out.shape)
             return out + x
 
     def __init__(self, input_channels, double_channels=False):
@@ -62,6 +65,7 @@ class FixupResNetCNN(nn.Module):
         self.output_size = math.ceil(64 / 8) ** 2 * depth_in
 
     def forward(self, x):
+        print('Core_Input',x.shape)
         return self.conv_layers(x)
 
 
@@ -76,12 +80,19 @@ class InputProcessor(nn.Module):
     def forward(self, spatial, nonspatial):
         shape = spatial.shape
         spatial = spatial.view((shape[0]*shape[1],)+shape[2:])/255.0
+        print('pov before Core:', spatial.shape)
         spatial = self.conv_layers(spatial)
-
+        print('pov after Core:', spatial.shape)
         new_shape = spatial.shape
         spatial = spatial.view(shape[:2]+(-1,))
+        print('pov after reshape:', spatial.shape)
+        print('nonspatial before Core:', nonspatial.shape)
         nonspatial = self.nonspatial_reshape(nonspatial)
+        print('nonspatial after FC:', nonspatial.shape)
         spatial = self.spatial_reshape(spatial)
+        print('spatial after FC:', spatial.shape)
+
+        print('Core_out: ', torch.cat([spatial, nonspatial],dim=-1).shape)
 
         return torch.cat([spatial, nonspatial],dim=-1)
 
@@ -95,7 +106,11 @@ class Core(nn.Module):
         
     def forward(self, spatial, nonspatial, state):
         processed = self.input_proc.forward(spatial, nonspatial)
+        print('State0: ',state[0].shape)
+        print('State1: ',state[0].shape)
         lstm_output, new_state = self.lstm(processed, state)
+        print('lstm_out:',lstm_output.shape)
+        print('Core_out_total:',(lstm_output+processed).shape)
         return lstm_output+processed, new_state
 
 
@@ -120,9 +135,15 @@ class Model(nn.Module):
         pass
 
     def get_loss(self, spatial, nonspatial, prev_action, state, target, point):
+
         loss = nn.CrossEntropyLoss()
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
+        print('d shape: ',d.shape)
+        print('point shape: ',point.shape)
+        print('d_view_shape: ',d.view(-1, d.shape[-1]).shape)
+        print('point_view_shape: ',point.view(-1).shape)
         l1 = loss(d.view(-1, d.shape[-1]), point.view(-1))
+        print('l1 shape: ', l1.item())
         return l1, {"action":l1.item()}, state
 
     def sample(self, spatial, nonspatial, prev_action, state, target):
