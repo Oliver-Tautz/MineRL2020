@@ -139,7 +139,13 @@ def train(model, mode, steps, loader, logger):
         optimizer.step()
         optimizer.zero_grad()
         scheduler.step()
-        
+
+
+        print('count/(steps/20): ',count//int(steps/20))
+        print('count: ', count )
+        print('modcount: ', modcount)
+
+
         if modcount >= steps/20:
             if ONLINE:
                 torch.save(model.state_dict(), "train/some_model.tm")

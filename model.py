@@ -6,6 +6,8 @@ import math
 from kmeans import cached_kmeans
 import cProfile as profile
 
+from timeit import timeit
+
 import numpy as np
 
 class FixupResNetCNN(nn.Module):
@@ -105,9 +107,25 @@ class Core(nn.Module):
         self.lstm = nn.LSTM(1024, 1024, 1)
         
     def forward(self, spatial, nonspatial, state):
+
+        print("starting_timeit")
+
+        input_proc = self.input_proc
+        lstm=self.lstm
+
+        print('time_CNN:',timeit("processed = input_proc.forward(spatial, nonspatial)",number = 10,globals=locals()))
+
+
+
         processed = self.input_proc.forward(spatial, nonspatial)
+
+        print('time_lstm:',timeit("lstm_output, new_state = lstm(processed, state)",number = 10,globals=locals()))
+
+        print("finished_timeit")
+
         print('State0: ',state[0].shape)
         print('State1: ',state[0].shape)
+
         lstm_output, new_state = self.lstm(processed, state)
         print('lstm_out:',lstm_output.shape)
         print('Core_out_total:',(lstm_output+processed).shape)
