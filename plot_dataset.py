@@ -3,6 +3,8 @@ import minerl
 from collections import defaultdict
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
+import pickle
 
 def print_portions(camera_actions):
     pitch = camera_actions[:,0]
@@ -85,8 +87,8 @@ loader = minerl.data.make('MineRLTreechop-v0',data_dir='./data',num_workers=1)
 
 
 
-
-no_streams = 30
+# 210 max!
+no_streams = 300
 actions = defaultdict(lambda : [])
 
 # concats numpy arrays given in list.
@@ -118,7 +120,7 @@ def get_int_from_vector(int_to_array_dict,vector,zero_index):
 # and returns one hot encoded actions with ndim = no_discrete_actions.
 # If map_to_zero is True, infrequent actions will be mapped to the zero vector.
 
-def transform_actions(actions, no_discrete_actions=30, map_to_zero=True, camera_noise_threshhold=0.5):
+def transform_actions(actions, no_discrete_actions=50, map_to_zero=True, camera_noise_threshhold=0.5):
     pitch_positive, pitch_negative, yaw_positive, yaw_negative = discreticize_camera_action(actions['camera'],camera_noise_threshhold)
 
     actions['pitch_positive'] = pitch_positive
@@ -138,14 +140,14 @@ def transform_actions(actions, no_discrete_actions=30, map_to_zero=True, camera_
 
     # number of 0/1 values
     array_dimensionality = np.max(list(index_lookup.values()))+1
-    #print('array_dimensionality: ', array_dimensionality)
+    print('array_dimensionality: ', array_dimensionality)
     one_hot_encoding_size = 2**array_dimensionality
     #print('one_hot_dimensionality: ', one_hot_encoding_size)
 
 
 
     vectors = []
-    for i in range(no_sampled_actions):
+    for i in tqdm(range(no_sampled_actions),desc='get_action_vectors'):
         action_vector = np.zeros(array_dimensionality)
 
         for key in actions.keys():
@@ -184,9 +186,10 @@ def transform_actions(actions, no_discrete_actions=30, map_to_zero=True, camera_
     # print frequent actions...
     for action, count in frequent_uniques_and_counts:
         ixs= list((np.where(action==1)))[0]
+        action_string = ""
         for i in ixs:
-            print(key_lookup[i],'; ',end='')
-        print('\t',count)
+            action_string+= key_lookup[i] + ' & '
+        print("{:70s}\t{:5d}".format(action_string,count))
 
     mapped_vectors = []
     no_mapped = 0
@@ -194,7 +197,7 @@ def transform_actions(actions, no_discrete_actions=30, map_to_zero=True, camera_
 
 
     # This is pretty slow! make it work in np?
-    for x in X:
+    for x in tqdm(X,desc='map vectors'):
         if in_for_np_array(x,frequent_uniques):
             mapped_vectors.append(x)
         else:
@@ -214,10 +217,10 @@ def transform_actions(actions, no_discrete_actions=30, map_to_zero=True, camera_
 
     integer_values = []
 
-    for vec in mapped_vectors:
+    for vec in tqdm(mapped_vectors,desc='convert_to_int'):
         integer_values.append(get_int_from_vector(int_to_vector_dict,vec,zero_index))
 
-    print(len(integer_values))
+    return one_hot(integer_values,no_discrete_actions), int_to_vector_dict, key_lookup
 
 
 
@@ -258,7 +261,7 @@ def discreticize_camera_action(camera_actions,noise_threshhold):
     return pitch_positive,pitch_negative, yaw_positive, yaw_negative
 
 
-for f in (os.listdir('./data/MineRLTreechop-v0')):
+for f in tqdm(os.listdir('./data/MineRLTreechop-v0'),desc='loading'):
     d = loader._load_data_pyfunc('./data/MineRLTreechop-v0/{}'.format(f),-1,None)
     obs, act, reward, nextobs, done = d
 
@@ -288,5 +291,18 @@ print_portions(actions['camera'])
 
 #print('pitch_shape: ',pitch.shape,'\nyaw_shape:', yaw.shape)
 
-transform_actions(actions)
+X, int_to_vec, key_to_ix = transform_actions(actions)
 
+def save_obj(obj, name ):
+    with open('obj/'+ name + '.pkl', 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+def load_obj(name ):
+    with open('obj/' + name + '.pkl', 'rb') as f:
+        return pickle.load(f)
+
+save_obj(int_to_vec,'int_to_vec_dict')
+save_obj(key_to_ix,'key_to_index_dict')
+print(X.shape)
+print(int_to_vec)
+print(key_to_ix)
