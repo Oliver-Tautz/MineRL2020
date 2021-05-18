@@ -92,30 +92,60 @@ actions = defaultdict(lambda : [])
 # concats numpy arrays given in list.
 # works
 
+def one_hot(scalar_array,no_classes):
+    return np.eye(no_classes)[scalar_array]
 
-def map_actions(actions):
-    pitch, yaw = discreticize_camera_action(actions['camera'],1)
+def in_for_np_array(array,list_of_arrays):
+    in_list = False
 
-    actions['pitch'] = pitch
-    actions['yaw'] = yaw
-    no_actions = len(actions['pitch'])
+    for arr in list_of_arrays:
+        if np.array_equal(array,arr):
+            in_list = True
+    return in_list
+
+def get_int_from_vector(int_to_array_dict,vector,zero_index):
+
+    for i,vec in int_to_array_dict.items():
+        if np.array_equal(vec,vector):
+            return i
+
+    print("Warning! Not yet seen action converted to zero_vector.")
+    print(vector)
+    return zero_index
+
+
+# Takes dict of discrete actions from Treechop-v0 environment
+# and returns one hot encoded actions with ndim = no_discrete_actions.
+# If map_to_zero is True, infrequent actions will be mapped to the zero vector.
+
+def transform_actions(actions, no_discrete_actions=30, map_to_zero=True, camera_noise_threshhold=0.5):
+    pitch_positive, pitch_negative, yaw_positive, yaw_negative = discreticize_camera_action(actions['camera'],camera_noise_threshhold)
+
+    actions['pitch_positive'] = pitch_positive
+    actions['pitch_negative'] = pitch_negative
+    actions['yaw_positive'] = yaw_positive
+    actions['yaw_negative'] = yaw_negative
+    
+    no_sampled_actions = len(actions['pitch_positive'])
     actions.pop('camera')
 
 
     index_lookup = {key : ix for (ix,key) in enumerate(actions.keys())}
     key_lookup = dict(enumerate(actions.keys()))
 
-    print(index_lookup)
+    #print(index_lookup)
 
 
     # number of 0/1 values
     array_dimensionality = np.max(list(index_lookup.values()))+1
-    print('array_dimensionality: ', array_dimensionality)
+    #print('array_dimensionality: ', array_dimensionality)
     one_hot_encoding_size = 2**array_dimensionality
-    print('one_hot_dimensionality: ', one_hot_encoding_size)
+    #print('one_hot_dimensionality: ', one_hot_encoding_size)
+
+
 
     vectors = []
-    for i in range(no_actions):
+    for i in range(no_sampled_actions):
         action_vector = np.zeros(array_dimensionality)
 
         for key in actions.keys():
@@ -124,27 +154,73 @@ def map_actions(actions):
         vectors.append(action_vector)
 
     X = np.array(vectors)
-    print('means: ',np.mean(X,axis=0))
+    #print('means: ',np.mean(X,axis=0))
 
     unique, unique_counts = np.unique(X,axis=0,return_counts=True)
 
-    print(unique.shape)
-    print(unique_counts.shape)
+   # print(unique.shape)
+    #print(unique_counts.shape)
 
 
 
-    for action, count in sorted(zip(unique,unique_counts),key=lambda x: x[1]):
-        pass
-        #print(action,'\t',count)
 
 
-    frequent_uniques = list(sorted(zip(unique,unique_counts),key=lambda x: -x[1]))
 
-    for action, count in frequent_uniques:
+    frequent_uniques_and_counts = list(sorted(zip(unique,unique_counts),key=lambda x: -x[1]))[0:no_discrete_actions]
+
+
+
+
+
+
+    frequent_uniques = (list(map(lambda x:x[0],frequent_uniques_and_counts)))
+
+    zero_vector = np.zeros(X[0].shape)
+    zero_index = 0
+    # make sure zero vector is in actions ...
+    if not in_for_np_array(zero_vector,frequent_uniques):
+        frequent_uniques.insert(zero_index,zero_vector)
+
+    # print frequent actions...
+    for action, count in frequent_uniques_and_counts:
         ixs= list((np.where(action==1)))[0]
         for i in ixs:
             print(key_lookup[i],'; ',end='')
         print('\t',count)
+
+    mapped_vectors = []
+    no_mapped = 0
+    #print(frequent_uniques,X[0])
+
+
+    # This is pretty slow! make it work in np?
+    for x in X:
+        if in_for_np_array(x,frequent_uniques):
+            mapped_vectors.append(x)
+        else:
+            if map_to_zero:
+                mapped_vectors.append(np.zeros(x.shape))
+                no_mapped+=1
+            # TODO implement map to closest action
+            else:
+                pass
+
+
+    mapped_vectors=np.array(mapped_vectors)
+
+    print("{}% of actions mapped".format(no_mapped/no_sampled_actions))
+
+    int_to_vector_dict = dict(enumerate(frequent_uniques))
+
+    integer_values = []
+
+    for vec in mapped_vectors:
+        integer_values.append(get_int_from_vector(int_to_vector_dict,vec,zero_index))
+
+    print(len(integer_values))
+
+
+
 
 
 
@@ -157,13 +233,29 @@ def discreticize_camera_action(camera_actions,noise_threshhold):
     pitch = camera_actions[:,0]
     yaw   = camera_actions[:,1]
 
-    pitch[np.absolute(pitch) < noise_threshhold ] = 0
-    pitch[np.absolute(pitch) > noise_threshhold ] = 1
+    print(pitch.shape)
+   
+    pitch_positive = pitch.copy()
+    pitch_negative = pitch.copy()
+    
+    pitch_positive[pitch > noise_threshhold ] = 1
+    pitch_positive[pitch <= noise_threshhold] = 0
 
-    yaw[np.absolute(yaw) < noise_threshhold ] = 0
-    yaw[np.absolute(yaw) > noise_threshhold ] = 1
+    pitch_negative[pitch < -noise_threshhold ] = 1
+    pitch_negative[pitch >= -noise_threshhold ] = 0
 
-    return pitch, yaw
+    yaw_positive = yaw.copy()
+    yaw_negative = yaw.copy()
+
+    yaw_positive[yaw > noise_threshhold] = 1
+    yaw_positive[yaw <= noise_threshhold] = 0
+
+    yaw_negative[yaw < -noise_threshhold] = 1
+    yaw_negative[yaw >= -noise_threshhold] = 0
+
+    print(np.sum(pitch_positive),np.sum(pitch_negative), np.sum(yaw_positive), np.sum(yaw_negative))
+
+    return pitch_positive,pitch_negative, yaw_positive, yaw_negative
 
 
 for f in (os.listdir('./data/MineRLTreechop-v0')):
@@ -190,11 +282,11 @@ for key in actions.keys():
 
 camera_actions = actions['camera']
 print_portions(actions['camera'])
-plot_hists((actions['camera']))
+#plot_hists((actions['camera']))
 
-pitch, yaw = discreticize_camera_action(actions['camera'], 0.2)
+#pitch, yaw = discreticize_camera_action(actions['camera'], 0.2)
 
-print('pitch_shape: ',pitch.shape,'\nyaw_shape:', yaw.shape)
+#print('pitch_shape: ',pitch.shape,'\nyaw_shape:', yaw.shape)
 
-map_actions(actions)
+transform_actions(actions)
 
