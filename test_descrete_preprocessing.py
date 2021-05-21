@@ -123,7 +123,7 @@ print_portions(actions['camera'])
 
 #print('pitch_shape: ',pitch.shape,'\nyaw_shape:', yaw.shape)
 
-from descrete_actions_preprocessing import transform_actions_to_onehot, save_frequent_actions_and_mapping,transform_onehot_to_actions
+from descrete_actions_transform import transform_actions_to_onehot, save_frequent_actions_and_mapping,transform_onehot_to_actions
 
 
 
