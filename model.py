@@ -77,7 +77,7 @@ class InputProcessor(nn.Module):
         super().__init__()
         self.conv_layers = FixupResNetCNN(3,double_channels=True)
         self.spatial_reshape = nn.Sequential(nn.Linear(128*8*8, 896),nn.ReLU(),nn.LayerNorm(896))
-        self.nonspatial_reshape = nn.Sequential(nn.Linear(66,128),nn.ReLU(),nn.LayerNorm(128))
+        self.nonspatial_reshape = nn.Sequential(nn.Linear(32,128),nn.ReLU(),nn.LayerNorm(128))
 
     def forward(self, spatial, nonspatial):
         shape = spatial.shape
@@ -113,15 +113,15 @@ class Core(nn.Module):
         input_proc = self.input_proc
         lstm=self.lstm
 
-        print('time_CNN:',timeit("processed = input_proc.forward(spatial, nonspatial)",number = 10,globals=locals()))
+#        print('time_CNN:',timeit("processed = input_proc.forward(spatial, nonspatial)",number = 10,globals=locals()))
 
 
 
         processed = self.input_proc.forward(spatial, nonspatial)
 
-        print('time_lstm:',timeit("lstm_output, new_state = lstm(processed, state)",number = 10,globals=locals()))
+        #print('time_lstm:',timeit("lstm_output, new_state = lstm(processed, state)",number = 10,globals=locals()))
 
-        print("finished_timeit")
+        #print("finished_timeit")
 
         print('State0: ',state[0].shape)
         print('State1: ',state[0].shape)
@@ -154,12 +154,17 @@ class Model(nn.Module):
 
     def get_loss(self, spatial, nonspatial, prev_action, state, target, point):
 
+        point = torch.tensor(point,dtype=torch.long)
+
         loss = nn.CrossEntropyLoss()
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
         print('d shape: ',d.shape)
         print('point shape: ',point.shape)
         print('d_view_shape: ',d.view(-1, d.shape[-1]).shape)
         print('point_view_shape: ',point.view(-1).shape)
+
+        print(d.shape)
+        print()
         l1 = loss(d.view(-1, d.shape[-1]), point.view(-1))
         print('l1 shape: ', l1.item())
         return l1, {"action":l1.item()}, state
