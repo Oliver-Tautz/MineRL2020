@@ -30,7 +30,7 @@ from kmeans import cached_kmeans
 
 # In ONLINE=True mode the code saves only the final version with early stopping,
 # in ONLINE=False it saves 20 intermediate versions during training.
-ONLINE = True
+ONLINE = False
 
 trains_loaded = True
 try:
@@ -97,7 +97,7 @@ def train(model, mode, steps, loader, logger):
     loss_dict = None
     modcount = 0
     print(int(steps/ BATCH_SIZE / SEQ_LEN))
-    for i in tqdm(range(3)):#tqdm(range(int(steps/ BATCH_SIZE / SEQ_LEN))):
+    for i in tqdm(range(int(steps/ BATCH_SIZE / SEQ_LEN))):
 
         print('batchsize ',BATCH_SIZE)
         print('sequence length ', SEQ_LEN)
@@ -198,7 +198,7 @@ def main():
 
 
 
-    loader = BatchSeqLoader(1, train_files, SEQ_LEN, model)
+    loader = BatchSeqLoader(16, train_files, SEQ_LEN, model)
     spatial, nonspatial, prev_action, act, hidden = loader.get_batch(BATCH_SIZE)
 
     #print(spatial.shape)
