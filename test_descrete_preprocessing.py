@@ -138,6 +138,7 @@ def load_obj(name ):
 
 # map to zero performs better.
 #int_to_vec, key_to_ix = save_frequent_actions_and_mapping(actions)
+
 def test(map_to_zero):
     X = transform_actions_to_onehot(actions,map_to_zero=map_to_zero)
 

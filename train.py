@@ -103,7 +103,7 @@ def train(model, mode, steps, loader, logger):
         print('sequence length ', SEQ_LEN)
         step+=1
         print(i)
-        spatial, nonspatial, prev_action, act, _, _, hidden = loader.get_batch(BATCH_SIZE)
+        spatial, nonspatial, prev_action, act,  hidden = loader.get_batch(BATCH_SIZE)
 
         print('pov_shape: ',spatial.shape)
         print('nonspatial_shape: ',nonspatial.shape)
@@ -186,8 +186,8 @@ def main():
     print("lets gooo", file=sys.stderr)
 
 
-    train_files = absolute_file_paths('data/MineRLTreechopVectorObf-v0')
-   # train_files = absolute_file_paths('data/MineRLTreechop-v0')
+    #train_files = absolute_file_paths('data/MineRLTreechopVectorObf-v0')
+    train_files = absolute_file_paths('data/MineRLTreechop-v0')
     model = Model()
 
 
@@ -198,8 +198,8 @@ def main():
 
 
 
-    loader = BatchSeqLoader(16, train_files, SEQ_LEN, model)
-    spatial, nonspatial, prev_action, act, _, _, hidden = loader.get_batch(BATCH_SIZE)
+    loader = BatchSeqLoader(1, train_files, SEQ_LEN, model)
+    spatial, nonspatial, prev_action, act, hidden = loader.get_batch(BATCH_SIZE)
 
     #print(spatial.shape)
     #print(nonspatial.shape)
