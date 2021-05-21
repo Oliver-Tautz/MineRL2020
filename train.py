@@ -33,6 +33,7 @@ from kmeans import cached_kmeans
 ONLINE = False
 
 trains_loaded = True
+
 try:
     from clearml import Task
 except:
@@ -156,7 +157,7 @@ def train(model, mode, steps, loader, logger):
                 if count//int(steps/20) == 14:
                     break
 
-        if step % 40 == 0:
+        if step % 5 == 0:
             print(losssum, count, count/(time()-t0), file=sys.stderr)
             if step > 50 and trains_loaded and not ONLINE:
                 for k in loss_dict:

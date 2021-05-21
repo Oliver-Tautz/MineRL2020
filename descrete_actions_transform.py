@@ -197,7 +197,7 @@ def transform_actions_to_onehot(actions, map_to_zero=True, camera_noise_threshho
     # print('one_hot_dimensionality: ', one_hot_encoding_size)
 
     vectors = []
-    for i in tqdm(range(no_sampled_actions), desc='get_action_vectors'):
+    for i in (range(no_sampled_actions)):
         action_vector = np.zeros(array_dimensionality)
 
         for key in actions.keys():
@@ -223,7 +223,7 @@ def transform_actions_to_onehot(actions, map_to_zero=True, camera_noise_threshho
     # print(frequent_uniques,X[0])
 
     # This is pretty slow! make it work in np?
-    for x in tqdm(X, desc='map vectors'):
+    for x in (X):
         if in_for_np_array(x, frequent_uniques):
             mapped_vectors.append(x)
         else:
@@ -250,7 +250,7 @@ def transform_actions_to_onehot(actions, map_to_zero=True, camera_noise_threshho
 
     integer_values = []
 
-    for vec in tqdm(mapped_vectors, desc='convert_to_int'):
+    for vec in (mapped_vectors):
         integer_values.append(get_int_from_vector(int_to_vector_dict, vec, zero_index))
 
     return int_to_one_hot(integer_values, no_discrete_actions)
