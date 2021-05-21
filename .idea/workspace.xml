@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="finished action-&gt;onehot, saved mappings in pickle">
-      <change afterPath="$PROJECT_DIR$/descrete_actions_preprocessing.py" afterDir="false" />
+    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data" beforeDir="false" afterPath="$PROJECT_DIR$/data" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/key_to_index_dict.pkl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/plot_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_descrete_preprocessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/loader.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +36,7 @@
     <setting file="file://$PROJECT_DIR$/../Minecraft72/venv/lib/python3.9/site-packages/torch/nn/modules/container.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/../Minecraft72/venv/lib/python3.9/site-packages/minerl/data/data_pipeline.py" root0="SKIP_INSPECTION" />
     <setting file="file:///usr/lib/python3.9/timeit.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/descrete_actions_preprocessing.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/descrete_actions_transform.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/../Minecraft72/venv/lib/python3.9/site-packages/torch/autograd/__init__.py" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/train.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../Minecraft72/venv/lib/python3.9/site-packages/minerl/data/__init__.py" root0="SKIP_INSPECTION" />
@@ -71,7 +67,7 @@
       <recent name="$PROJECT_DIR$/train" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test_descrete_preprocessing">
+  <component name="RunManager" selected="Python.train">
     <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -145,8 +141,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.test_descrete_preprocessing" />
         <item itemvalue="Python.train" />
+        <item itemvalue="Python.test_descrete_preprocessing" />
         <item itemvalue="Python.test" />
       </list>
     </recent_temporary>
@@ -224,13 +220,35 @@
       <option name="project" value="LOCAL" />
       <updated>1621354242466</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="finished onehot-&gt;action + testing.">
+      <created>1621581393329</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1621581393329</updated>
+    </task>
+    <task id="LOCAL-00011" summary="rename">
+      <created>1621581450311</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1621581450311</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Not working yet">
+      <created>1621588483725</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1621588483725</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="SHOW_UNVERSIONED_FILES_WHILE_COMMIT" value="false" />
     <MESSAGE value="added symlink." />
     <MESSAGE value="port to cpu-device." />
     <MESSAGE value="add model" />
@@ -240,7 +258,10 @@
     <MESSAGE value="timeit and plot hists." />
     <MESSAGE value="Almost finished action-&gt;onehot" />
     <MESSAGE value="finished action-&gt;onehot, saved mappings in pickle" />
-    <option name="LAST_COMMIT_MESSAGE" value="finished action-&gt;onehot, saved mappings in pickle" />
+    <MESSAGE value="finished onehot-&gt;action + testing." />
+    <MESSAGE value="rename" />
+    <MESSAGE value="Not working yet" />
+    <option name="LAST_COMMIT_MESSAGE" value="Not working yet" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -269,6 +290,21 @@
           <url>file://$PROJECT_DIR$/model.py</url>
           <line>165</line>
           <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/loader.py</url>
+          <line>239</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>200</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/loader.py</url>
+          <line>255</line>
+          <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

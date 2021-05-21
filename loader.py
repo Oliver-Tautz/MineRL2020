@@ -136,7 +136,7 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
 
 
         #prev_action = torch.cat([torch.zeros((1,), dtype=torch.int64), actions[:-1]], dim=0)
-        prev_action = actions
+        prev_action = torch.tensor(actions,dtype=torch.float32)
 
         l = actions.shape[0]
         for i in range(0, l, batch_size):
@@ -255,8 +255,9 @@ class BatchSeqLoader():
         data = list(zip(*data))
         output = []
         for d in data[:-1]:
-            padded = pad_sequence(d).cpu()
+
             print(d[0].shape)
+            padded = pad_sequence(d).cpu()
             print(padded.shape)
             output.append(padded)
 
