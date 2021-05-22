@@ -26,6 +26,7 @@ from time import time
 from loader import BatchSeqLoader, absolute_file_paths
 from math import sqrt
 from kmeans import cached_kmeans
+from simple_logger import SimpleLogger
 
 
 # In ONLINE=True mode the code saves only the final version with early stopping,
@@ -98,6 +99,8 @@ def train(model, mode, steps, loader, logger):
     loss_dict = None
     modcount = 0
     print(int(steps/ BATCH_SIZE / SEQ_LEN))
+    simple_logger = SimpleLogger("loss_csv/{}.csv".format(sys.argv[1]),['step','loss','grad_norm','learning_rate'])
+
     for i in tqdm(range(int(steps/ BATCH_SIZE / SEQ_LEN))):
 
         print('batchsize ',BATCH_SIZE)
@@ -157,14 +160,16 @@ def train(model, mode, steps, loader, logger):
                 if count//int(steps/20) == 14:
                     break
 
-        if step % 5 == 0:
+        if step % 40 == 0:
             print(losssum, count, count/(time()-t0), file=sys.stderr)
-            if step > 50 and trains_loaded and not ONLINE:
+            if trains_loaded and not ONLINE:
                 for k in loss_dict:
                     logger.report_scalar(title='Training_'+mode, series='loss_'+k, value=loss_dict[k]/40, iteration=int(count)) 
                 logger.report_scalar(title='Training_'+mode, series='loss', value=losssum/40, iteration=int(count))
                 logger.report_scalar(title='Training_'+mode, series='grad_norm', value=gradsum/40, iteration=int(count))
                 logger.report_scalar(title='Training_'+mode, series='learning_rate', value=float(optimizer.param_groups[0]["lr"]), iteration=int(count))
+
+                simple_logger.log([step,losssum/40,gradsum/40,float(optimizer.param_groups[0]["lr"])])
             losssum = 0
             gradsum = 0
             loss_dict = None
