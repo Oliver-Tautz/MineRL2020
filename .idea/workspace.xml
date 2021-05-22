@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/descrete_actions_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/descrete_actions_transform.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/key_to_index_dict.pkl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_descrete_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_descrete_preprocessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/loader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -200,7 +199,28 @@
       <option name="project" value="LOCAL" />
       <updated>1621688085276</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="change pickle settings for support.">
+      <created>1621688558999</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1621688558999</updated>
+    </task>
+    <task id="LOCAL-00010" summary="added new files.">
+      <created>1621688611865</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1621688611865</updated>
+    </task>
+    <task id="LOCAL-00011" summary="added logs folder">
+      <created>1621688690940</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1621688690940</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -210,7 +230,10 @@
     <MESSAGE value="remove kmeans." />
     <MESSAGE value="nvm, adding kmeans to git." />
     <MESSAGE value="Also added translation dicts." />
-    <option name="LAST_COMMIT_MESSAGE" value="Also added translation dicts." />
+    <MESSAGE value="change pickle settings for support." />
+    <MESSAGE value="added new files." />
+    <MESSAGE value="added logs folder" />
+    <option name="LAST_COMMIT_MESSAGE" value="added logs folder" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

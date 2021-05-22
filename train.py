@@ -217,7 +217,7 @@ def main():
 
     #if LOAD:
     #    model.load_state_dict(torch.load("train/some_model.tm"))
-    model.cpu()
+    model.cuda()
     print('Starting training!')
     train(model, "train", 150000000, loader, logger)
     print('training done!')

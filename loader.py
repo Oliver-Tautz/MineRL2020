@@ -169,7 +169,7 @@ class ReplayRoller():
         self.data = []
         self.hidden = self.model.get_zero_state(1)
         # print(self.hidden)
-        self.hidden = (self.hidden[0].cpu(), self.hidden[1].cpu())
+        self.hidden = (self.hidden[0].cuda(), self.hidden[1].cuda())
         self.pipe_my, pipe_other = pseudo_pipe()
         self.files = files_queue
         self.loader = mp.Thread(target=loader, args=(self.files, pipe_other, self.sem, self.in_sem, self.batch_size))
@@ -185,7 +185,7 @@ class ReplayRoller():
 
         while data == "RESET":
             self.hidden = self.model.get_zero_state(1)
-            self.hidden = (self.hidden[0].cpu(), self.hidden[1].cpu())
+            self.hidden = (self.hidden[0].cuda(), self.hidden[1].cuda())
             data = self.pipe_my.recv()
 
         return data + (self.hidden,)
@@ -257,7 +257,7 @@ class BatchSeqLoader():
         for d in data[:-1]:
 
             print(d[0].shape)
-            padded = pad_sequence(d).cpu()
+            padded = pad_sequence(d).cuda()
             print(padded.shape)
             output.append(padded)
 

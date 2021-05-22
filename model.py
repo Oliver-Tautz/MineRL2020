@@ -142,7 +142,7 @@ class Model(nn.Module):
         self.core = Core()
         self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024, 120))
 
-    def get_zero_state(self, batch_size, device="cpu"):
+    def get_zero_state(self, batch_size, device="cuda"):
         return (torch.zeros((1, batch_size, 1024), device=device), torch.zeros((1, batch_size, 1024), device=device))
 
     def compute_front(self, spatial, nonspatial, state):
@@ -181,5 +181,5 @@ class Model(nn.Module):
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
         dist = D.Categorical(logits = d)
         s = dist.sample()
-        s = s.squeeze().cpu().numpy()
+        s = s.squeeze().cuda().numpy()
         return self.kmeans.cluster_centers_[s], state
