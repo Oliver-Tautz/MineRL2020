@@ -76,8 +76,8 @@ class InputProcessor(nn.Module):
     def __init__(self):
         super().__init__()
         self.conv_layers = FixupResNetCNN(3,double_channels=True)
-        self.spatial_reshape = nn.Sequential(nn.Linear(128*8*8, 896),nn.ReLU(),nn.LayerNorm(896))
-        self.nonspatial_reshape = nn.Sequential(nn.Linear(32,128),nn.ReLU(),nn.LayerNorm(128))
+        self.spatial_reshape = nn.Sequential(nn.Linear(128*8*8, 1024),nn.ReLU(),nn.LayerNorm(1024))
+        #self.nonspatial_reshape = nn.Sequential(nn.Linear(32,128),nn.ReLU(),nn.LayerNorm(128))
 
     def forward(self, spatial, nonspatial):
         shape = spatial.shape
@@ -89,14 +89,14 @@ class InputProcessor(nn.Module):
         spatial = spatial.view(shape[:2]+(-1,))
         print('pov after reshape:', spatial.shape)
         print('nonspatial before Core:', nonspatial.shape)
-        nonspatial = self.nonspatial_reshape(nonspatial)
+        #nonspatial = self.nonspatial_reshape(nonspatial)
         print('nonspatial after FC:', nonspatial.shape)
         spatial = self.spatial_reshape(spatial)
         print('spatial after FC:', spatial.shape)
 
         print('Core_out: ', torch.cat([spatial, nonspatial],dim=-1).shape)
 
-        return torch.cat([spatial, nonspatial],dim=-1)
+        return spatial
 
 
 class Core(nn.Module):
@@ -110,8 +110,7 @@ class Core(nn.Module):
 
         print("starting_timeit")
 
-        input_proc = self.input_proc
-        lstm=self.lstm
+
 
 #        print('time_CNN:',timeit("processed = input_proc.forward(spatial, nonspatial)",number = 10,globals=locals()))
 
@@ -154,7 +153,7 @@ class Model(nn.Module):
 
     def get_loss(self, spatial, nonspatial, prev_action, state, target, point):
 
-        point = torch.tensor(point,dtype=torch.long)
+        point = point.long()
 
         loss = nn.CrossEntropyLoss()
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
