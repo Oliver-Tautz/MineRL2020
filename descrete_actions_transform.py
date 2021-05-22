@@ -16,7 +16,7 @@ camera_noise_threshhold = 0.5
 # save to pkl
 def save_obj(obj, name):
     with open('obj/' + name + '.pkl', 'wb') as f:
-        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(obj, f, 0)
 
 
 # load from pkl
