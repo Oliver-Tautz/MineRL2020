@@ -188,7 +188,7 @@ def main():
         logger = None
 
     os.makedirs("train", exist_ok=True)
-    #cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
+    cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
     print("lets gooo", file=sys.stderr)
 
 
