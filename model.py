@@ -73,6 +73,9 @@ class FixupResNetCNN(nn.Module):
 
 class InputProcessor(nn.Module):
 
+# TODO make this work for arbitrary nonspati shape.
+# Use Extra None Case. Use (1024-nonspatialsize) for spatial out.
+
     def __init__(self):
         super().__init__()
         self.conv_layers = FixupResNetCNN(3,double_channels=True)
