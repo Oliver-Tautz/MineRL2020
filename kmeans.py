@@ -104,11 +104,11 @@ def _do_kmeans(env_id, n_clusters, random_state, subtask_reward_max,
 def _save_kmeans_result_cache(kmeans, filepath):
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     joblib.dump(kmeans, filepath)
-    logger.info(f'saved kmeans {filepath}')
+    logger.info('saved kmeans {}'.format(filepath))
 
 
 def _load_kmeans_result_cache(filepath):
     if not os.path.exists(filepath):
         raise _KMeansCacheNotFound
-    logger.debug(f'loading kmeans {filepath}')
+    logger.debug('loading kmeans {}'.format(filepath))
     return joblib.load(filepath)
