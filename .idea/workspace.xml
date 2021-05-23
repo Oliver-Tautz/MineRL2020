@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
-    </list>
+    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -254,7 +252,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621757189398</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="revert revert change">
+      <created>1621757541275</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1621757541276</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -271,7 +276,8 @@
     <MESSAGE value="merge some stupid stuff" />
     <MESSAGE value="correct python 3.9 syntax AHRG" />
     <MESSAGE value="revert change." />
-    <option name="LAST_COMMIT_MESSAGE" value="revert change." />
+    <MESSAGE value="revert revert change" />
+    <option name="LAST_COMMIT_MESSAGE" value="revert revert change" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

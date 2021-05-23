@@ -60,7 +60,7 @@ def cached_kmeans(cache_dir, env_id, n_clusters=default_n, random_state=default_
                            maxlen_each, name_subtask_reward_max)
         else:
             filename = 'kmeans{}.joblib'.format(name_subtask_reward_max)
-        filepath = os.path.join(cache_dir, env_id, f'n_clusters_{n_clusters}', f'random_state_{random_state}', filename)
+        filepath = os.path.join(cache_dir, env_id, 'n_clusters_{}'.format(n_clusters), 'random_state_{}'.format(random_state), filename)
         try:
             kmeans = _load_kmeans_result_cache(filepath)
             logger.info('found kmeans cache')
