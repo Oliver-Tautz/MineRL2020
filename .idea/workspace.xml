@@ -123,9 +123,9 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.train" />
       <item itemvalue="Python.test" />
       <item itemvalue="Python.test_descrete_preprocessing" />
+      <item itemvalue="Python.train" />
     </list>
     <recent_temporary>
       <list>
