@@ -247,7 +247,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621756924773</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="revert change.">
+      <created>1621757189398</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1621757189398</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -263,7 +270,8 @@
     <MESSAGE value="add option for short runs." />
     <MESSAGE value="merge some stupid stuff" />
     <MESSAGE value="correct python 3.9 syntax AHRG" />
-    <option name="LAST_COMMIT_MESSAGE" value="correct python 3.9 syntax AHRG" />
+    <MESSAGE value="revert change." />
+    <option name="LAST_COMMIT_MESSAGE" value="revert change." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
