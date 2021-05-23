@@ -160,7 +160,7 @@ def train(model, mode, steps, loader, logger):
             if ONLINE:
                 torch.save(model.state_dict(), "train/some_model.tm")
             else:
-                torch.save(model.state_dict(),"testing/model_{}.tm".format(count//int(steps/20)))
+                torch.save(model.state_dict(),f"testing/model_{count//int(steps/20)}.tm")
             modcount -= int(steps/20)
             if ONLINE:
                 if count//int(steps/20) == 14:

@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -241,7 +240,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621756667714</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="correct python 3.9 syntax AHRG">
+      <created>1621756924773</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1621756924773</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -256,7 +262,8 @@
     <MESSAGE value="added logs folder" />
     <MESSAGE value="add option for short runs." />
     <MESSAGE value="merge some stupid stuff" />
-    <option name="LAST_COMMIT_MESSAGE" value="merge some stupid stuff" />
+    <MESSAGE value="correct python 3.9 syntax AHRG" />
+    <option name="LAST_COMMIT_MESSAGE" value="correct python 3.9 syntax AHRG" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
