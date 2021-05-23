@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="" />
+    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/kmeans.py" beforeDir="false" afterPath="$PROJECT_DIR$/kmeans.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -259,7 +261,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621757541276</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="python 3.5 ;(">
+      <created>1621758164433</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1621758164433</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -277,7 +286,8 @@
     <MESSAGE value="correct python 3.9 syntax AHRG" />
     <MESSAGE value="revert change." />
     <MESSAGE value="revert revert change" />
-    <option name="LAST_COMMIT_MESSAGE" value="revert revert change" />
+    <MESSAGE value="python 3.5 ;(" />
+    <option name="LAST_COMMIT_MESSAGE" value="python 3.5 ;(" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
