@@ -104,7 +104,7 @@ def train(model, mode, steps, loader, logger):
 
     no_loops = range(int(steps/ BATCH_SIZE / SEQ_LEN))
     if sys.argv[2]:
-        no_loops = range(sys.argv[2])
+        no_loops = range(int(sys.argv[2]))
 
     for i in tqdm(no_loops):
 
