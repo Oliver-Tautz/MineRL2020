@@ -93,10 +93,10 @@ def _do_kmeans(env_id, n_clusters, random_state, subtask_reward_max,
         act_vectors.append(act['vector'])
     acts = np.concatenate(act_vectors).reshape(-1, 64)
 
-    logger.debug(f'loading data... done.')
-    logger.debug(f'executing keamns...')
+    logger.debug('loading data... done.')
+    logger.debug('executing keamns...')
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state).fit(acts)
-    logger.debug(f'executing keamns... done.')
+    logger.debug('executing keamns... done.')
     return kmeans
 
 
