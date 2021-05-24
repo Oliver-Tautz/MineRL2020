@@ -102,11 +102,11 @@ def train(model, mode, steps, loader, logger):
     simple_logger = SimpleLogger("loss_csv/{}.csv".format(sys.argv[1]),['step','loss','grad_norm','learning_rate'])
 
 
-    no_loops = range(int(steps/ BATCH_SIZE / SEQ_LEN))
-    if sys.argv[2]:
-        no_loops = range(int(sys.argv[2]))
+    #no_loops = range(int(steps/ BATCH_SIZE / SEQ_LEN))
+    #if sys.argv[2]:
+    #    no_loops = range(int(sys.argv[2]))
 
-    for i in tqdm(no_loops):
+    for i in tqdm(range(int(steps/ BATCH_SIZE / SEQ_LEN))):
 
 
         print('batchsize ',BATCH_SIZE)
