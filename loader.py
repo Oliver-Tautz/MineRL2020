@@ -125,7 +125,7 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
 
         running = 1 - torch.tensor(done, dtype=torch.float32)
         rewards = torch.tensor(reward, dtype=torch.float32)
-        print('act_shape', actions.shape)
+       # print('act_shape', actions.shape)
 
         # no encoding needed
         # encoded = kmeans.predict(act["vector"])
@@ -266,12 +266,10 @@ class BatchSeqLoader():
         output = []
         for d in data[:-1]:
 
-            print(d[0].shape)
             if deviceStr == 'cuda':
                 padded = pad_sequence(d).cuda()
             else:
                 padded = pad_sequence(d).cpu()
-            print(padded.shape)
             output.append(padded)
 
         return output + [self.batch_lstm(data[-1])]

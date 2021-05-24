@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/descrete_actions_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/descrete_actions_transform.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/loader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simple_logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/simple_logger.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
@@ -315,8 +313,18 @@
       <option name="project" value="LOCAL" />
       <updated>1621846010714</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="make printing optional, very dirty. Make cuda and cpu viable, also dirty.">
+      <created>1621850989634</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1621850989634</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added symlink." />
@@ -336,7 +344,8 @@
     <MESSAGE value="python 3.5 ;(" />
     <MESSAGE value="fix" />
     <MESSAGE value="make printing optional. Dirty implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="make printing optional. Dirty implementation" />
+    <MESSAGE value="make printing optional, very dirty. Make cuda and cpu viable, also dirty." />
+    <option name="LAST_COMMIT_MESSAGE" value="make printing optional, very dirty. Make cuda and cpu viable, also dirty." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -12,6 +12,7 @@ class SimpleLogger():
         self.csv_file= open(filename, 'w', newline='\n')
         self.writer=csv.DictWriter(self.csv_file, colnames, delimiter=';')
         self.writer.writeheader()
+        print("writing header!")
 
 
     def log(self,values):

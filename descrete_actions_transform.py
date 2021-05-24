@@ -198,7 +198,7 @@ def transform_actions_to_onehot(actions, map_to_zero=True, camera_noise_threshho
 
     # number of 0/1 values
     array_dimensionality = np.max(list(index_lookup.values())) + 1
-    print('array_dimensionality: ', array_dimensionality)
+    verb_print('array_dimensionality: ', array_dimensionality)
     one_hot_encoding_size = 2 ** array_dimensionality
     # print('one_hot_dimensionality: ', one_hot_encoding_size)
 
@@ -250,7 +250,7 @@ def transform_actions_to_onehot(actions, map_to_zero=True, camera_noise_threshho
 
     mapped_vectors = np.array(mapped_vectors)
 
-    print("{}% of actions mapped".format(no_mapped / no_sampled_actions))
+    verb_print("{}% of actions mapped".format(no_mapped / no_sampled_actions))
 
     int_to_vector_dict = dict(enumerate(frequent_uniques))
 

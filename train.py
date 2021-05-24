@@ -37,6 +37,7 @@ trains_loaded = True
 verb=False
 
 def verb_print(*strings):
+    global verb
     if verb:
         print(strings)
 
@@ -106,7 +107,6 @@ def train(model, mode, steps, loader, logger):
     gradsum = 0
     loss_dict = None
     modcount = 0
-    print(int(steps/ BATCH_SIZE / SEQ_LEN))
     simple_logger = SimpleLogger("loss_csv/{}.csv".format(sys.argv[1]),['step','loss','grad_norm','learning_rate'])
 
 
@@ -156,9 +156,9 @@ def train(model, mode, steps, loader, logger):
         scheduler.step()
 
 
-        print('count/(steps/20): ',count//int(steps/20))
-        print('count: ', count )
-        print('modcount: ', modcount)
+        #print('count/(steps/20): ',count//int(steps/20))
+        #print('count: ', count )
+        #print('modcount: ', modcount)
 
 
         if modcount >= steps/20:
@@ -169,6 +169,8 @@ def train(model, mode, steps, loader, logger):
                 torch.save(model.state_dict(),"testing/model_{}.tm".format(count//int(steps/20)))
 
             modcount -= int(steps/20)
+
+            # What is this?!
             if ONLINE:
                 if count//int(steps/20) == 14:
                     break
