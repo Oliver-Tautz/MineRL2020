@@ -34,6 +34,14 @@ from simple_logger import SimpleLogger
 ONLINE = True
 
 trains_loaded = True
+verb=False
+
+def verb_print(*strings):
+    if verb:
+        print(strings)
+
+deviceStr = "cuda" if torch.cuda.is_available() else "cpu"
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 try:
     from clearml import Task
@@ -103,18 +111,18 @@ def train(model, mode, steps, loader, logger):
 
 
 
-    for i in range(int(steps/ BATCH_SIZE / SEQ_LEN)):
+    for i in tqdm(range(int(steps/ BATCH_SIZE / SEQ_LEN))):
 
 
-        print('batchsize ',BATCH_SIZE)
-        print('sequence length ', SEQ_LEN)
+        verb_print('batchsize ',BATCH_SIZE)
+        verb_print('sequence length ', SEQ_LEN)
         step+=1
-        print(i)
+        verb_print(i)
         spatial, nonspatial, prev_action, act,  hidden = loader.get_batch(BATCH_SIZE)
 
-        print('pov_shape: ',spatial.shape)
-        print('nonspatial_shape: ',nonspatial.shape)
-        print('act_shape: ',act.shape)
+        verb_print('pov_shape: ',spatial.shape)
+        verb_print('nonspatial_shape: ',nonspatial.shape)
+        verb_print('act_shape: ',act.shape)
 
 
         count += BATCH_SIZE*SEQ_LEN
@@ -123,7 +131,7 @@ def train(model, mode, steps, loader, logger):
         pr.enable()
 
         if mode != "pretrain":
-            loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, torch.zeros(act.shape, dtype=torch.float32, device="cpu"), act)
+            loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
         else:
             loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, act, act)
 
@@ -156,7 +164,7 @@ def train(model, mode, steps, loader, logger):
         if modcount >= steps/20:
             if ONLINE:
 
-                print("Saving Model!")
+                print("------------------Saving Model!-----------------------")
                 torch.save(model.state_dict(), "train/some_model.tm")
                 torch.save(model.state_dict(),"testing/model_{}.tm".format(count//int(steps/20)))
 
@@ -205,7 +213,7 @@ def main():
 
     #train_files = absolute_file_paths('data/MineRLTreechopVectorObf-v0')
     train_files = absolute_file_paths('data/MineRLTreechop-v0')
-    model = Model()
+    model = Model(deviceStr=deviceStr)
 
 
     shuffle(train_files)
@@ -228,7 +236,11 @@ def main():
 
     #if LOAD:
     #    model.load_state_dict(torch.load("train/some_model.tm"))
-    model.cuda()
+    if deviceStr == "cuda":
+        model.cuda()
+    else:
+        model.cpu()
+
     print('Starting training!')
     train(model, "train", 150000000, loader, logger)
     print('training done!')

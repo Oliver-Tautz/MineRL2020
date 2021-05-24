@@ -3,6 +3,12 @@ import numpy as np
 from tqdm import tqdm
 from collections import defaultdict
 
+verb=False
+
+def verb_print(*strings):
+    if verb:
+        print(strings)
+
 # This dict maps integers to actions in 0/1 encoding
 int_to_vec_filename = 'int_to_vec_dict'
 
@@ -49,9 +55,9 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
 
     # number of 0/1 values
     array_dimensionality = np.max(list(index_lookup.values())) + 1
-    print('array_dimensionality: ', array_dimensionality)
+    verb_print('array_dimensionality: ', array_dimensionality)
     one_hot_encoding_size = 2 ** array_dimensionality
-    # print('one_hot_dimensionality: ', one_hot_encoding_size)
+    # verb_print('one_hot_dimensionality: ', one_hot_encoding_size)
 
     vectors = []
     for i in tqdm(range(no_sampled_actions), desc='get_action_vectors'):
@@ -63,12 +69,12 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
         vectors.append(action_vector)
 
     X = np.array(vectors)
-    # print('means: ',np.mean(X,axis=0))
+    # verb_print('means: ',np.mean(X,axis=0))
 
     unique, unique_counts = np.unique(X, axis=0, return_counts=True)
 
-    # print(unique.shape)
-    # print(unique_counts.shape)
+    # verb_print(unique.shape)
+    # verb_print(unique_counts.shape)
 
     frequent_uniques_and_counts = list(sorted(zip(unique, unique_counts), key=lambda x: -x[1]))[0:no_discrete_actions]
 
@@ -86,7 +92,7 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
         action_string = ""
         for i in ixs:
             action_string += key_lookup[i] + ' & '
-        print("{:70s}\t{:5d}".format(action_string, count))
+        verb_print("{:70s}\t{:5d}".format(action_string, count))
 
     int_to_vector_dict = dict(enumerate(frequent_uniques))
 

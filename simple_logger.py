@@ -1,9 +1,11 @@
 import csv
+from os import makedirs
 
 #creating this class will overwrite given filename!
 class SimpleLogger():
 
     def __init__(self,filename,colnames):
+        makedirs('loss_csv',exist_ok=True)
         self.colnames = colnames
         self.no_cols = len(colnames)
         self.filename=filename

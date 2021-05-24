@@ -11,9 +11,9 @@ from timeit import timeit
 import numpy as np
 verb = False
 
-def verb_print(String):
+def verb_print(*strings):
     if verb:
-        print(String)
+        print(strings)
 
 class FixupResNetCNN(nn.Module):
     """source: https://github.com/unixpickle/obs-tower2/blob/master/obs_tower2/model.py"""
@@ -142,16 +142,17 @@ class Core(nn.Module):
 
 class Model(nn.Module):
 
-    def __init__(self,verbose=False):
+    def __init__(self, verbose=False, deviceStr='cuda'):
         super().__init__()
         self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         self.core = Core()
         self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024, 120))
         global verb
         verb = verbose
+        self.deviceStr=deviceStr
 
     def get_zero_state(self, batch_size, device="cuda"):
-        return (torch.zeros((1, batch_size, 1024), device=device), torch.zeros((1, batch_size, 1024), device=device))
+        return (torch.zeros((1, batch_size, 1024), device=self.deviceStr), torch.zeros((1, batch_size, 1024), device=self.deviceStr))
 
     def compute_front(self, spatial, nonspatial, state):
         hidden, new_state = self.core(spatial, nonspatial, state)
