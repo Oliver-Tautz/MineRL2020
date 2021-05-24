@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="" />
+    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -322,7 +325,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621851569916</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="fix late-logging">
+      <created>1621851753560</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1621851753560</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -348,7 +358,8 @@
     <MESSAGE value="make printing optional. Dirty implementation" />
     <MESSAGE value="make printing optional, very dirty. Make cuda and cpu viable, also dirty." />
     <MESSAGE value="cleanup output." />
-    <option name="LAST_COMMIT_MESSAGE" value="cleanup output." />
+    <MESSAGE value="fix late-logging" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix late-logging" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

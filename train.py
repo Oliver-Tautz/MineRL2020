@@ -89,7 +89,7 @@ def train(model, mode, steps, loader, logger):
     pr = profile.Profile()
     pr.disable()
 
-    torch.set_num_threads(1)
+    torch.set_num_threads(3)
     if mode != "fit_selector":
         optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-6)
     else:
