@@ -31,7 +31,7 @@ from simple_logger import SimpleLogger
 
 # In ONLINE=True mode the code saves only the final version with early stopping,
 # in ONLINE=False it saves 20 intermediate versions during training.
-ONLINE = False
+ONLINE = True
 
 trains_loaded = True
 
@@ -102,11 +102,8 @@ def train(model, mode, steps, loader, logger):
     simple_logger = SimpleLogger("loss_csv/{}.csv".format(sys.argv[1]),['step','loss','grad_norm','learning_rate'])
 
 
-    #no_loops = range(int(steps/ BATCH_SIZE / SEQ_LEN))
-    #if sys.argv[2]:
-    #    no_loops = range(int(sys.argv[2]))
 
-    for i in tqdm(range(int(steps/ BATCH_SIZE / SEQ_LEN))):
+    for i in range(int(steps/ BATCH_SIZE / SEQ_LEN)):
 
 
         print('batchsize ',BATCH_SIZE)
@@ -158,16 +155,18 @@ def train(model, mode, steps, loader, logger):
 
         if modcount >= steps/20:
             if ONLINE:
+
+                print("Saving Model!")
                 torch.save(model.state_dict(), "train/some_model.tm")
-            else:
                 torch.save(model.state_dict(),"testing/model_{}.tm".format(count//int(steps/20)))
+
             modcount -= int(steps/20)
             if ONLINE:
                 if count//int(steps/20) == 14:
                     break
 
         if step % 40 == 0:
-            print(losssum, count, count/(time()-t0), file=sys.stderr)
+            #print(losssum, count, count/(time()-t0))
             if trains_loaded and not ONLINE:
                 for k in loss_dict:
                     logger.report_scalar(title='Training_'+mode, series='loss_'+k, value=loss_dict[k]/40, iteration=int(count)) 
@@ -175,14 +174,19 @@ def train(model, mode, steps, loader, logger):
                 logger.report_scalar(title='Training_'+mode, series='grad_norm', value=gradsum/40, iteration=int(count))
                 logger.report_scalar(title='Training_'+mode, series='learning_rate', value=float(optimizer.param_groups[0]["lr"]), iteration=int(count))
 
-                simple_logger.log([step,losssum/40,gradsum/40,float(optimizer.param_groups[0]["lr"])])
+            print("-------------Logging!!!-------------")
+            simple_logger.log([step,losssum/40,gradsum/40,float(optimizer.param_groups[0]["lr"])])
             losssum = 0
             gradsum = 0
             loss_dict = None
-            if mode == "fit_selector":
-                torch.save(model.state_dict(),"train/model_fitted.tm")
-            else:
-                torch.save(model.state_dict(), "train/some_model.tm")
+          #  if mode == "fit_selector":
+          #      torch.save(model.state_dict(),"train/model_fitted.tm")
+          #  else:
+          #      torch.save(model.state_dict(), "train/some_model.tm")
+
+
+
+
 
 def main():
     # a bit of code that creates clearml logging (formerly trains) if clearml
