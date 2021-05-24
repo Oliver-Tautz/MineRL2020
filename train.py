@@ -89,7 +89,7 @@ def train(model, mode, steps, loader, logger):
     pr = profile.Profile()
     pr.disable()
 
-    torch.set_num_threads(3)
+    torch.set_num_threads(12)
     if mode != "fit_selector":
         optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-6)
     else:
@@ -166,7 +166,7 @@ def train(model, mode, steps, loader, logger):
 
                 print("------------------Saving Model!-----------------------")
                 torch.save(model.state_dict(), "train/some_model.tm")
-                torch.save(model.state_dict(),"testing/model_{}.tm".format(count//int(steps/20)))
+                torch.save(model.state_dict(),"train/model_{}.tm".format(count//int(steps/20)))
 
             modcount -= int(steps/20)
 

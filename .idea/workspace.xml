@@ -122,9 +122,9 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.train" />
       <item itemvalue="Python.test" />
       <item itemvalue="Python.test_descrete_preprocessing" />
+      <item itemvalue="Python.train" />
     </list>
     <recent_temporary>
       <list>
@@ -332,7 +332,14 @@
       <option name="project" value="LOCAL" />
       <updated>1621851753560</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="use 3 cpus in torch.">
+      <created>1621853040900</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1621853040900</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -359,7 +366,8 @@
     <MESSAGE value="make printing optional, very dirty. Make cuda and cpu viable, also dirty." />
     <MESSAGE value="cleanup output." />
     <MESSAGE value="fix late-logging" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix late-logging" />
+    <MESSAGE value="use 3 cpus in torch." />
+    <option name="LAST_COMMIT_MESSAGE" value="use 3 cpus in torch." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
