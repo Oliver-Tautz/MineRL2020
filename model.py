@@ -9,6 +9,11 @@ import cProfile as profile
 from timeit import timeit
 
 import numpy as np
+verb = False
+
+def verb_print(String):
+    if verb:
+        print(String)
 
 class FixupResNetCNN(nn.Module):
     """source: https://github.com/unixpickle/obs-tower2/blob/master/obs_tower2/model.py"""
@@ -29,7 +34,7 @@ class FixupResNetCNN(nn.Module):
             self.scale = nn.Parameter(torch.ones([depth, 1, 1]))
 
         def forward(self, x):
-            print('REsInput: ', x.shape)
+            verb_print('REsInput: ', x.shape)
             x = F.relu(x)
             out = x + self.bias1
             out = self.conv1(out)
@@ -39,7 +44,7 @@ class FixupResNetCNN(nn.Module):
             out = self.conv2(out)
             out = out * self.scale
             out = out + self.bias4
-            print('REsOutput: ', out.shape)
+            verb_print('REsOutput: ', out.shape)
             return out + x
 
     def __init__(self, input_channels, double_channels=False):
@@ -67,7 +72,7 @@ class FixupResNetCNN(nn.Module):
         self.output_size = math.ceil(64 / 8) ** 2 * depth_in
 
     def forward(self, x):
-        print('Core_Input',x.shape)
+        verb_print('Core_Input',x.shape)
         return self.conv_layers(x)
 
 
@@ -85,19 +90,19 @@ class InputProcessor(nn.Module):
     def forward(self, spatial, nonspatial):
         shape = spatial.shape
         spatial = spatial.view((shape[0]*shape[1],)+shape[2:])/255.0
-        print('pov before Core:', spatial.shape)
+        verb_print('pov before Core:', spatial.shape)
         spatial = self.conv_layers(spatial)
-        print('pov after Core:', spatial.shape)
+        verb_print('pov after Core:', spatial.shape)
         new_shape = spatial.shape
         spatial = spatial.view(shape[:2]+(-1,))
-        print('pov after reshape:', spatial.shape)
-        print('nonspatial before Core:', nonspatial.shape)
+        verb_print('pov after reshape:', spatial.shape)
+        verb_print('nonspatial before Core:', nonspatial.shape)
         #nonspatial = self.nonspatial_reshape(nonspatial)
-        print('nonspatial after FC:', nonspatial.shape)
+        verb_print('nonspatial after FC:', nonspatial.shape)
         spatial = self.spatial_reshape(spatial)
-        print('spatial after FC:', spatial.shape)
+        verb_print('spatial after FC:', spatial.shape)
 
-        print('Core_out: ', torch.cat([spatial, nonspatial],dim=-1).shape)
+        verb_print('Core_out: ', torch.cat([spatial, nonspatial],dim=-1).shape)
 
         return spatial
 
@@ -111,44 +116,47 @@ class Core(nn.Module):
         
     def forward(self, spatial, nonspatial, state):
 
-        print("starting_timeit")
+        verb_print("starting_timeit")
 
 
 
-#        print('time_CNN:',timeit("processed = input_proc.forward(spatial, nonspatial)",number = 10,globals=locals()))
+#        verb_print('time_CNN:',timeit("processed = input_proc.forward(spatial, nonspatial)",number = 10,globals=locals()))
 
 
 
         processed = self.input_proc.forward(spatial, nonspatial)
 
-        #print('time_lstm:',timeit("lstm_output, new_state = lstm(processed, state)",number = 10,globals=locals()))
+        #verb_print('time_lstm:',timeit("lstm_output, new_state = lstm(processed, state)",number = 10,globals=locals()))
 
         #print("finished_timeit")
 
-        print('State0: ',state[0].shape)
-        print('State1: ',state[0].shape)
+        verb_print('State0: ',state[0].shape)
+        verb_print('State1: ',state[0].shape)
 
         lstm_output, new_state = self.lstm(processed, state)
-        print('lstm_out:',lstm_output.shape)
-        print('Core_out_total:',(lstm_output+processed).shape)
+        verb_print('lstm_out:',lstm_output.shape)
+        verb_print('Core_out_total:',(lstm_output+processed).shape)
         return lstm_output+processed, new_state
+
 
 
 class Model(nn.Module):
 
-    def __init__(self):
+    def __init__(self,verbose=False):
         super().__init__()
         self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         self.core = Core()
         self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024, 120))
+        global verb
+        verb = verbose
 
     def get_zero_state(self, batch_size, device="cuda"):
         return (torch.zeros((1, batch_size, 1024), device=device), torch.zeros((1, batch_size, 1024), device=device))
 
     def compute_front(self, spatial, nonspatial, state):
         hidden, new_state = self.core(spatial, nonspatial, state)
-        #print('after core: hidden,new_state  = ',hidden[0].shape,new_state.shape)
-        print('after_selector : hidden state',self.selector(hidden)[0].shape)
+        #verb_print('after core: hidden,new_state  = ',hidden[0].shape,new_state.shape)
+        verb_print('after_selector : hidden state',self.selector(hidden)[0].shape)
         return hidden, self.selector(hidden), new_state
 
     def forward(self, spatial, nonspatial, state, target):
@@ -160,23 +168,23 @@ class Model(nn.Module):
 
         loss = nn.CrossEntropyLoss()
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
-        print('d shape: ',d.shape)
-        print('point shape: ',point.shape)
-        print('d_view_shape: ',d.view(-1, d.shape[-1]).shape)
-        print('point_view_shape: ',point.view(-1).shape)
+        verb_print('d shape: ',d.shape)
+        verb_print('point shape: ',point.shape)
+        verb_print('d_view_shape: ',d.view(-1, d.shape[-1]).shape)
+        verb_print('point_view_shape: ',point.view(-1).shape)
 
-        print(d.shape)
-        print()
+        verb_print(d.shape)
+        verb_print()
         l1 = loss(d.view(-1, d.shape[-1]), point.view(-1))
-        print('l1 shape: ', l1.item())
+        verb_print('l1 shape: ', l1.item())
         return l1, {"action":l1.item()}, state
 
     def sample(self, spatial, nonspatial, prev_action, state, target):
-        print('pov_input = ',spatial.shape)
-        print('obfs_input = ',nonspatial.shape)
-        print('hidden_states = ',state[0].shape)
+        verb_print('pov_input = ',spatial.shape)
+        verb_print('obfs_input = ',nonspatial.shape)
+        verb_print('hidden_states = ',state[0].shape)
 
-        print(self.core)
+        verb_print(self.core)
 
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
         dist = D.Categorical(logits = d)

@@ -168,11 +168,12 @@ def train(model, mode, steps, loader, logger):
         if step % 40 == 0:
             #print(losssum, count, count/(time()-t0))
             if trains_loaded and not ONLINE:
-                for k in loss_dict:
-                    logger.report_scalar(title='Training_'+mode, series='loss_'+k, value=loss_dict[k]/40, iteration=int(count)) 
-                logger.report_scalar(title='Training_'+mode, series='loss', value=losssum/40, iteration=int(count))
-                logger.report_scalar(title='Training_'+mode, series='grad_norm', value=gradsum/40, iteration=int(count))
-                logger.report_scalar(title='Training_'+mode, series='learning_rate', value=float(optimizer.param_groups[0]["lr"]), iteration=int(count))
+                pass
+             #   for k in loss_dict:
+             #       logger.report_scalar(title='Training_'+mode, series='loss_'+k, value=loss_dict[k]/40, iteration=int(count))
+             #   logger.report_scalar(title='Training_'+mode, series='loss', value=losssum/40, iteration=int(count))
+             #   logger.report_scalar(title='Training_'+mode, series='grad_norm', value=gradsum/40, iteration=int(count))
+             #   logger.report_scalar(title='Training_'+mode, series='learning_rate', value=float(optimizer.param_groups[0]["lr"]), iteration=int(count))
 
             print("-------------Logging!!!-------------")
             simple_logger.log([step,losssum/40,gradsum/40,float(optimizer.param_groups[0]["lr"])])
