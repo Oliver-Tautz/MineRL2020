@@ -106,7 +106,7 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
         # obs_vector = torch.tensor(obs["vector"], dtype=torch.float32)
 
         # We dont want flipping
-        actions = descrete_actions_transform.transform_actions(act)
+        actions = descrete_actions_transform.transform_actions(act,map_to_zero=False)
         flip_data = torch.ones((actions.shape[0], 2), dtype=torch.float32)
 
         if 0:
