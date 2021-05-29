@@ -146,7 +146,7 @@ class Model(nn.Module):
         super().__init__()
         self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         self.core = Core()
-        self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024,30),nn.Softmax())
+        self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024,30))
         global verb
         verb = verbose
         self.deviceStr=deviceStr

@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/loader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -389,14 +390,20 @@
       <option name="project" value="LOCAL" />
       <updated>1622278822337</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="change map to zero">
+      <created>1622278863669</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1622278863669</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added symlink." />
     <MESSAGE value="port to cpu-device." />
     <MESSAGE value="remove nonspatial input. This seems to work :)" />
     <MESSAGE value="remove kmeans." />
@@ -421,7 +428,8 @@
     <MESSAGE value="integrate testing, add plotter, make model training ready." />
     <MESSAGE value="add proper folder structure ..." />
     <MESSAGE value="make no_checkpoints adjustable in script." />
-    <option name="LAST_COMMIT_MESSAGE" value="make no_checkpoints adjustable in script." />
+    <MESSAGE value="change map to zero" />
+    <option name="LAST_COMMIT_MESSAGE" value="change map to zero" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
