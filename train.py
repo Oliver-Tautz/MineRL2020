@@ -35,7 +35,7 @@ ONLINE = True
 
 trains_loaded = True
 verb=False
-number_of_checkpoints = 2
+number_of_checkpoints = 20
 map_to_zero=False
 
 if len(sys.argv) < 2:
