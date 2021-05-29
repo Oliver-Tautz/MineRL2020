@@ -146,6 +146,7 @@ def train(model, mode, steps, loader, logger):
         else:
             loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, act, act)
 
+
         pr.disable()
         pr.dump_stats('profile.pstat')
         loss_dict = update_loss_dict(loss_dict, ldict)
@@ -226,7 +227,7 @@ def main():
 
     #train_files = absolute_file_paths('data/MineRLTreechopVectorObf-v0')
     train_files = absolute_file_paths('data/MineRLTreechop-v0')
-    model = Model(deviceStr=deviceStr,verbose=True)
+    model = Model(deviceStr=deviceStr,verbose=True,no_classes=50)
 
 
     shuffle(train_files)

@@ -106,21 +106,10 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
         # obs_vector = torch.tensor(obs["vector"], dtype=torch.float32)
 
         # We dont want flipping
-        actions = descrete_actions_transform.transform_actions(act,map_to_zero=False)
-        flip_data = torch.ones((actions.shape[0], 2), dtype=torch.float32)
+        actions = torch.tensor(descrete_actions_transform.transform_actions(act,map_to_zero=False,get_ints=True),dtype=torch.long)
 
-        if 0:
-            obs_screen = torch.flip(obs_screen, [2])
-            flip_data[:, 0] = -1
 
-        if 0:
-            obs_screen = obs_screen.transpose(2, 3)
-            flip_data[:, 1] = -1
-
-        if 0:
-            obs_screen = torch.flip(obs_screen, [1])
-
-        obs_vector = torch.cat([torch.tensor(actions,dtype=torch.float32), flip_data], dim=1)
+        obs_vector = torch.tensor(actions,dtype=torch.float32)
 
         #act = descrete_actions_transform.transform_actions_to_onehot(act)
 
@@ -159,7 +148,7 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
                 return
 
             pipe.send((obs_screen[i:i + batch_size], obs_vector[i:i + batch_size], prev_action[i:i + batch_size],
-                        rewards[i:i + batch_size]))
+                        actions[i:i + batch_size]))
 
 
 class ReplayRoller():

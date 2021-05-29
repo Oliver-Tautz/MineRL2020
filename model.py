@@ -142,12 +142,13 @@ class Core(nn.Module):
 
 class Model(nn.Module):
 
-    def __init__(self, verbose=False, deviceStr='cuda'):
+    def __init__(self, verbose=False, deviceStr='cuda',no_classes=30):
         super().__init__()
         self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         self.core = Core()
         # Dont use Softmax here! Its applied by nn.CrossEntropyLoss().
-        self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024,30))
+        self.no_classes=no_classes
+        self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024,self.no_classes))
         global verb
         verb = verbose
         self.deviceStr=deviceStr
@@ -166,7 +167,6 @@ class Model(nn.Module):
 
     def get_loss(self, spatial, nonspatial, prev_action, state, target, point):
 
-        point = point.long()
 
         loss = nn.CrossEntropyLoss()
         hidden, d, state = self.compute_front(spatial, nonspatial, state)

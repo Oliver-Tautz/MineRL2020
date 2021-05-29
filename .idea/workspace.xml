@@ -3,9 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/loader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_descrete_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_descrete_preprocessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -411,14 +411,20 @@
       <option name="project" value="LOCAL" />
       <updated>1622280305468</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="get 50 action dict.">
+      <created>1622293637514</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1622293637514</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="remove nonspatial input. This seems to work :)" />
     <MESSAGE value="remove kmeans." />
     <MESSAGE value="nvm, adding kmeans to git." />
     <MESSAGE value="Also added translation dicts." />
@@ -443,19 +449,20 @@
     <MESSAGE value="make no_checkpoints adjustable in script." />
     <MESSAGE value="change map to zero" />
     <MESSAGE value="change to no softmax" />
-    <option name="LAST_COMMIT_MESSAGE" value="change to no softmax" />
+    <MESSAGE value="get 50 action dict." />
+    <option name="LAST_COMMIT_MESSAGE" value="get 50 action dict." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>205</line>
+          <line>206</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>212</line>
+          <line>213</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -463,25 +470,25 @@
           <line>119</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/test.py</url>
           <line>213</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/train.py</url>
-          <line>141</line>
-          <option name="timeStamp" value="16" />
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>167</line>
+          <option name="timeStamp" value="19" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/loader.py</url>
           <line>66</line>
-          <option name="timeStamp" value="18" />
+          <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/model.py</url>
-          <line>166</line>
-          <option name="timeStamp" value="19" />
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>138</line>
+          <option name="timeStamp" value="22" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
