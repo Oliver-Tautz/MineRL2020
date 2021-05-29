@@ -4,6 +4,8 @@
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_descrete_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_descrete_preprocessing.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,6 +58,11 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/train/trained_models" />
+    </key>
   </component>
   <component name="RunManager" selected="Python.train">
     <configuration name="simple_plotter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -113,7 +120,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
-      <option name="PARAMETERS" value="first_run/model_1.tm" />
+      <option name="PARAMETERS" value="test_without_softmax_2.tm" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -151,9 +158,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.train" />
-        <item itemvalue="Python.simple_plotter" />
         <item itemvalue="Python.test_descrete_preprocessing" />
         <item itemvalue="Python.test_first_model" />
+        <item itemvalue="Python.simple_plotter" />
       </list>
     </recent_temporary>
   </component>
@@ -397,14 +404,20 @@
       <option name="project" value="LOCAL" />
       <updated>1622278863669</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="change to no softmax">
+      <created>1622280305468</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1622280305468</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="port to cpu-device." />
     <MESSAGE value="remove nonspatial input. This seems to work :)" />
     <MESSAGE value="remove kmeans." />
     <MESSAGE value="nvm, adding kmeans to git." />
@@ -429,7 +442,8 @@
     <MESSAGE value="add proper folder structure ..." />
     <MESSAGE value="make no_checkpoints adjustable in script." />
     <MESSAGE value="change map to zero" />
-    <option name="LAST_COMMIT_MESSAGE" value="change map to zero" />
+    <MESSAGE value="change to no softmax" />
+    <option name="LAST_COMMIT_MESSAGE" value="change to no softmax" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -466,7 +480,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>165</line>
+          <line>166</line>
           <option name="timeStamp" value="19" />
         </line-breakpoint>
       </breakpoints>

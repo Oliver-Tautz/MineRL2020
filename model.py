@@ -146,6 +146,7 @@ class Model(nn.Module):
         super().__init__()
         self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         self.core = Core()
+        # Dont use Softmax here! Its applied by nn.CrossEntropyLoss().
         self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024,30))
         global verb
         verb = verbose
@@ -176,8 +177,8 @@ class Model(nn.Module):
         verb_print('d_view_shape: ',d.view(-1, d.shape[-1]).shape)
         verb_print('point_view_shape: ',point.view(-1).shape)
 
-        verb_print(d.shape)
-        verb_print()
+        verb_print(d)
+
         l1 = loss(d.view(-1, d.shape[-1]), point.view(-1))
         #verb_print('l1 shape: ', l1.item())
         return l1, {"action":l1.item()}, state
