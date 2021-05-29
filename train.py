@@ -36,6 +36,15 @@ ONLINE = True
 trains_loaded = True
 verb=False
 
+if len(sys.argv) < 2:
+    print("Please enter model name!")
+    exit()
+else:
+    try:
+        os.makedirs("train/{}".format(sys.argv[1]),exist_ok=False)
+    except:
+        print("Model already present!")
+        exit()
 def verb_print(*strings):
     global verb
     if verb:
@@ -165,8 +174,8 @@ def train(model, mode, steps, loader, logger):
             if ONLINE:
 
                 print("------------------Saving Model!-----------------------")
-                torch.save(model.state_dict(), "train/some_model.tm")
-                torch.save(model.state_dict(),"train/model_{}.tm".format(count//int(steps/20)))
+                torch.save(model.state_dict(), "train/{}/{}.tm".format(sys.argv[1],sys.argv[1]))
+                torch.save(model.state_dict(),"train/{}/{}_{}.tm".format(sys.argv[1],sys.argv[1],count//int(steps/20)))
 
             modcount -= int(steps/20)
 
