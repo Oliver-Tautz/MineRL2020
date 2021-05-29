@@ -4,6 +4,7 @@ from torch.nn import functional as F
 import torch.distributions as D
 import math
 from kmeans import cached_kmeans
+import use_resnet
 import cProfile as profile
 
 from timeit import timeit
@@ -142,7 +143,7 @@ class Core(nn.Module):
 
 class Model(nn.Module):
 
-    def __init__(self, verbose=False, deviceStr='cuda',no_classes=30):
+    def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False):
         super().__init__()
         self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         self.core = Core()
@@ -152,11 +153,21 @@ class Model(nn.Module):
         global verb
         verb = verbose
         self.deviceStr=deviceStr
+        self.with_masks = with_masks
+        if with_masks:
+            self.masksGenerator = use_resnet.MaskGeneratorResnet(self.deviceStr)
+
 
     def get_zero_state(self, batch_size, device="cuda"):
         return (torch.zeros((1, batch_size, 1024), device=self.deviceStr), torch.zeros((1, batch_size, 1024), device=self.deviceStr))
 
     def compute_front(self, spatial, nonspatial, state):
+
+        if self.with_masks:
+
+
+
+
         hidden, new_state = self.core(spatial, nonspatial, state)
         #verb_print('after core: hidden,new_state  = ',hidden[0].shape,new_state.shape)
         verb_print('after_selector : hidden state',self.selector(hidden)[0].shape)

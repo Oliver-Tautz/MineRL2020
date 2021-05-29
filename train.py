@@ -5,6 +5,7 @@ import time
 import logging
 import os
 import sys
+import argparse
 
 from tqdm import tqdm
 import cProfile as profile
@@ -28,6 +29,15 @@ from math import sqrt
 from kmeans import cached_kmeans
 from simple_logger import SimpleLogger
 
+import main
+
+import argparse
+parser = argparse.ArgumentParser(description='train the model ...')
+parser.add_argument('modelname',help="name of the model",type=str)
+parser.add_argument('--verbose',help="print more stuff",action="store_true")
+parser.add_argument('--map-to-zero',help="map non recorded actions to zero",action="store_true")
+parser.add_argument('--with-masks',help="use extra mask channel",action="store_true")
+args = parser.parse_args()
 
 # In ONLINE=True mode the code saves only the final version with early stopping,
 # in ONLINE=False it saves 20 intermediate versions during training.
