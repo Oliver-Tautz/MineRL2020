@@ -35,7 +35,7 @@ ONLINE = True
 
 trains_loaded = True
 verb=False
-number_of_checkpoints = 2
+number_of_checkpoints = 20
 map_to_zero=False
 
 if len(sys.argv) < 2:
@@ -224,7 +224,7 @@ def main():
 
     #train_files = absolute_file_paths('data/MineRLTreechopVectorObf-v0')
     train_files = absolute_file_paths('data/MineRLTreechop-v0')
-    model = Model(deviceStr=deviceStr,verbose=True,no_classes=50)
+    model = Model(deviceStr=deviceStr,verbose=True,no_classes=30)
 
 
     shuffle(train_files)

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
+    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="new dict. some cleanup and option for map to zero">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_descrete_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_descrete_preprocessing.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -64,7 +63,7 @@
       <recent name="$PROJECT_DIR$/train/trained_models" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.train">
+  <component name="RunManager" selected="Python.test_first_model">
     <configuration name="simple_plotter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -120,7 +119,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
-      <option name="PARAMETERS" value="test_without_softmax_2.tm" />
+      <option name="PARAMETERS" value="fixed_test_30actions_map_to_zero" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -157,9 +156,9 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.test_first_model" />
         <item itemvalue="Python.train" />
         <item itemvalue="Python.test_descrete_preprocessing" />
-        <item itemvalue="Python.test_first_model" />
         <item itemvalue="Python.simple_plotter" />
       </list>
     </recent_temporary>
@@ -425,14 +424,20 @@
       <option name="project" value="LOCAL" />
       <updated>1622294874543</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="new dict. some cleanup and option for map to zero">
+      <created>1622295490647</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1622295490647</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="nvm, adding kmeans to git." />
     <MESSAGE value="Also added translation dicts." />
     <MESSAGE value="change pickle settings for support." />
     <MESSAGE value="added new files." />
@@ -457,7 +462,8 @@
     <MESSAGE value="change to no softmax" />
     <MESSAGE value="get 50 action dict." />
     <MESSAGE value="debug model. add option for different output size in model.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="debug model. add option for different output size in model.py" />
+    <MESSAGE value="new dict. some cleanup and option for map to zero" />
+    <option name="LAST_COMMIT_MESSAGE" value="new dict. some cleanup and option for map to zero" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

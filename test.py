@@ -40,7 +40,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 if len(sys.argv) > 1:
     model_name = sys.argv[1]
 else:
-    model_name='some_model.tm'
+    model_name='some_model'
 
 
 
@@ -168,8 +168,8 @@ class MineRLNetworkAgent(MineRLAgentBase):
         This is where you could load a neural network.
         """
         # Some helpful constants from the environment.
-        self.model = Model(deviceStr=device,verbose=True)
-        self.model.load_state_dict(torch.load(f"train/trained_models/{model_name}", map_location=device))
+        self.model = Model(deviceStr=device,verbose=True,no_classes=30)
+        self.model.load_state_dict(torch.load(f"train/{model_name}/{model_name}.tm", map_location=device))
         # self.model.load_state_dict(torch.load("testing/m.tm", map_location=device))
         
         self.model.to(device)
