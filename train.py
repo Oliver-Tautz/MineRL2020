@@ -35,6 +35,8 @@ ONLINE = True
 
 trains_loaded = True
 verb=False
+number_of_checkpoints = 2
+
 
 if len(sys.argv) < 2:
     print("Please enter model name!")
@@ -181,7 +183,7 @@ def train(model, mode, steps, loader, logger):
 
             # What is this?!
             if ONLINE:
-                if count//int(steps/20) == 14:
+                if count//int(steps/20) == number_of_checkpoints:
                     break
 
         if step % 40 == 0:

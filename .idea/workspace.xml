@@ -376,7 +376,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622278192568</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="add proper folder structure ...">
+      <created>1622278687458</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1622278687458</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -406,24 +413,25 @@
     <MESSAGE value="use 3 cpus in torch." />
     <MESSAGE value="change_saving" />
     <MESSAGE value="integrate testing, add plotter, make model training ready." />
-    <option name="LAST_COMMIT_MESSAGE" value="integrate testing, add plotter, make model training ready." />
+    <MESSAGE value="add proper folder structure ..." />
+    <option name="LAST_COMMIT_MESSAGE" value="add proper folder structure ..." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>203</line>
+          <line>205</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>210</line>
+          <line>212</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>117</line>
+          <line>119</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -433,7 +441,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>139</line>
+          <line>141</line>
           <option name="timeStamp" value="16" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
