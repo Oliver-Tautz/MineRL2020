@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/loader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/obj/int_to_vec_dict.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_descrete_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_descrete_preprocessing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -418,14 +418,20 @@
       <option name="project" value="LOCAL" />
       <updated>1622293637514</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="debug model. add option for different output size in model.py">
+      <created>1622294874543</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1622294874543</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="remove kmeans." />
     <MESSAGE value="nvm, adding kmeans to git." />
     <MESSAGE value="Also added translation dicts." />
     <MESSAGE value="change pickle settings for support." />
@@ -450,24 +456,25 @@
     <MESSAGE value="change map to zero" />
     <MESSAGE value="change to no softmax" />
     <MESSAGE value="get 50 action dict." />
-    <option name="LAST_COMMIT_MESSAGE" value="get 50 action dict." />
+    <MESSAGE value="debug model. add option for different output size in model.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="debug model. add option for different output size in model.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>206</line>
+          <line>203</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>213</line>
+          <line>210</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>119</line>
+          <line>123</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -487,7 +494,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>138</line>
+          <line>142</line>
           <option name="timeStamp" value="22" />
         </line-breakpoint>
       </breakpoints>

@@ -137,7 +137,7 @@ def load_obj(name ):
         return pickle.load(f)
 
 # map to zero performs better.
-int_to_vec, key_to_ix = save_frequent_actions_and_mapping(actions,no_discrete_actions=50)
+int_to_vec, key_to_ix = save_frequent_actions_and_mapping(actions,no_discrete_actions=30)
 
 def test(map_to_zero):
     X = transform_actions(actions, map_to_zero=map_to_zero)

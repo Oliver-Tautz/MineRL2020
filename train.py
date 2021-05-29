@@ -36,17 +36,24 @@ ONLINE = True
 trains_loaded = True
 verb=False
 number_of_checkpoints = 2
-
+map_to_zero=False
 
 if len(sys.argv) < 2:
     print("Please enter model name!")
     exit()
-else:
+else :
+    modelname = sys.argv[1]
     try:
-        os.makedirs("train/{}".format(sys.argv[1]),exist_ok=False)
+        os.makedirs("train/{}".format(modelname),exist_ok=False)
     except:
         print("Model already present!")
         exit()
+if len(sys.argv) == 3:
+    if sys.argv[2] == 'yes':
+        map_to_zero = True
+
+
+
 def verb_print(*strings):
     global verb
     if verb:
@@ -96,9 +103,6 @@ def update_loss_dict(old, new):
 
 def train(model, mode, steps, loader, logger):
 
-    ## Profiler
-    pr = profile.Profile()
-    pr.disable()
 
     torch.set_num_threads(12)
     if mode != "fit_selector":
@@ -118,7 +122,7 @@ def train(model, mode, steps, loader, logger):
     gradsum = 0
     loss_dict = None
     modcount = 0
-    simple_logger = SimpleLogger("loss_csv/{}.csv".format(sys.argv[1]),['step','loss','grad_norm','learning_rate'])
+    simple_logger = SimpleLogger("loss_csv/{}.csv".format(modelname),['step','loss','grad_norm','learning_rate'])
 
 
 
@@ -139,16 +143,9 @@ def train(model, mode, steps, loader, logger):
         count += BATCH_SIZE*SEQ_LEN
         modcount += BATCH_SIZE*SEQ_LEN
 
-        pr.enable()
-
-        if mode != "pretrain":
-            loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
-        else:
-            loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, act, act)
+        loss, ldict, hidden = model.get_loss(spatial, nonspatial, prev_action, hidden, torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
 
 
-        pr.disable()
-        pr.dump_stats('profile.pstat')
         loss_dict = update_loss_dict(loss_dict, ldict)
         loader.put_back(hidden)
 
@@ -177,8 +174,8 @@ def train(model, mode, steps, loader, logger):
             if ONLINE:
 
                 print("------------------Saving Model!-----------------------")
-                torch.save(model.state_dict(), "train/{}/{}.tm".format(sys.argv[1],sys.argv[1]))
-                torch.save(model.state_dict(),"train/{}/{}_{}.tm".format(sys.argv[1],sys.argv[1],count//int(steps/20)))
+                torch.save(model.state_dict(), "train/{}/{}.tm".format(modelname,modelname))
+                torch.save(model.state_dict(),"train/{}/{}_{}.tm".format(modelname,modelname,count//int(steps/20)))
 
             modcount -= int(steps/20)
 
@@ -256,7 +253,7 @@ def main():
         model.cpu()
 
     #model.load_state_dict(torch.load(f"train/trained_models/first_run/model_14.tm", map_location=device))
-    print('Starting training!')
+    print('Starting training with map_to_zero={}, modelname={}'.format(map_to_zero,modelname))
     train(model, "train", 150000000, loader, logger)
     print('training done!')
     torch.save(model.state_dict(), "train/some_model.tm")
