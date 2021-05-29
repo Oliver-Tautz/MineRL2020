@@ -96,13 +96,13 @@ class InputProcessor(nn.Module):
         new_shape = spatial.shape
         spatial = spatial.view(shape[:2]+(-1,))
         verb_print('pov after reshape:', spatial.shape)
-        verb_print('nonspatial before Core:', nonspatial.shape)
+        #verb_print('nonspatial before Core:', nonspatial.shape)
         #nonspatial = self.nonspatial_reshape(nonspatial)
-        verb_print('nonspatial after FC:', nonspatial.shape)
+        #verb_print('nonspatial after FC:', nonspatial.shape)
         spatial = self.spatial_reshape(spatial)
         verb_print('spatial after FC:', spatial.shape)
 
-        verb_print('Core_out: ', torch.cat([spatial, nonspatial],dim=-1).shape)
+        #verb_print('Core_out: ', torch.cat([spatial, nonspatial],dim=-1).shape)
 
         return spatial
 
@@ -146,7 +146,7 @@ class Model(nn.Module):
         super().__init__()
         self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         self.core = Core()
-        self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024, 120))
+        self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024,30),nn.Softmax())
         global verb
         verb = verbose
         self.deviceStr=deviceStr
@@ -169,6 +169,8 @@ class Model(nn.Module):
 
         loss = nn.CrossEntropyLoss()
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
+
+
         verb_print('d shape: ',d.shape)
         verb_print('point shape: ',point.shape)
         verb_print('d_view_shape: ',d.view(-1, d.shape[-1]).shape)
@@ -177,7 +179,7 @@ class Model(nn.Module):
         verb_print(d.shape)
         verb_print()
         l1 = loss(d.view(-1, d.shape[-1]), point.view(-1))
-        verb_print('l1 shape: ', l1.item())
+        #verb_print('l1 shape: ', l1.item())
         return l1, {"action":l1.item()}, state
 
     def sample(self, spatial, nonspatial, prev_action, state, target):
@@ -188,7 +190,9 @@ class Model(nn.Module):
         verb_print(self.core)
 
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
+        verb_print('d', d)
+        verb_print('d.shape' ,d.shape)
         dist = D.Categorical(logits = d)
         s = dist.sample()
-        s = s.squeeze().cuda().numpy()
-        return self.kmeans.cluster_centers_[s], state
+        s = s.squeeze().cpu().numpy()
+        return s, state

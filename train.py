@@ -215,7 +215,7 @@ def main():
 
     #train_files = absolute_file_paths('data/MineRLTreechopVectorObf-v0')
     train_files = absolute_file_paths('data/MineRLTreechop-v0')
-    model = Model(deviceStr=deviceStr)
+    model = Model(deviceStr=deviceStr,verbose=True)
 
 
     shuffle(train_files)
@@ -243,6 +243,7 @@ def main():
     else:
         model.cpu()
 
+    #model.load_state_dict(torch.load(f"train/trained_models/first_run/model_14.tm", map_location=device))
     print('Starting training!')
     train(model, "train", 150000000, loader, logger)
     print('training done!')

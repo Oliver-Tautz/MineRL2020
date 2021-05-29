@@ -23,18 +23,26 @@ from model import Model
 import torch
 import cv2
 from record_episode import EpisodeRecorder
+from descrete_actions_transform import transform_actions, transform_onehot_to_actions, transform_int_to_actions
 
-
+import sys
 
 # All the evaluations will be evaluated on MineRLObtainDiamondVectorObf-v0 environment
-MINERL_GYM_ENV = os.getenv('MINERL_GYM_ENV', 'MineRLTreechopVectorObf-v0')
-MINERL_MAX_EVALUATION_EPISODES = int(os.getenv('MINERL_MAX_EVALUATION_EPISODES', 100))
+MINERL_GYM_ENV = os.getenv('MINERL_GYM_ENV', 'MineRLTreechop-v0')
+MINERL_MAX_EVALUATION_EPISODES = int(os.getenv('MINERL_MAX_EVALUATION_EPISODES', 1000))
 
 # Parallel testing/inference, **you can override** below value based on compute
 # requirements, etc to save OOM in this phase.
 EVALUATION_THREAD_COUNT = 1#int(os.getenv('EPISODES_EVALUATION_THREAD_COUNT', 4))
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
+if len(sys.argv) > 1:
+    model_name = sys.argv[1]
+else:
+    model_name='some_model.tm'
+
+
 
 
 class EpisodeDone(Exception):
@@ -160,8 +168,8 @@ class MineRLNetworkAgent(MineRLAgentBase):
         This is where you could load a neural network.
         """
         # Some helpful constants from the environment.
-        self.model = Model()
-        self.model.load_state_dict(torch.load("train/some_model.tm", map_location=device))
+        self.model = Model(deviceStr=device,verbose=True)
+        self.model.load_state_dict(torch.load(f"train/trained_models/{model_name}", map_location=device))
         # self.model.load_state_dict(torch.load("testing/m.tm", map_location=device))
         
         self.model.to(device)
@@ -184,7 +192,7 @@ class MineRLNetworkAgent(MineRLAgentBase):
                  281286]
 
         with torch.no_grad():
-            seed = random.sample(seeds,1)
+            seed = 76543#random.sample(seeds,1)
             single_episode_env.seed(seed)
             obs = single_episode_env.reset()
             er.record_frame(obs['pov'])
@@ -199,19 +207,20 @@ class MineRLNetworkAgent(MineRLAgentBase):
 
                 #cv2.imshow("xdd", obs["pov"])
                 # cv2.waitKey(30)
-                nonspatial = torch.cat([torch.tensor(obs["vector"], device=device, dtype=torch.float32), 
-                                        torch.ones((2,), device=device,dtype=torch.float32)], dim=0).unsqueeze(0).unsqueeze(0)
+                #nonspatial = torch.cat([torch.tensor(obs["vector"], device=device, dtype=torch.float32),
+                 #                       torch.ones((2,), device=device,dtype=torch.float32)], dim=0).unsqueeze(0).unsqueeze(0)
 
 
+                nonspatial = torch.zeros((1,1,64))
 
                 s, state = self.model.sample(spatial, nonspatial, s, state, torch.zeros((1,1,64),dtype=torch.float32,device=device))
 
 
-
+                action = transform_int_to_actions([int(s)])
 
 
                 for i in range(1):
-                    obs,reward,done,_ = single_episode_env.step({"vector":s})
+                    obs,reward,done,_ = single_episode_env.step(action)
                     er.record_frame(obs['pov'])
 
                     counter+=1
@@ -224,7 +233,7 @@ class MineRLNetworkAgent(MineRLAgentBase):
                     if max_steps and counter > max_steps:
                         done = True
 
-        er.save_vid('Original_Trained_Treechop_Obf/Original_Trained_Michael_Obf_Treechop{}_seed={}.avi'.format(index,seed))
+        er.save_vid(f'{model_name}{index}_seed={seed}.avi')
         
         
 

@@ -67,6 +67,7 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
         obs, act, reward, nextobs, done = d
         obs_screen = torch.tensor(obs["pov"], dtype=torch.float32).transpose(1, 3).transpose(2, 3)
 
+
         ## added by otautz
         # print('pov shape:',obs['pov'].shape)
         # print('reward shape:', reward.shape)
@@ -105,18 +106,18 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
         # obs_vector = torch.tensor(obs["vector"], dtype=torch.float32)
 
         # We dont want flipping
-        actions = descrete_actions_transform.transform_actions_to_onehot(act)
+        actions = descrete_actions_transform.transform_actions(act)
         flip_data = torch.ones((actions.shape[0], 2), dtype=torch.float32)
 
-        if random() > 0.5:
+        if 0:
             obs_screen = torch.flip(obs_screen, [2])
             flip_data[:, 0] = -1
 
-        if random() > 0.5:
+        if 0:
             obs_screen = obs_screen.transpose(2, 3)
             flip_data[:, 1] = -1
 
-        if random() > 0.5:
+        if 0:
             obs_screen = torch.flip(obs_screen, [1])
 
         obs_vector = torch.cat([torch.tensor(actions,dtype=torch.float32), flip_data], dim=1)

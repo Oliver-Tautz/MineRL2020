@@ -102,6 +102,71 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
     return int_to_vector_dict, key_lookup
 
 
+def transform_int_to_actions(ints, camera_noise_threshhold=camera_noise_threshhold):
+
+    key_lookup = load_obj(key_to_index_filename)
+    int_to_vector_dict = load_obj(int_to_vec_filename)
+
+    actions = defaultdict(lambda: [])
+
+
+    vecs = []
+    for i in ints:
+        vecs.append(int_to_vector_dict[i])
+
+    for vec in vecs:
+        for index in key_lookup.keys():
+            if vec[index] == 1:
+                actions[key_lookup[index]].append(1)
+            elif vec[index] == 0:
+                actions[key_lookup[index]].append(0)
+            else:
+                actions[key_lookup[index]].append(0)
+                print("Warning! Trying to convert non binary values to actions.")
+
+    pitch_positive = actions.pop('pitch_positive')
+    pitch_negative = actions.pop('pitch_negative')
+    yaw_positive = actions.pop('yaw_positive')
+    yaw_negative = actions.pop('yaw_negative')
+
+    pitch_action = []
+
+    for pos, neg in zip(pitch_positive, pitch_negative):
+        if pos and neg:
+            print("Warning, both camera directions at the same timestep!")
+            pitch_action.append(2)
+        elif pos:
+            pitch_action.append(2)
+        elif neg:
+            pitch_action.append(-2)
+        else:
+            pitch_action.append(0)
+
+    yaw_action = []
+
+    for pos, neg in zip(yaw_positive, yaw_negative):
+        if pos and neg:
+            print("Warning, both camera directions at the same timestep!")
+            yaw_action.append(2)
+        elif pos:
+            yaw_action.append(2)
+        elif neg:
+            yaw_action.append(-2)
+        else:
+            yaw_action.append(0)
+
+    pitch_action = np.array(pitch_action)
+    yaw_action = np.array(yaw_action)
+
+    camera_action = np.column_stack((pitch_action, yaw_action))
+    actions['camera'] = camera_action
+
+    for key in actions.keys():
+        actions[key] = np.array(actions[key])
+
+    return actions
+
+
 def transform_onehot_to_actions(X,camera_noise_threshhold=camera_noise_threshhold):
 
     key_lookup = load_obj(key_to_index_filename)
@@ -174,7 +239,7 @@ def transform_onehot_to_actions(X,camera_noise_threshhold=camera_noise_threshhol
 
 
 
-def transform_actions_to_onehot(actions, map_to_zero=True, camera_noise_threshhold=camera_noise_threshhold):
+def transform_actions(actions, map_to_zero=True, camera_noise_threshhold=camera_noise_threshhold,get_ints=False):
     pitch_positive, pitch_negative, yaw_positive, yaw_negative = discreticize_camera_action(actions['camera'],
                                                                                             camera_noise_threshhold)
 
@@ -250,7 +315,7 @@ def transform_actions_to_onehot(actions, map_to_zero=True, camera_noise_threshho
 
     mapped_vectors = np.array(mapped_vectors)
 
-    verb_print("{}% of actions mapped".format(no_mapped / no_sampled_actions))
+    verb_print("{}% of actions mapped".format(no_mapped / no_sampled_actions*100))
 
     int_to_vector_dict = dict(enumerate(frequent_uniques))
 
@@ -259,8 +324,10 @@ def transform_actions_to_onehot(actions, map_to_zero=True, camera_noise_threshho
     for vec in (mapped_vectors):
         integer_values.append(get_int_from_vector(int_to_vector_dict, vec, zero_index))
 
-    return int_to_one_hot(integer_values, no_discrete_actions)
-
+    if get_ints:
+        return integer_values
+    else:
+        return int_to_one_hot(integer_values, no_discrete_actions)
 
 
 

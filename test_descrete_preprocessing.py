@@ -123,7 +123,7 @@ print_portions(actions['camera'])
 
 #print('pitch_shape: ',pitch.shape,'\nyaw_shape:', yaw.shape)
 
-from descrete_actions_transform import transform_actions_to_onehot, save_frequent_actions_and_mapping,transform_onehot_to_actions
+from descrete_actions_transform import transform_actions, save_frequent_actions_and_mapping,transform_onehot_to_actions
 
 
 
@@ -140,7 +140,7 @@ def load_obj(name ):
 int_to_vec, key_to_ix = save_frequent_actions_and_mapping(actions)
 
 def test(map_to_zero):
-    X = transform_actions_to_onehot(actions,map_to_zero=map_to_zero)
+    X = transform_actions(actions, map_to_zero=map_to_zero)
 
 
     print(X.shape)
