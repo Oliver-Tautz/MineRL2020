@@ -38,8 +38,30 @@ class MaskGeneratorResnet():
         combined = np.concatenate((img,mask),axis=2)
         return combined
 
+    # input and output = torch.tensor :)
     def append_channel_batch(self,batch):
-        pass
+        batch_shape = batch.shape
+
+        # reshape to (batch,pic)
+        reshaped = torch.reshape(batch,(batch_shape[0] * batch_shape[1], *batch_shape[2:]))
+
+        # get masks from model
+        masks = self.model(reshaped)['out']
+
+        # postprocess to classes
+        masks = torch.argmax(masks,dim=1)
+
+        # reshape back to original shape
+        masks = torch.reshape(masks, (batch_shape[0], batch_shape[1], *masks.shape[1:]))
+
+        # add channel dimension
+        masks = torch.unsqueeze(masks, dim=2)
+
+        # concat channels
+        masked = torch.cat((batch, masks), dim=2)
+
+
+        return masked
 
 
 #cmap = np.asarray([[0, 0, 0],

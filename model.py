@@ -82,9 +82,9 @@ class InputProcessor(nn.Module):
 # TODO make this work for arbitrary nonspati shape.
 # Use Extra None Case. Use (1024-nonspatialsize) for spatial out.
 
-    def __init__(self):
+    def __init__(self,input_channels):
         super().__init__()
-        self.conv_layers = FixupResNetCNN(3,double_channels=True)
+        self.conv_layers = FixupResNetCNN(input_channels,double_channels=True)
         self.spatial_reshape = nn.Sequential(nn.Linear(128*8*8, 1024),nn.ReLU(),nn.LayerNorm(1024))
         #self.nonspatial_reshape = nn.Sequential(nn.Linear(32,128),nn.ReLU(),nn.LayerNorm(128))
 
@@ -110,9 +110,9 @@ class InputProcessor(nn.Module):
 
 class Core(nn.Module):
     
-    def __init__(self):
+    def __init__(self,input_channels):
         super().__init__()
-        self.input_proc = InputProcessor()
+        self.input_proc = InputProcessor(input_channels=input_channels)
         self.lstm = nn.LSTM(1024, 1024, 1)
         
     def forward(self, spatial, nonspatial, state):
@@ -146,7 +146,11 @@ class Model(nn.Module):
     def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False):
         super().__init__()
         self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
-        self.core = Core()
+        if with_masks:
+            self.core = Core(input_channels=4)
+        else:
+            self.core = Core(input_channels=3)
+
         # Dont use Softmax here! Its applied by nn.CrossEntropyLoss().
         self.no_classes=no_classes
         self.selector = nn.Sequential(nn.Linear(1024, 1024), nn.ReLU(), nn.Linear(1024,self.no_classes))
@@ -164,8 +168,8 @@ class Model(nn.Module):
     def compute_front(self, spatial, nonspatial, state):
 
         if self.with_masks:
-            spatialnp = spatial.numpy()
-            spatial = self.masksGenerator.append_channel_batch(spatialnp)
+            #spatialnp = spatial.numpy()
+            spatial = self.masksGenerator.append_channel_batch(spatial)
 
 
 

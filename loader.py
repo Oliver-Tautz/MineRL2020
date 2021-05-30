@@ -54,7 +54,6 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
 
     while True:
         f = next(files)
-        print(type(f))
 
         try:
             d = DataPipeline._load_data_pyfunc(f, -1, None)
