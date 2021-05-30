@@ -6,6 +6,7 @@ import numpy as np
 
 # Segmentation model
 from pretrainedResnetMasks.segm.model import load_fcn_resnet101
+from pretrainedResnetMasks.segm.data import MineDataset
 
 
 
@@ -30,25 +31,35 @@ class MaskGeneratorResnet():
         mask = torch.argmax(mask.squeeze(), dim=0).detach().to(self.device).numpy()
         return mask
 
-cmap = np.asarray([[0, 0, 0],
-                   [0, 0, 1],
-                   [0, 1, 0],
-                   [0, 1, 1],
-                   [1, 0, 0],
-                   [1, 0, 1],
-                   [1, 1, 0],
-                   [1, 1, 1]])
+    def append_channel(self,img):
+        mask = self.transform_image(img)
+        mask = np.expand_dims(mask,axis=-1)
+
+        combined = np.concatenate((img,mask),axis=2)
+        return combined
+
+    def append_channel_batch(self,batch):
+        pass
 
 
+#cmap = np.asarray([[0, 0, 0],
+#                   [0, 0, 1],
+#                   [0, 1, 0],
+#                   [0, 1, 1],
+#                   [1, 0, 0],
+#                   [1, 0, 1],
+#                   [1, 1, 0],
+#                   [1, 1, 1]])
+#
+#
+#
+#img_file = 'pretrainedResnetMasks/data/X.npy'
+#msk_file = 'pretrainedResnetMasks/data/Y.npy'
+#dataset = MineDataset(img_file, msk_file, cmap)
+#testfile = dataset[137][0]
+#resnet = MaskGeneratorResnet('cpu')
+#pred = resnet.transform_image(testfile)
+#padded = resnet.append_channel(testfile)
 
-img_file = 'pretrainedResnetMasks/data/X.npy'
-msk_file = 'pretrainedResnetMasks/data/Y.npy'
-dataset = MineDataset(img_file, msk_file, cmap)
-testfile = dataset[137][0]
-resnet = MaskGeneratorResnet('cpu')
-pred = resnet.transform_image(testfile)
-
-plt.imshow(pred)
-plt.show()
 
 

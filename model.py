@@ -164,7 +164,8 @@ class Model(nn.Module):
     def compute_front(self, spatial, nonspatial, state):
 
         if self.with_masks:
-
+            spatialnp = spatial.numpy()
+            spatial = self.masksGenerator.append_channel_batch(spatialnp)
 
 
 

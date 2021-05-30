@@ -29,7 +29,7 @@ from math import sqrt
 from kmeans import cached_kmeans
 from simple_logger import SimpleLogger
 
-import main
+
 
 import argparse
 parser = argparse.ArgumentParser(description='train the model ...')
@@ -37,6 +37,7 @@ parser.add_argument('modelname',help="name of the model",type=str)
 parser.add_argument('--verbose',help="print more stuff",action="store_true")
 parser.add_argument('--map-to-zero',help="map non recorded actions to zero",action="store_true")
 parser.add_argument('--with-masks',help="use extra mask channel",action="store_true")
+
 args = parser.parse_args()
 
 # In ONLINE=True mode the code saves only the final version with early stopping,
@@ -44,23 +45,23 @@ args = parser.parse_args()
 ONLINE = True
 
 trains_loaded = True
-verb=False
-number_of_checkpoints = 20
-map_to_zero=False
 
-if len(sys.argv) < 2:
-    print("Please enter model name!")
+number_of_checkpoints = 20
+
+
+
+
+modelname = args.modelname
+
+try:
+    os.makedirs("train/{}".format(modelname),exist_ok=False)
+except:
+    print("Model already present!")
     exit()
-else :
-    modelname = sys.argv[1]
-    try:
-        os.makedirs("train/{}".format(modelname),exist_ok=False)
-    except:
-        print("Model already present!")
-        exit()
-if len(sys.argv) == 3:
-    if sys.argv[2] == 'yes':
-        map_to_zero = True
+
+map_to_zero = args.map_to_zero
+with_masks = args.with_masks
+verb = args.verbose
 
 
 
@@ -234,7 +235,7 @@ def main():
 
     #train_files = absolute_file_paths('data/MineRLTreechopVectorObf-v0')
     train_files = absolute_file_paths('data/MineRLTreechop-v0')
-    model = Model(deviceStr=deviceStr,verbose=True,no_classes=30)
+    model = Model(deviceStr=deviceStr,verbose=True,no_classes=30,with_masks=with_masks)
 
 
     shuffle(train_files)
@@ -263,7 +264,7 @@ def main():
         model.cpu()
 
     #model.load_state_dict(torch.load(f"train/trained_models/first_run/model_14.tm", map_location=device))
-    print('Starting training with map_to_zero={}, modelname={}'.format(map_to_zero,modelname))
+    print('Starting training with map_to_zero={}, modelname={}, with_masks={}'.format(map_to_zero,modelname,with_masks))
     train(model, "train", 150000000, loader, logger)
     print('training done!')
     torch.save(model.state_dict(), "train/some_model.tm")

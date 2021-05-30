@@ -27,6 +27,27 @@ from descrete_actions_transform import transform_actions, transform_onehot_to_ac
 
 import sys
 
+import argparse
+
+
+parser = argparse.ArgumentParser(description='train the model ...')
+parser.add_argument('modelname',help="name of the model",type=str)
+parser.add_argument('--verbose',help="print more stuff",action="store_true")
+parser.add_argument('--with-masks',help="use extra mask channel",action="store_true")
+
+
+
+args = parser.parse_args()
+model_name = args.modelname
+
+
+
+
+
+
+
+
+
 # All the evaluations will be evaluated on MineRLObtainDiamondVectorObf-v0 environment
 MINERL_GYM_ENV = os.getenv('MINERL_GYM_ENV', 'MineRLTreechop-v0')
 MINERL_MAX_EVALUATION_EPISODES = int(os.getenv('MINERL_MAX_EVALUATION_EPISODES', 1000))
@@ -36,13 +57,6 @@ MINERL_MAX_EVALUATION_EPISODES = int(os.getenv('MINERL_MAX_EVALUATION_EPISODES',
 EVALUATION_THREAD_COUNT = 1#int(os.getenv('EPISODES_EVALUATION_THREAD_COUNT', 4))
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
-if len(sys.argv) > 1:
-    model_name = sys.argv[1]
-else:
-    model_name='some_model'
-
-
 
 
 class EpisodeDone(Exception):
@@ -168,7 +182,7 @@ class MineRLNetworkAgent(MineRLAgentBase):
         This is where you could load a neural network.
         """
         # Some helpful constants from the environment.
-        self.model = Model(deviceStr=device,verbose=True,no_classes=30)
+        self.model = Model(deviceStr=device,verbose=args.verbose,no_classes=30,with_masks=args.with_masks)
         self.model.load_state_dict(torch.load(f"train/{model_name}/{model_name}.tm", map_location=device))
         # self.model.load_state_dict(torch.load("testing/m.tm", map_location=device))
         
