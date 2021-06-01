@@ -44,8 +44,8 @@ def pseudo_pipe():
 
 
 def loader(files, pipe, main_sem, internal_sem, batch_size):
-    torch.set_num_threads(1)
-    kmeans = cached_kmeans("train", "MineRLObtainDiamondVectorObf-v0")
+    torch.set_num_threads(4)
+    #kmeans = cached_kmeans("train", "MineRLObtainDiamondVectorObf-v0")
 
     files = cycle(files)
 
@@ -253,12 +253,18 @@ class BatchSeqLoader():
 
         data = list(zip(*data))
         output = []
+
+        d_len = len(data[0])
+        for d in data[:-1]:
+            assert len(d) == d_len, 'WARNING! these lengths should better be equal!'
+
         for d in data[:-1]:
 
             if deviceStr == 'cuda':
                 padded = pad_sequence(d).cuda()
             else:
                 padded = pad_sequence(d).cpu()
+
             output.append(padded)
 
         return output + [self.batch_lstm(data[-1])]

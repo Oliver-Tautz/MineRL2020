@@ -30,5 +30,5 @@ class SimplePlotter():
 
 
 
-sp = SimplePlotter('loss_csv/first_run.csv')
+sp = SimplePlotter('loss_csv/working_closest.csv')
 df = sp.df

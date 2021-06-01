@@ -37,6 +37,8 @@ parser.add_argument('modelname',help="name of the model",type=str)
 parser.add_argument('--verbose',help="print more stuff",action="store_true")
 parser.add_argument('--map-to-zero',help="map non recorded actions to zero",action="store_true")
 parser.add_argument('--with-masks',help="use extra mask channel",action="store_true")
+parser.add_argument('--c',help="make torch use number of cpus",default = 12)
+
 
 args = parser.parse_args()
 
@@ -115,7 +117,7 @@ def update_loss_dict(old, new):
 def train(model, mode, steps, loader, logger):
 
 
-    torch.set_num_threads(12)
+    torch.set_num_threads(args.c)
     if mode != "fit_selector":
         optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-6)
     else:
