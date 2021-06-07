@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/use_resnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/use_resnet.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +169,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
-      <option name="PARAMETERS" value="unimportant" />
+      <option name="PARAMETERS" value="unimportant --with-masks" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -222,13 +223,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00002" summary="port to cpu-device.">
-      <created>1619026686560</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1619026686560</updated>
     </task>
     <task id="LOCAL-00003" summary="remove nonspatial input. This seems to work :)">
       <created>1621686309482</created>
@@ -566,14 +560,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623057412586</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="remove old logger">
+      <created>1623057553322</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1623057553322</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix" />
     <MESSAGE value="make printing optional. Dirty implementation" />
     <MESSAGE value="make printing optional, very dirty. Make cuda and cpu viable, also dirty." />
     <MESSAGE value="cleanup output." />
@@ -598,7 +598,8 @@
     <MESSAGE value="add segm.data" />
     <MESSAGE value="add full segm" />
     <MESSAGE value="smal fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="smal fix" />
+    <MESSAGE value="remove old logger" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove old logger" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

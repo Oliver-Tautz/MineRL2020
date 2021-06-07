@@ -11,10 +11,10 @@ from pretrainedResnetMasks.segm.data import MineDataset
 
 
 class MaskGeneratorResnet():
-    def __init__(self,device):
+    def __init__(self,device,model_filename='pretrainedResnetMasks/saved_res_lr_0.001/model.pt'):
         self.device =device
         self.model = load_fcn_resnet101(n_classes=8)
-        self.model.load_state_dict(torch.load('/home/olli/gits/MichalOpMineRL2020/pretrainedResnetMasks/saved_res_lr_0.001/model.pt', map_location=device))
+        self.model.load_state_dict(torch.load(model_filename, map_location=device))
         self.model = self.model.to(device)
         self.model = self.model.eval()
 
