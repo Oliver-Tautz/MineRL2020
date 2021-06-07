@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -525,14 +524,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623048432797</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="fix eval">
+      <created>1623053539474</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1623053539474</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="merge some stupid stuff" />
     <MESSAGE value="correct python 3.9 syntax AHRG" />
     <MESSAGE value="revert change." />
     <MESSAGE value="revert revert change" />
@@ -557,7 +562,8 @@
     <MESSAGE value="resnet integration finished" />
     <MESSAGE value="use more threads for loading, asser padding. adjust train/test scripts" />
     <MESSAGE value="eval added to train. This is rudimentary implementation ..." />
-    <option name="LAST_COMMIT_MESSAGE" value="eval added to train. This is rudimentary implementation ..." />
+    <MESSAGE value="fix eval" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix eval" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

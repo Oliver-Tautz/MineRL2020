@@ -8,13 +8,10 @@ import sys
 import argparse
 
 from tqdm import tqdm
-import cProfile as profile
 
-import gym
-import minerl
 import coloredlogs
 
-from torchsummary import summary
+
 
 coloredlogs.install(logging.DEBUG)
 
