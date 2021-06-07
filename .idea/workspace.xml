@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/use_resnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/use_resnet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simple_plotter.py" beforeDir="false" afterPath="$PROJECT_DIR$/simple_plotter.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +71,7 @@
       <recent name="$PROJECT_DIR$/train/trained_models" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.train">
+  <component name="RunManager" selected="Python.simple_plotter">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -207,8 +207,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.train" />
         <item itemvalue="Python.simple_plotter" />
+        <item itemvalue="Python.train" />
         <item itemvalue="Python.test_first_model" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.main" />
@@ -223,13 +223,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00003" summary="remove nonspatial input. This seems to work :)">
-      <created>1621686309482</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1621686309482</updated>
     </task>
     <task id="LOCAL-00004" summary="remove nonspatial input. This seems to work :)">
       <created>1621686397384</created>
@@ -567,14 +560,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623057553322</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="make resnet model path relative">
+      <created>1623059027050</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1623059027111</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="make printing optional. Dirty implementation" />
     <MESSAGE value="make printing optional, very dirty. Make cuda and cpu viable, also dirty." />
     <MESSAGE value="cleanup output." />
     <MESSAGE value="fix late-logging" />
@@ -599,7 +598,8 @@
     <MESSAGE value="add full segm" />
     <MESSAGE value="smal fix" />
     <MESSAGE value="remove old logger" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove old logger" />
+    <MESSAGE value="make resnet model path relative" />
+    <option name="LAST_COMMIT_MESSAGE" value="make resnet model path relative" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -23,12 +23,17 @@ class SimplePlotter():
     def plot_line(self,colX,colY,startx=0):
         df = self.df.drop(range(0,startx))
         fig = df.plot(x=colX,y=colY,xlabel=colX,ylabel=colY)
+
+    def show(self):
         plt.show()
+
+    def clear(self):
         plt.clf()
 
+    def plot_vlines(self,x):
+        plt.vlines(x,linestyles = 'dotted',  color="green",ymin=0,ymax=3,label='checkpoints')
 
-
-
+x = [350000/20*i for i in range(1,20)]
 
 sp = SimplePlotter('loss_csv/working_closest.csv')
-df = sp.df
+
