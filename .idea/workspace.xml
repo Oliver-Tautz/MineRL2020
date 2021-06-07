@@ -518,14 +518,20 @@
       <option name="project" value="LOCAL" />
       <updated>1622564626451</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="eval added to train. This is rudimentary implementation ...">
+      <created>1623048432797</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1623048432797</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add option for short runs." />
     <MESSAGE value="merge some stupid stuff" />
     <MESSAGE value="correct python 3.9 syntax AHRG" />
     <MESSAGE value="revert change." />
@@ -550,7 +556,8 @@
     <MESSAGE value="commit for folder structure. unusable commit" />
     <MESSAGE value="resnet integration finished" />
     <MESSAGE value="use more threads for loading, asser padding. adjust train/test scripts" />
-    <option name="LAST_COMMIT_MESSAGE" value="use more threads for loading, asser padding. adjust train/test scripts" />
+    <MESSAGE value="eval added to train. This is rudimentary implementation ..." />
+    <option name="LAST_COMMIT_MESSAGE" value="eval added to train. This is rudimentary implementation ..." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -190,7 +190,7 @@ def train(model, mode, steps, train_loader, val_loader, logger):
 
         val_loss = val_loss.sum()  # / BATCH_SIZE / SEQ_LEN
 
-        val_losssum += loss.item()
+        val_losssum += val_loss.item()
 
         model.train()
 
@@ -228,7 +228,7 @@ def train(model, mode, steps, train_loader, val_loader, logger):
             simple_logger.log(
                 [step, losssum / 40, val_losssum / 40, gradsum / 40, float(optimizer.param_groups[0]["lr"])])
             losssum = 0
-            val_losssum
+            val_losssum = 0
             gradsum = 0
             loss_dict = None
             val_loss_dict = None
