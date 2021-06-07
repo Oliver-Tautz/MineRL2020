@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -546,15 +546,27 @@
       <option name="project" value="LOCAL" />
       <updated>1623054630458</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="add segm.data">
+      <created>1623054958393</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1623054958393</updated>
+    </task>
+    <task id="LOCAL-00048" summary="add full segm">
+      <created>1623055161389</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1623055161389</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="revert change." />
-    <MESSAGE value="revert revert change" />
     <MESSAGE value="python 3.5 ;(" />
     <MESSAGE value="fix" />
     <MESSAGE value="make printing optional. Dirty implementation" />
@@ -578,7 +590,9 @@
     <MESSAGE value="eval added to train. This is rudimentary implementation ..." />
     <MESSAGE value="fix eval" />
     <MESSAGE value="remove unessecary imports from train.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove unessecary imports from train.py" />
+    <MESSAGE value="add segm.data" />
+    <MESSAGE value="add full segm" />
+    <option name="LAST_COMMIT_MESSAGE" value="add full segm" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

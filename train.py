@@ -13,7 +13,7 @@ import coloredlogs
 
 
 
-coloredlogs.install(logging.DEBUG)
+#coloredlogs.install(logging.DEBUG)
 
 from model import Model
 import torch
