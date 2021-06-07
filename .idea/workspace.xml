@@ -3,11 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/loader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/record_episode.py" beforeDir="false" afterPath="$PROJECT_DIR$/record_episode.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple_logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/simple_logger.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple_plotter.py" beforeDir="false" afterPath="$PROJECT_DIR$/simple_plotter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -119,6 +114,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="simple_plotter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="MichalOpMineRL2020" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/simple_plotter.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="test_first_model" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -183,18 +199,19 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.main" />
       <item itemvalue="Python.test_first_model" />
       <item itemvalue="Python.train" />
-      <item itemvalue="Python.main" />
       <item itemvalue="Python.use_resnet" />
+      <item itemvalue="Python.simple_plotter" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.train" />
+        <item itemvalue="Python.simple_plotter" />
         <item itemvalue="Python.test_first_model" />
         <item itemvalue="Python.main" />
         <item itemvalue="Python.main" />
-        <item itemvalue="Python.use_resnet" />
       </list>
     </recent_temporary>
   </component>
@@ -494,14 +511,20 @@
       <option name="project" value="LOCAL" />
       <updated>1622361948135</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="use more threads for loading, asser padding. adjust train/test scripts">
+      <created>1622564626451</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1622564626451</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added logs folder" />
     <MESSAGE value="add option for short runs." />
     <MESSAGE value="merge some stupid stuff" />
     <MESSAGE value="correct python 3.9 syntax AHRG" />
@@ -526,24 +549,25 @@
     <MESSAGE value="change to no_classes = 30" />
     <MESSAGE value="commit for folder structure. unusable commit" />
     <MESSAGE value="resnet integration finished" />
-    <option name="LAST_COMMIT_MESSAGE" value="resnet integration finished" />
+    <MESSAGE value="use more threads for loading, asser padding. adjust train/test scripts" />
+    <option name="LAST_COMMIT_MESSAGE" value="use more threads for loading, asser padding. adjust train/test scripts" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>216</line>
+          <line>236</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>223</line>
+          <line>240</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>136</line>
+          <line>137</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -606,19 +630,32 @@
           <line>119</line>
           <option name="timeStamp" value="50" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>162</line>
+          <line>159</line>
           <option name="timeStamp" value="53" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>122</line>
+          <option name="timeStamp" value="54" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>93</line>
+          <option name="timeStamp" value="55" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>115</line>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>136</line>
+          <option name="timeStamp" value="57" />
+        </line-breakpoint>
       </breakpoints>
-      <default-breakpoints>
-        <breakpoint type="python-exception">
-          <properties notifyOnTerminate="true" exception="BaseException">
-            <option name="notifyOnTerminate" value="true" />
-          </properties>
-        </breakpoint>
-      </default-breakpoints>
     </breakpoint-manager>
   </component>
 </project>
