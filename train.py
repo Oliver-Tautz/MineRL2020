@@ -273,7 +273,7 @@ def main():
     print(
         'Starting training with map_to_zero={}, modelname={}, with_masks={}'.format(map_to_zero, modelname, with_masks))
     train(model, "train", 150000000, train_loader, val_loader,
-          logger)
+          None)
     print('training done!')
     torch.save(model.state_dict(), "train/some_model.tm")
     print("ok", file=sys.stderr)
