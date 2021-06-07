@@ -238,11 +238,7 @@ def train(model, mode, steps, train_loader, val_loader, logger):
 def main():
     # a bit of code that creates clearml logging (formerly trains) if clearml
     # is available
-    if trains_loaded and not ONLINE:
-        task = Task.init(project_name='MineRL', task_name='kmeans pic+pic+tre 1024 + flips whatever')
-        logger = task.get_logger()
-    else:
-        logger = None
+
 
     os.makedirs("train", exist_ok=True)
     cached_kmeans("train", "MineRLObtainDiamondVectorObf-v0")

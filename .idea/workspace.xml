@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -560,14 +559,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623055161389</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="smal fix">
+      <created>1623057223606</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1623057223606</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="python 3.5 ;(" />
     <MESSAGE value="fix" />
     <MESSAGE value="make printing optional. Dirty implementation" />
     <MESSAGE value="make printing optional, very dirty. Make cuda and cpu viable, also dirty." />
@@ -592,7 +597,8 @@
     <MESSAGE value="remove unessecary imports from train.py" />
     <MESSAGE value="add segm.data" />
     <MESSAGE value="add full segm" />
-    <option name="LAST_COMMIT_MESSAGE" value="add full segm" />
+    <MESSAGE value="smal fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="smal fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
