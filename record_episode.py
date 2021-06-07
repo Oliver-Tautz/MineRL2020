@@ -27,10 +27,19 @@ class EpisodeRecorder():
     def _manual_save_frames(self,dir):
         pass
 
-    # filepath m,ust end in .avi!
+    # filepath must end in .avi!
     def save_vid(self,filepath):
         if self.frames:
-            out = cv2.VideoWriter(filepath, cv2.VideoWriter_fourcc(*'DIVX'), 30, self.frames[0].shape[0:2])
+
+            # remove filename
+            dirpath =  (filepath.split('/'))
+            dirpath.pop(-1)
+
+            # restore path
+            dirpath = os.path.join(*dirpath)
+
+            os.makedirs(dirpath,exist_ok=True)
+            out = cv2.VideoWriter(filepath, cv2.VideoWriter_fourcc(*'HFYU'), 30, self.frames[0].shape[0:2])
             for frame in self.frames:
                 out.write(frame)
 
