@@ -5,7 +5,7 @@ import torch.distributions as D
 import math
 from kmeans import cached_kmeans
 import use_resnet
-import cProfile as profile
+
 
 from timeit import timeit
 
