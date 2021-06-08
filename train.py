@@ -28,6 +28,8 @@ from simple_logger import SimpleLogger
 import numpy as np
 import random
 
+from mineDataset import Dataset
+
 import argparse
 
 parser = argparse.ArgumentParser(description='train the model ...')
@@ -64,6 +66,7 @@ map_to_zero = args.map_to_zero
 with_masks = args.with_masks
 verb = args.verbose
 
+print(verb)
 
 def verb_print(*strings):
     global verb
@@ -112,7 +115,7 @@ def update_loss_dict(old, new):
     return new
 
 
-def train(model, mode, steps, train_loader, val_loader, logger):
+def train(model, mode, epochs, train_loader, val_loader,batchsize):
     torch.set_num_threads(args.c)
     if mode != "fit_selector":
         optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-6)
@@ -140,6 +143,7 @@ def train(model, mode, steps, train_loader, val_loader, logger):
 
         step += 1
         spatial, nonspatial, prev_action, act, hidden = train_loader.get_batch(BATCH_SIZE)
+        print(spatial.shape)
 
         verb_print('batchsize ', BATCH_SIZE)
         verb_print('sequence length ', SEQ_LEN)
