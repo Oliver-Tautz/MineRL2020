@@ -5,6 +5,8 @@ from tqdm import tqdm
 import os
 import minerl
 
+from torch.utils.data import DataLoader
+
 # Segmentation model
 from pretrainedResnetMasks.segm.model import load_fcn_resnet101
 from pretrainedResnetMasks.segm.data import MineDataset
@@ -130,15 +132,16 @@ def precompute_dir(filepath, device):
     loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=1)
     resnet = MaskGeneratorResnet(device=device)
 
-    for replay in tqdm(os.listdir(filepath)):
-        obs, act, reward, nextobs, done = loader._load_data_pyfunc(os.path.join(filepath, replay), -1, None)
-        obs = torch.tensor(obs['pov'], dtype=torch.float32).to(device)
 
-        masks = resnet.return_masks(obs)
-        torch.save(masks, os.path.join(filepath, replay, 'mask.pt'))
+    set = MineDataset(filepath, sequence_length=1)
 
-        del masks
-        del obs
+
+    masks = resnet.return_masks(obs)
+    torch.save(masks, os.path.join(filepath, replay, 'mask.pt'))
+    set = DataLoader(set, batch_size=100,
+                              shuffle=True, num_workers=0, drop_last=False)
+    del masks
+    del obs
 
 if __name__ == '__main__':
     precompute_dir('data/MineRLTreechop-v0/val',device='cuda')

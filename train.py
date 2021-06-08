@@ -125,7 +125,7 @@ def train(model, epochs, train_loader, val_loader):
     best_val_loss = 1000
 
     for epoch in trange(epochs, desc='epochs'):
-
+        model.train()
         # save batch losses
         epoch_train_loss = []
         epoch_val_loss = []
