@@ -59,11 +59,15 @@ torch.manual_seed(12)
 random.seed(12)
 np.random.seed(12)
 
-try:
-    os.makedirs("train/{}".format(modelname), exist_ok=True)
-except:
-    print("Model already present!")
-    exit()
+model_index = 0
+
+while (True):
+    try:
+        os.makedirs(f"train/{modelname}_{model_index}", exist_ok=False)
+        model_folder = f"train/{modelname}_{model_index}"
+    except:
+        model_index+=1
+        break
 
 map_to_zero = args.map_to_zero
 with_masks = args.with_masks
@@ -94,12 +98,13 @@ BATCH_SIZE = args.batchsize
 SEQ_LEN = args.seq_len
 
 if args.debug:
-    no_replays = 3
+    no_replays = 2
 else:
     no_replays =300
 
 
 def train(model, epochs, train_loader, val_loader):
+
     torch.set_num_threads(args.c)
     optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-6)
 
@@ -108,16 +113,16 @@ def train(model, epochs, train_loader, val_loader):
 
     scheduler = LambdaLR(optimizer, lr_lambda=lambda1)
     optimizer.zero_grad()
-    step = 0
+
 
     gradsum = 0
 
-    simple_logger = SimpleLogger("loss_csv/{}_{}.csv".format(modelname,datetime.now()),
+    simple_logger = SimpleLogger(f"{model_folder}/with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_time={datetime.now()}.csv",
                                  ['epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate'])
 
     nonspatial_dummy = torch.zeros(10)
 
-    for epoch in tqdm(range(epochs), desc='epochs',position=0,leave=True):
+    for epoch in tqdm(range(epochs), desc='epochs'):
 
         # save batch losses
         epoch_train_loss = []
@@ -152,7 +157,7 @@ def train(model, epochs, train_loader, val_loader):
         with torch.no_grad():
             model.eval()
 
-            for pov, act in tqdm(train_loader, desc='batch_eval',position=0,leave=True):
+            for pov, act in tqdm(val_loader, desc='batch_eval',position=0,leave=True):
                 # reset hidden
                 hidden = model.get_zero_state(BATCH_SIZE)
                 pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
@@ -169,7 +174,7 @@ def train(model, epochs, train_loader, val_loader):
 
             model.train()
             print("------------------Saving Model!-----------------------")
-            torch.save(model.state_dict(), f"train/{modelname}/{modelname}_with-masks]{with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_epoch={epoch}_time={datetime.now()}.tm")
+            torch.save(model.state_dict(), f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_epoch={epoch}_time={datetime.now()}.tm")
 
             print("-------------Logging!!!-------------")
             simple_logger.log(

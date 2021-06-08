@@ -68,6 +68,7 @@ class MaskGeneratorResnet():
 
     # input and output = torch.tensor :)
     # input = (batch,...)
+
     def append_channel_batch(self, batch):
         batch_shape = batch.shape
 
@@ -90,6 +91,27 @@ class MaskGeneratorResnet():
 
 
         return masked
+
+    def return_masks(self, batch):
+        batch_shape = batch.shape
+
+        # reshape to (batch,pic)
+        reshaped = torch.transpose(batch,1,3)
+
+
+        # get masks from model
+        masks = self.model(reshaped)['out']
+
+
+        # postprocess to classes
+        masks = torch.argmax(masks,dim=1)
+
+        # add channel dimension
+        masks = torch.unsqueeze(masks, dim=3)
+
+
+
+        return masks
 
 #cmap = np.asarray([[0, 0, 0],
 #                   [0, 0, 1],
@@ -116,6 +138,11 @@ def precompute_dir(filepath,device):
     loader = minerl.data.make('MineRLTreechop-v0',data_dir='./data',num_workers=1)
     resnet = MaskGeneratorResnet(device=device)
 
+    for replay in os.listdir(filepath):
+        obs, act, reward, nextobs, done = loader._load_data_pyfunc(os.path.join(filepath,replay), -1, None)
+
+
+
 if __name__ == "__main__":
     loader = minerl.data.make('MineRLTreechop-v0',data_dir='./data',num_workers=1)
     resnet = MaskGeneratorResnet(device='cpu')
@@ -125,7 +152,7 @@ if __name__ == "__main__":
     d = loader._load_data_pyfunc('./data/MineRLTreechop-v0/train/{}'.format(f), -1, None)
     obs, act, reward, nextobs, done = d
     print(obs['pov'][0:100].shape)
-    print(resnet.append_channel_batch(torch.tensor(obs['pov'][0:100], dtype=torch.float32)).shape)
+    print(resnet.return_masks(torch.tensor(obs['pov'][0:100], dtype=torch.float32)).shape)
 
     #for f in tqdm(os.listdir('./data/MineRLTreechop-v0/train'),desc='loading'):
 
