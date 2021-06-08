@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/use_resnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/use_resnet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,7 +138,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="test_first_model" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="test_first_model" type="PythonConfigurationType" factoryName="Python">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -159,7 +159,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="train" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="train" type="PythonConfigurationType" factoryName="Python">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -181,19 +181,17 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.train" />
-      <item itemvalue="Python.test_first_model" />
+      <item itemvalue="Python.descrete_actions_transform" />
       <item itemvalue="Python.simple_plotter" />
       <item itemvalue="Python.test_descrete_preprocessing" />
-      <item itemvalue="Python.descrete_actions_transform" />
+      <item itemvalue="Python.test_first_model" />
+      <item itemvalue="Python.train" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.train" />
         <item itemvalue="Python.descrete_actions_transform" />
         <item itemvalue="Python.test_descrete_preprocessing" />
         <item itemvalue="Python.simple_plotter" />
-        <item itemvalue="Python.test_first_model" />
       </list>
     </recent_temporary>
   </component>
@@ -205,13 +203,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00013" summary="add option for short runs.">
-      <created>1621756625264</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1621756625264</updated>
     </task>
     <task id="LOCAL-00014" summary="merge some stupid stuff">
       <created>1621756667714</created>
@@ -549,14 +540,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623156713345</updated>
     </task>
-    <option name="localTasksCounter" value="62" />
+    <task id="LOCAL-00062" summary="check what device is used">
+      <created>1623157421241</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1623157421241</updated>
+    </task>
+    <option name="localTasksCounter" value="63" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="make no_checkpoints adjustable in script." />
     <MESSAGE value="change map to zero" />
     <MESSAGE value="change to no softmax" />
     <MESSAGE value="get 50 action dict." />
@@ -581,24 +578,25 @@
     <MESSAGE value="make dataloader single threaded" />
     <MESSAGE value="set no replays to max" />
     <MESSAGE value="add debug option, pin memro =true" />
-    <option name="LAST_COMMIT_MESSAGE" value="add debug option, pin memro =true" />
+    <MESSAGE value="check what device is used" />
+    <option name="LAST_COMMIT_MESSAGE" value="check what device is used" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>177</line>
+          <line>179</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>179</line>
+          <line>181</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>110</line>
+          <line>111</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -663,12 +661,12 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>114</line>
+          <line>115</line>
           <option name="timeStamp" value="53" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>103</line>
+          <line>104</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">

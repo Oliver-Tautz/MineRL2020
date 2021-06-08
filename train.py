@@ -167,6 +167,7 @@ def train(model, epochs, train_loader, val_loader):
                 loss = loss.sum()
                 epoch_val_loss.append(loss.item())
 
+            model.train()
             print("------------------Saving Model!-----------------------")
             torch.save(model.state_dict(), f"train/{modelname}/{modelname}_with-masks]{with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_epoch={epoch}_time={datetime.now()}.tm")
 
