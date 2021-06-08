@@ -134,7 +134,7 @@ def precompute_dir(filepath, device):
         obs, act, reward, nextobs, done = loader._load_data_pyfunc(os.path.join(filepath, replay), -1, None)
         obs = torch.tensor(obs['pov'], dtype=torch.float32).to(device)
 
-        masks = resnet.return_masks()
+        masks = resnet.return_masks(obs)
         torch.save(masks, os.path.join(filepath, replay, 'mask.pt'))
 
         del masks
