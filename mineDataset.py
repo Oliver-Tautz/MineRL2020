@@ -19,7 +19,7 @@ class MineDataset(Dataset):
     # cpus              = mnake dataloader use multiple cores. Can not utilize more than 3 really
     # no_replays        = choose lower number of replays if ram is an issue.
 
-    def __init__(self,root_dir, sequence_length=100,with_masks=False,map_to_zero = True,cpus=3, no_replays = 300):
+    def __init__(self,root_dir, sequence_length=100,with_masks=False,map_to_zero = True,cpus=3, no_replays = 300,no_classes=30):
 
 
 
@@ -66,7 +66,7 @@ class MineDataset(Dataset):
             self.replays_length[i] = (len(obs['pov'])//sequence_length)-1
 
             self.replays_pov[i] = torch.tensor(obs['pov'],dtype=torch.float32)
-            self.replays_act[i] = torch.tensor(transform_actions(act,map_to_zero=map_to_zero,get_ints=True),dtype=torch.long)
+            self.replays_act[i] = torch.tensor(transform_actions(act,map_to_zero=map_to_zero,get_ints=True,no_classes=no_classes),dtype=torch.long)
             #replays[i] = d
 
 

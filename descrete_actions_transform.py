@@ -2,6 +2,8 @@ import pickle
 import numpy as np
 from tqdm import tqdm
 from collections import defaultdict
+import os
+import minerl
 
 verb=False
 
@@ -31,10 +33,52 @@ def load_obj(name):
         return pickle.load(f)
 
 
+
+# Wrapper function for using directory as input
+
+def save_frequent_actions_and_mapping_for_dir(folders, no_discrete_actions=30, camera_noise_threshhold=camera_noise_threshhold):
+
+    def concat_actions(actlist):
+        if actlist:
+            start = actlist.pop()
+        else:
+            print('No actions given!')
+            return []
+
+        while actlist:
+            start = np.concatenate((start, actlist.pop()), axis=0)
+
+        return start
+
+    loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=4)
+    actions = defaultdict(lambda: [])
+
+
+    for folder in folders:
+        replays=(os.listdir(folder))
+
+        for f in tqdm(replays, desc='loading actions for clustering',position=0,leave=True):
+            d = loader._load_data_pyfunc(os.path.join(folder,f), -1, None)
+            obs, act, reward, nextobs, done = d
+
+            for key in act.keys():
+                actions[key].append(act[key])
+
+    for key in actions.keys():
+        actions[key] = concat_actions(actions[key])
+
+    camera_actions = actions['camera']
+
+
+
+
+
+
+    save_frequent_actions_and_mapping(actions,no_discrete_actions=no_discrete_actions, camera_noise_threshhold=camera_noise_threshhold)
+
 # Takes dict of discrete actions from Treechop-v0 environment
 # and returns one hot encoded actions with ndim = no_discrete_actions.
 # If map_to_zero is True, infrequent actions will be mapped to the zero vector.
-
 
 def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_noise_threshhold=camera_noise_threshhold):
     actions = actions.copy()
@@ -60,7 +104,7 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
     # verb_print('one_hot_dimensionality: ', one_hot_encoding_size)
 
     vectors = []
-    for i in tqdm(range(no_sampled_actions), desc='get_action_vectors'):
+    for i in tqdm(range(no_sampled_actions), desc='get_action_vectors',position=0,leave=True):
         action_vector = np.zeros(array_dimensionality)
 
         for key in actions.keys():
@@ -96,8 +140,8 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
 
     int_to_vector_dict = dict(enumerate(frequent_uniques))
 
-    save_obj(int_to_vector_dict, int_to_vec_filename)
-    save_obj(key_lookup, key_to_index_filename)
+    save_obj(int_to_vector_dict, f'{int_to_vec_filename}_{no_discrete_actions}')
+    save_obj(key_lookup,f'{key_to_index_filename}_{no_discrete_actions}')
 
     return int_to_vector_dict, key_lookup
 
@@ -239,14 +283,23 @@ def transform_onehot_to_actions(X,camera_noise_threshhold=camera_noise_threshhol
 
 
 
-def transform_actions(actions, map_to_zero=True, camera_noise_threshhold=camera_noise_threshhold,get_ints=False):
+def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_threshhold=camera_noise_threshhold,get_ints=False):
     pitch_positive, pitch_negative, yaw_positive, yaw_negative = discreticize_camera_action(actions['camera'],
                                                                                             camera_noise_threshhold)
 
 
     actions = actions.copy()
-    key_lookup = load_obj(key_to_index_filename)
-    int_to_vector_dict = load_obj(int_to_vec_filename)
+
+
+    #if mappings dont exist yet, make them!
+
+    if not os.path.isfile(f'obj/{key_to_index_filename}_{no_classes}.pkl') or not os.path.isfile(f'obj/{int_to_vec_filename}_{no_classes}.pkl'):
+        print('descrete actions transform: no precomputed actions found! Computing new...')
+        save_frequent_actions_and_mapping_for_dir(['data/MineRLTreechop-v0/train','data/MineRLTreechop-v0/val'],no_discrete_actions=no_classes)
+
+    # this could be done only once ...
+    key_lookup = load_obj(f'{key_to_index_filename}_{no_classes}')
+    int_to_vector_dict = load_obj(f'{int_to_vec_filename}_{no_classes}')
 
     actions['pitch_positive'] = pitch_positive
     actions['pitch_negative'] = pitch_negative
@@ -380,3 +433,8 @@ def get_int_from_vector(int_to_array_dict, vector, zero_index):
     print("Warning! Not yet seen action converted to zero_vector.")
     print(vector)
     return zero_index
+
+
+if __name__ == '__main__':
+    pass
+    #save_frequent_actions_and_mapping_for_dir(['data/MineRLTreechop-v0/train','data/MineRLTreechop-v0/val'])

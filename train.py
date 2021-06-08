@@ -37,9 +37,10 @@ parser.add_argument('--verbose', help="print more stuff", action="store_true")
 parser.add_argument('--map-to-zero', help="map non recorded actions to zero", action="store_true")
 parser.add_argument('--with-masks', help="use extra mask channel", action="store_true")
 parser.add_argument('--c', help="make torch use number of cpus",type=int, default=4)
-parser.add_argument('--epochs', help="make torch use number of cpus", default=100)
+parser.add_argument('--epochs', help="make torch use number of cpus", type=int,default=100)
 parser.add_argument('--batchsize', help="make torch use number of cpus",type=int, default=4)
-parser.add_argument('--seq-len', help="make torch use number of cpus", default=100)
+parser.add_argument('--seq-len', help="make torch use number of cpus",type=int, default=100)
+parser.add_argument('--no-classes', help="use number of distcrete actions",type=int, default=30)
 
 args = parser.parse_args()
 
@@ -67,8 +68,7 @@ map_to_zero = args.map_to_zero
 with_masks = args.with_masks
 verb = args.verbose
 epochs = args.epochs
-
-print(verb)
+no_classes = args.no_classes
 
 
 def verb_print(*strings):
@@ -110,14 +110,14 @@ def train(model, epochs, train_loader, val_loader):
 
     nonspatial_dummy = torch.zeros(10)
 
-    for epoch in tqdm(range(epochs), desc='epochs'):
+    for epoch in tqdm(range(epochs), desc='epochs',position=0,leave=True):
 
         # save batch losses
         epoch_train_loss = []
         epoch_val_loss = []
 
         # train on batches
-        for pov, act in tqdm(train_loader, desc='batch_train'):
+        for pov, act in tqdm(train_loader, desc='batch_train',position=0,leave=True):
             # reset hidden
             hidden = model.get_zero_state(BATCH_SIZE)
 
@@ -146,7 +146,7 @@ def train(model, epochs, train_loader, val_loader):
         with torch.no_grad():
             model.eval()
 
-            for pov, act in tqdm(train_loader, desc='batch_eval'):
+            for pov, act in tqdm(train_loader, desc='batch_eval',position=0,leave=True):
                 # reset hidden
                 hidden = model.get_zero_state(BATCH_SIZE)
                 pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
@@ -162,7 +162,7 @@ def train(model, epochs, train_loader, val_loader):
                 epoch_val_loss.append(loss.item())
 
             print("------------------Saving Model!-----------------------")
-            torch.save(model.state_dict(), f"train/{modelname}/{modelname}_epoch={epoch}_time={datetime.now()}.tm")
+            torch.save(model.state_dict(), f"train/{modelname}/{modelname}_with-masks]{with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_epoch={epoch}_time={datetime.now()}.tm")
 
             print("-------------Logging!!!-------------")
             simple_logger.log(
@@ -176,31 +176,26 @@ def main():
     # a bit of code that creates clearml logging (formerly trains) if clearml
     # is available
 
-    model = Model(deviceStr=deviceStr, verbose=False, no_classes=30, with_masks=with_masks)
+    model = Model(deviceStr=deviceStr, verbose=False, no_classes=no_classes, with_masks=with_masks)
 
     os.makedirs("train", exist_ok=True)
 
     train_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=SEQ_LEN, map_to_zero=map_to_zero,
-                            with_masks=with_masks, no_replays=3)
+                            with_masks=with_masks, no_replays=3,no_classes=no_classes)
 
     val_set = MineDataset('data/MineRLTreechop-v0/val', sequence_length=SEQ_LEN, map_to_zero=map_to_zero,
-                          with_masks=with_masks, no_replays=1)
+                          with_masks=with_masks, no_replays=1,no_classes=no_classes)
 
+
+    # shuffle only train set.
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE,
                               shuffle=True, num_workers=args.c-1, drop_last=True)
 
     val_loader = DataLoader(val_set, batch_size=BATCH_SIZE,
                             shuffle=False, num_workers=args.c-1, drop_last=True)
-    # print(spatial.shape)
-    # print(nonspatial.shape)
-    # print(prev_action.shape)
-    # print(act.shape)
-    # print(hidden.shape)
 
-    # summary(Model)
 
-    # if LOAD:
-    #    model.load_state_dict(torch.load("train/some_model.tm"))
+
     if deviceStr == "cuda":
         model.cuda()
     else:
@@ -208,7 +203,7 @@ def main():
 
     # model.load_state_dict(torch.load(f"train/trained_models/first_run/model_14.tm", map_location=device))
     print(
-        'Starting training with map_to_zero={}, modelname={}, with_masks={}'.format(map_to_zero, modelname, with_masks))
+        'Starting training with map_to_zero={}, modelname={}, with_masks={}, no_actions={}'.format(map_to_zero, modelname, with_masks,no_classes))
 
     train(model, 3, train_loader, val_loader)
 

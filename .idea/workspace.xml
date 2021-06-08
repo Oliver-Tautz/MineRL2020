@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
+    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="set reasonable value for torch cpus.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/descrete_actions_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/descrete_actions_transform.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mineDataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/mineDataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_descrete_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_descrete_preprocessing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -75,6 +78,27 @@
     </key>
   </component>
   <component name="RunManager" selected="Python.train">
+    <configuration name="descrete_actions_transform" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="MichalOpMineRL2020" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/descrete_actions_transform.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="simple_plotter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -151,28 +175,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
-      <option name="PARAMETERS" value="unimportant" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="use_resnet" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="MichalOpMineRL2020" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/use_resnet.py" />
-      <option name="PARAMETERS" value="" />
+      <option name="PARAMETERS" value="unimportant --no-classes 50" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -182,18 +185,18 @@
     </configuration>
     <list>
       <item itemvalue="Python.train" />
-      <item itemvalue="Python.use_resnet" />
       <item itemvalue="Python.test_first_model" />
       <item itemvalue="Python.simple_plotter" />
       <item itemvalue="Python.test_descrete_preprocessing" />
+      <item itemvalue="Python.descrete_actions_transform" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.train" />
+        <item itemvalue="Python.descrete_actions_transform" />
         <item itemvalue="Python.test_descrete_preprocessing" />
         <item itemvalue="Python.simple_plotter" />
         <item itemvalue="Python.test_first_model" />
-        <item itemvalue="Python.use_resnet" />
       </list>
     </recent_temporary>
   </component>
@@ -205,13 +208,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Also added translation dicts.">
-      <created>1621688085276</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1621688085276</updated>
     </task>
     <task id="LOCAL-00009" summary="change pickle settings for support.">
       <created>1621688558999</created>
@@ -549,14 +545,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623152858363</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="set reasonable value for torch cpus.">
+      <created>1623152935463</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1623152935463</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix late-logging" />
     <MESSAGE value="use 3 cpus in torch." />
     <MESSAGE value="change_saving" />
     <MESSAGE value="integrate testing, add plotter, make model training ready." />
@@ -581,7 +583,8 @@
     <MESSAGE value="make resnet model path relative" />
     <MESSAGE value="updated simple plotter" />
     <MESSAGE value="remove kmeans" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove kmeans" />
+    <MESSAGE value="set reasonable value for torch cpus." />
+    <option name="LAST_COMMIT_MESSAGE" value="set reasonable value for torch cpus." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -623,7 +626,7 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>43</line>
+          <line>44</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -681,10 +684,15 @@
           <line>136</line>
           <option name="timeStamp" value="57" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
           <line>91</line>
           <option name="timeStamp" value="67" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/descrete_actions_transform.py</url>
+          <line>142</line>
+          <option name="timeStamp" value="68" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
