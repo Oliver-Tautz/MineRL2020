@@ -111,6 +111,11 @@ class MaskGeneratorResnet():
 #padded = resnet.append_channel(testfile)
 
 # precompute masks for dataset.
+
+def precompute_dir(filepath,device):
+    loader = minerl.data.make('MineRLTreechop-v0',data_dir='./data',num_workers=1)
+    resnet = MaskGeneratorResnet(device=device)
+
 if __name__ == "__main__":
     loader = minerl.data.make('MineRLTreechop-v0',data_dir='./data',num_workers=1)
     resnet = MaskGeneratorResnet(device='cpu')

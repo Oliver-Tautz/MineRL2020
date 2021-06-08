@@ -80,6 +80,7 @@ def verb_print(*strings):
 
 deviceStr = "cuda" if torch.cuda.is_available() else "cpu"
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+print('using device:', device,file=sys.stderr)
 
 try:
     from clearml import Task
