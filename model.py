@@ -145,7 +145,7 @@ class Model(nn.Module):
 
     def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False):
         super().__init__()
-        self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
+#        self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         if with_masks:
             self.core = Core(input_channels=4)
         else:
