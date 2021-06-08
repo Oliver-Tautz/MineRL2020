@@ -229,7 +229,7 @@ def main():
     print(
         'Starting training with map_to_zero={}, modelname={}, with_masks={}, no_actions={}'.format(map_to_zero, modelname, with_masks,no_classes))
 
-    train(model, 3, train_loader, val_loader)
+    train(model, epochs, train_loader, val_loader)
 
     print('training done!')
     torch.save(model.state_dict(), "train/some_model.tm")
