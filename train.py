@@ -105,7 +105,7 @@ def train(model, epochs, train_loader, val_loader):
 
     gradsum = 0
 
-    simple_logger = SimpleLogger("loss_csv/{}.csv".format(modelname),
+    simple_logger = SimpleLogger("loss_csv/{}_{}.csv".format(modelname,datetime.now()),
                                  ['epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate'])
 
     nonspatial_dummy = torch.zeros(10)
