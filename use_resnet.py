@@ -133,7 +133,9 @@ def precompute_dir(filepath, device):
     for replay in os.listdir(filepath):
         obs, act, reward, nextobs, done = loader._load_data_pyfunc(os.path.join(filepath, replay), -1, None)
 
-        masks = resnet.return_masks(torch.tensor(obs['pov'], dtype=torch.float32))
+        masks = resnet.return_masks(torch.tensor(obs['pov'], dtype=torch.float32).to(device))
         torch.save(masks, os.path.join(filepath, replay, 'mask.pt'))
 
-precompute_dir('data/MineRLTreechop-v0/val')
+if __name__ == '__main__':
+    precompute_dir('data/MineRLTreechop-v0/val',device='cuda')
+    precompute_dir('data/MineRLTreechop-v0/train',device='cuda')

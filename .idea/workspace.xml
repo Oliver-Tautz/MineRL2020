@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/use_resnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/use_resnet.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -227,13 +225,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00016" summary="revert change.">
-      <created>1621757189398</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1621757189398</updated>
     </task>
     <task id="LOCAL-00017" summary="revert revert change">
       <created>1621757541275</created>
@@ -571,14 +562,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623160980008</updated>
     </task>
-    <option name="localTasksCounter" value="65" />
+    <task id="LOCAL-00065" summary="made precompute loop">
+      <created>1623162574538</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1623162574538</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="get 50 action dict." />
     <MESSAGE value="debug model. add option for different output size in model.py" />
     <MESSAGE value="new dict. some cleanup and option for map to zero" />
     <MESSAGE value="change to no_classes = 30" />
@@ -603,7 +600,8 @@
     <MESSAGE value="check what device is used" />
     <MESSAGE value="fix" />
     <MESSAGE value="made files more verbose and seperated" />
-    <option name="LAST_COMMIT_MESSAGE" value="made files more verbose and seperated" />
+    <MESSAGE value="made precompute loop" />
+    <option name="LAST_COMMIT_MESSAGE" value="made precompute loop" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
