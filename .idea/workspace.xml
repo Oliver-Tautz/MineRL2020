@@ -3,9 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mineDataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/mineDataset.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simple_loader.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -151,7 +149,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
-      <option name="PARAMETERS" value="unimportant" />
+      <option name="PARAMETERS" value="unimportant --batchsize 8" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -191,9 +189,9 @@
       <list>
         <item itemvalue="Python.train" />
         <item itemvalue="Python.mineDataset" />
-        <item itemvalue="Python.use_resnet" />
         <item itemvalue="Python.test_descrete_preprocessing" />
         <item itemvalue="Python.simple_plotter" />
+        <item itemvalue="Python.use_resnet" />
       </list>
     </recent_temporary>
   </component>
@@ -603,12 +601,12 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>42</line>
+          <line>43</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>170</line>
+          <line>169</line>
           <option name="timeStamp" value="39" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -618,7 +616,7 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>135</line>
+          <line>134</line>
           <option name="timeStamp" value="42" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -628,42 +626,42 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>187</line>
+          <line>186</line>
           <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>118</line>
+          <line>117</line>
           <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>120</line>
+          <line>119</line>
           <option name="timeStamp" value="50" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>94</line>
+          <line>93</line>
           <option name="timeStamp" value="55" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>116</line>
+          <line>115</line>
           <option name="timeStamp" value="56" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/model.py</url>
-          <line>137</line>
+          <line>136</line>
           <option name="timeStamp" value="57" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>175</line>
+          <line>174</line>
           <option name="timeStamp" value="59" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>181</line>
+          <line>180</line>
           <option name="timeStamp" value="60" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

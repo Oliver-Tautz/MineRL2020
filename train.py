@@ -29,6 +29,7 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 
 import argparse
+from datetime import datetime
 
 parser = argparse.ArgumentParser(description='train the model ...')
 parser.add_argument('modelname', help="name of the model", type=str)
@@ -37,7 +38,7 @@ parser.add_argument('--map-to-zero', help="map non recorded actions to zero", ac
 parser.add_argument('--with-masks', help="use extra mask channel", action="store_true")
 parser.add_argument('--c', help="make torch use number of cpus", default=12)
 parser.add_argument('--epochs', help="make torch use number of cpus", default=100)
-parser.add_argument('--batchsize', help="make torch use number of cpus", default=4)
+parser.add_argument('--batchsize', help="make torch use number of cpus",type=int, default=4)
 parser.add_argument('--seq-len', help="make torch use number of cpus", default=100)
 
 args = parser.parse_args()
@@ -48,7 +49,6 @@ ONLINE = True
 
 trains_loaded = True
 
-number_of_checkpoints = 20
 modelname = args.modelname
 
 # ensure reproducability
@@ -122,7 +122,7 @@ def train(model, epochs, train_loader, val_loader):
             hidden = model.get_zero_state(BATCH_SIZE)
 
             # swap batch and seq; swap x and c; swap x and y back. Is this necessary? Be careful in testing! match this operation.
-            pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4)
+            pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
             # move to gpu
             pov.to(deviceStr)
@@ -149,11 +149,11 @@ def train(model, epochs, train_loader, val_loader):
             for pov, act in tqdm(train_loader, desc='batch_eval'):
                 # reset hidden
                 hidden = model.get_zero_state(BATCH_SIZE)
-                pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4)
+                pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
                 # move to gpu
-                pov.to(deviceStr)
-                act.to(deviceStr)
+                pov, act = pov.to(deviceStr), act.to(deviceStr)
+
 
                 loss, ldict, hidden = model.get_loss(pov, nonspatial_dummy, nonspatial_dummy, hidden,
                                                      torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
@@ -161,9 +161,8 @@ def train(model, epochs, train_loader, val_loader):
                 loss = loss.sum()
                 epoch_val_loss.append(loss.item())
 
-                print("------------------Saving Model!-----------------------")
-            torch.save(model.state_dict(), f"train/{modelname}/{modelname}_{epoch}.tm")
-            torch.save(model.state_dict(), f"train/{modelname}/{modelname}.tm")
+            print("------------------Saving Model!-----------------------")
+            torch.save(model.state_dict(), f"train/{modelname}/{modelname}_epoch={epoch}_time={datetime.now()}.tm")
 
             print("-------------Logging!!!-------------")
             simple_logger.log(
@@ -177,7 +176,7 @@ def main():
     # a bit of code that creates clearml logging (formerly trains) if clearml
     # is available
 
-    model = Model(deviceStr=deviceStr, verbose=True, no_classes=30, with_masks=with_masks)
+    model = Model(deviceStr=deviceStr, verbose=False, no_classes=30, with_masks=with_masks)
 
     os.makedirs("train", exist_ok=True)
 
@@ -188,10 +187,10 @@ def main():
                           with_masks=with_masks, no_replays=1)
 
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE,
-                              shuffle=True, num_workers=0, drop_last=True)
+                              shuffle=True, num_workers=args.c-1, drop_last=True)
 
     val_loader = DataLoader(val_set, batch_size=BATCH_SIZE,
-                            shuffle=False, num_workers=0, drop_last=True)
+                            shuffle=False, num_workers=args.c-1, drop_last=True)
     # print(spatial.shape)
     # print(nonspatial.shape)
     # print(prev_action.shape)

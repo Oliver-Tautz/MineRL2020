@@ -90,7 +90,6 @@ class InputProcessor(nn.Module):
 
     def forward(self, spatial, nonspatial):
         shape = spatial.shape
-        print(shape)
         spatial = spatial.view((shape[0]*shape[1],)+shape[2:])/255.0
         verb_print('pov before Core:', spatial.shape)
         spatial = self.conv_layers(spatial)
