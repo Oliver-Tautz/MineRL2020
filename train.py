@@ -1,4 +1,4 @@
-# TODO
+
 
 import time
 import logging
@@ -6,7 +6,7 @@ import os
 import sys
 import argparse
 
-from tqdm import tqdm
+from tqdm import tqdm, trange
 
 import coloredlogs
 
@@ -65,9 +65,10 @@ while (True):
     try:
         os.makedirs(f"train/{modelname}_{model_index}", exist_ok=False)
         model_folder = f"train/{modelname}_{model_index}"
+        break
     except:
         model_index+=1
-        break
+
 
 map_to_zero = args.map_to_zero
 with_masks = args.with_masks
@@ -117,12 +118,13 @@ def train(model, epochs, train_loader, val_loader):
 
     gradsum = 0
 
-    simple_logger = SimpleLogger(f"{model_folder}/with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_time={datetime.now()}.csv",
+    simple_logger = SimpleLogger(f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={SEQ_LEN}_time={datetime.now()}.csv",
                                  ['epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate'])
 
     nonspatial_dummy = torch.zeros(10)
+    best_val_loss = 1000
 
-    for epoch in tqdm(range(epochs), desc='epochs'):
+    for epoch in trange(epochs, desc='epochs'):
 
         # save batch losses
         epoch_train_loss = []
@@ -136,8 +138,9 @@ def train(model, epochs, train_loader, val_loader):
             # swap batch and seq; swap x and c; swap x and y back. Is this necessary? Be careful in testing! match this operation.
             pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
-            # move to gpu
-            pov, act = pov.to(deviceStr), act.to(deviceStr)
+            # move to gpu if not there
+            if not pov.is_cuda or not act.is_cuda:
+                pov, act = pov.to(deviceStr), act.to(deviceStr)
 
             loss, ldict, hidden = model.get_loss(pov, nonspatial_dummy, nonspatial_dummy, hidden,
                                                  torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
@@ -165,6 +168,11 @@ def train(model, epochs, train_loader, val_loader):
                 # move to gpu
                 pov, act = pov.to(deviceStr), act.to(deviceStr)
 
+                # move to gpu if not there
+                if not pov.is_cuda or not act.is_cuda:
+                    pov, act = pov.to(deviceStr), act.to(deviceStr)
+                else:
+                    print('this is actually useful maybe?')
 
                 loss, ldict, hidden = model.get_loss(pov, nonspatial_dummy, nonspatial_dummy, hidden,
                                                      torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
@@ -172,9 +180,13 @@ def train(model, epochs, train_loader, val_loader):
                 loss = loss.sum()
                 epoch_val_loss.append(loss.item())
 
-            model.train()
-            print("------------------Saving Model!-----------------------")
-            torch.save(model.state_dict(), f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_epoch={epoch}_time={datetime.now()}.tm")
+            if (epoch%5) == 0:
+                print("------------------Saving Model!-----------------------")
+                torch.save(model.state_dict(), f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={SEQ_LEN}_epoch={epoch}_time={datetime.now()}.tm")
+
+            if (sum(epoch_train_loss) / len(epoch_train_loss)) < best_val_loss:
+                best_val_loss = (sum(epoch_train_loss) / len(epoch_train_loss))
+                torch.save(model.state_dict(),f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={SEQ_LEN}_epoch={epoch}_time={datetime.now()}.tm")
 
             print("-------------Logging!!!-------------")
             simple_logger.log(

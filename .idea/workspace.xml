@@ -75,7 +75,7 @@
       <recent name="$PROJECT_DIR$/train/trained_models" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.train">
+  <component name="RunManager" selected="Python.use_resnet">
     <configuration name="descrete_actions_transform" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -173,7 +173,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
-      <option name="PARAMETERS" value="unimportant --no-classes 50 --debug" />
+      <option name="PARAMETERS" value="unimportant --no-classes 50 --debug --c 4 --epochs 11" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -227,13 +227,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00015" summary="correct python 3.9 syntax AHRG">
-      <created>1621756924773</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1621756924773</updated>
     </task>
     <task id="LOCAL-00016" summary="revert change.">
       <created>1621757189398</created>
@@ -571,14 +564,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623159250410</updated>
     </task>
-    <option name="localTasksCounter" value="64" />
+    <task id="LOCAL-00064" summary="made files more verbose and seperated">
+      <created>1623160980008</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1623160980008</updated>
+    </task>
+    <option name="localTasksCounter" value="65" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="change to no softmax" />
     <MESSAGE value="get 50 action dict." />
     <MESSAGE value="debug model. add option for different output size in model.py" />
     <MESSAGE value="new dict. some cleanup and option for map to zero" />
@@ -603,24 +602,25 @@
     <MESSAGE value="add debug option, pin memro =true" />
     <MESSAGE value="check what device is used" />
     <MESSAGE value="fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix" />
+    <MESSAGE value="made files more verbose and seperated" />
+    <option name="LAST_COMMIT_MESSAGE" value="made files more verbose and seperated" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>180</line>
+          <line>196</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>182</line>
+          <line>198</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>112</line>
+          <line>117</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -685,12 +685,12 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>116</line>
+          <line>121</line>
           <option name="timeStamp" value="53" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train.py</url>
-          <line>105</line>
+          <line>110</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -712,6 +712,11 @@
           <url>file://$PROJECT_DIR$/descrete_actions_transform.py</url>
           <line>142</line>
           <option name="timeStamp" value="68" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>61</line>
+          <option name="timeStamp" value="69" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
