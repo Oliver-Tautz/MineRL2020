@@ -72,9 +72,7 @@ class MineDataset(Dataset):
 
 
         self.len = sum(self.replays_length.values())
-        print(sys.getsizeof(self.replays_pov))
-        print(sys.getsizeof(self.replays_act))
-        print()
+
 
     def __print(self,str):
         print(f'{self.message_str}{str}')
@@ -123,3 +121,9 @@ class MineDataset(Dataset):
 
 
 
+
+
+if __name__ == '__main__':
+    ds = MineDataset('data/MineRLTreechop-v0/val')
+    dataloader = DataLoader(ds, batch_size=4,
+                        shuffle=True, num_workers=0)
