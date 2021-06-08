@@ -130,11 +130,15 @@ def precompute_dir(filepath, device):
     loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=1)
     resnet = MaskGeneratorResnet(device=device)
 
-    for replay in os.listdir(filepath):
+    for replay in tqdm(os.listdir(filepath)):
         obs, act, reward, nextobs, done = loader._load_data_pyfunc(os.path.join(filepath, replay), -1, None)
+        obs = torch.tensor(obs['pov'], dtype=torch.float32).to(device)
 
-        masks = resnet.return_masks(torch.tensor(obs['pov'], dtype=torch.float32).to(device))
+        masks = resnet.return_masks()
         torch.save(masks, os.path.join(filepath, replay, 'mask.pt'))
+
+        del masks
+        del obs
 
 if __name__ == '__main__':
     precompute_dir('data/MineRLTreechop-v0/val',device='cuda')
