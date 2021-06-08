@@ -41,6 +41,7 @@ parser.add_argument('--epochs', help="make torch use number of cpus", type=int,d
 parser.add_argument('--batchsize', help="make torch use number of cpus",type=int, default=4)
 parser.add_argument('--seq-len', help="make torch use number of cpus",type=int, default=100)
 parser.add_argument('--no-classes', help="use number of distcrete actions",type=int, default=30)
+parser.add_argument('--debug', help="use small number of samples for debugging faster",action='store_true')
 
 args = parser.parse_args()
 
@@ -91,6 +92,11 @@ from minerl.data import DataPipeline
 BATCH_SIZE = args.batchsize
 SEQ_LEN = args.seq_len
 
+if args.debug:
+    no_replays = 3
+else:
+    no_replays =300
+
 
 def train(model, epochs, train_loader, val_loader):
     torch.set_num_threads(args.c)
@@ -125,8 +131,7 @@ def train(model, epochs, train_loader, val_loader):
             pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
             # move to gpu
-            pov.to(deviceStr)
-            act.to(deviceStr)
+            pov, act = pov.to(deviceStr), act.to(deviceStr)
 
             loss, ldict, hidden = model.get_loss(pov, nonspatial_dummy, nonspatial_dummy, hidden,
                                                  torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
@@ -181,18 +186,18 @@ def main():
     os.makedirs("train", exist_ok=True)
 
     train_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=SEQ_LEN, map_to_zero=map_to_zero,
-                            with_masks=with_masks,no_classes=no_classes)
+                            with_masks=with_masks,no_classes=no_classes,no_replays=no_replays)
 
     val_set = MineDataset('data/MineRLTreechop-v0/val', sequence_length=SEQ_LEN, map_to_zero=map_to_zero,
-                          with_masks=with_masks,no_classes=no_classes)
+                          with_masks=with_masks,no_classes=no_classes,no_replays=no_replays)
 
 
     # shuffle only train set.
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE,
-                              shuffle=True, num_workers=0, drop_last=True)
+                              shuffle=True, num_workers=0, drop_last=True,pin_memory=True)
 
     val_loader = DataLoader(val_set, batch_size=BATCH_SIZE,
-                            shuffle=False, num_workers=0, drop_last=True)
+                            shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
 
 
 
