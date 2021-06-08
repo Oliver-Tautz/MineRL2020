@@ -181,10 +181,10 @@ def main():
     os.makedirs("train", exist_ok=True)
 
     train_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=SEQ_LEN, map_to_zero=map_to_zero,
-                            with_masks=with_masks, no_replays=3,no_classes=no_classes)
+                            with_masks=with_masks,no_classes=no_classes)
 
     val_set = MineDataset('data/MineRLTreechop-v0/val', sequence_length=SEQ_LEN, map_to_zero=map_to_zero,
-                          with_masks=with_masks, no_replays=1,no_classes=no_classes)
+                          with_masks=with_masks,no_classes=no_classes)
 
 
     # shuffle only train set.
