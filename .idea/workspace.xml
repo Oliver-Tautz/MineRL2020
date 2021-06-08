@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="set reasonable value for torch cpus.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/descrete_actions_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/descrete_actions_transform.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mineDataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/mineDataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_descrete_preprocessing.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_descrete_preprocessing.py" afterDir="false" />
+    <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -208,13 +204,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00009" summary="change pickle settings for support.">
-      <created>1621688558999</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1621688558999</updated>
     </task>
     <task id="LOCAL-00010" summary="added new files.">
       <created>1621688611865</created>
@@ -552,14 +541,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623152935463</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="make no_classes selectable in training">
+      <created>1623155739854</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1623155739854</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="use 3 cpus in torch." />
     <MESSAGE value="change_saving" />
     <MESSAGE value="integrate testing, add plotter, make model training ready." />
     <MESSAGE value="add proper folder structure ..." />
@@ -584,7 +579,8 @@
     <MESSAGE value="updated simple plotter" />
     <MESSAGE value="remove kmeans" />
     <MESSAGE value="set reasonable value for torch cpus." />
-    <option name="LAST_COMMIT_MESSAGE" value="set reasonable value for torch cpus." />
+    <MESSAGE value="make no_classes selectable in training" />
+    <option name="LAST_COMMIT_MESSAGE" value="make no_classes selectable in training" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
