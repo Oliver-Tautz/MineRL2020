@@ -88,7 +88,7 @@ loader = minerl.data.make('MineRLTreechop-v0',data_dir='./data',num_workers=1)
 
 
 # 210 max!
-no_streams = 300
+no_streams = 30
 actions = defaultdict(lambda : [])
 
 

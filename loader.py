@@ -59,6 +59,7 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
             d = DataPipeline._load_data_pyfunc(f, -1, None)
         except:
             continue
+
         pipe.send("RESET")
         steps = 0
 
@@ -108,7 +109,7 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
         actions = torch.tensor(descrete_actions_transform.transform_actions(act,map_to_zero=False,get_ints=True),dtype=torch.long)
 
 
-        obs_vector = torch.tensor(actions,dtype=torch.float32)
+        obs_vector = torch.zeros(actions.shape)
 
         #act = descrete_actions_transform.transform_actions_to_onehot(act)
 
@@ -127,7 +128,7 @@ def loader(files, pipe, main_sem, internal_sem, batch_size):
 
 
         #prev_action = torch.cat([torch.zeros((1,), dtype=torch.int64), actions[:-1]], dim=0)
-        prev_action = torch.tensor(actions,dtype=torch.float32)
+        prev_action = torch.zeros(actions.shape,dtype=torch.float32)
 
         l = actions.shape[0]
         for i in range(0, l, batch_size):

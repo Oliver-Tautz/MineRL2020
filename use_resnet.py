@@ -1,7 +1,9 @@
 import torch
 #import matplotlib.pyplot as plt
 import numpy as np
-
+from tqdm import tqdm
+import os
+import minerl
 
 
 # Segmentation model
@@ -39,7 +41,8 @@ class MaskGeneratorResnet():
         return combined
 
     # input and output = torch.tensor :)
-    def append_channel_batch(self,batch):
+    # input = (batch,sequence,...)
+    def append_channel_sequence_batch(self, batch):
         batch_shape = batch.shape
 
         # reshape to (batch,pic)
@@ -63,6 +66,30 @@ class MaskGeneratorResnet():
 
         return masked
 
+    # input and output = torch.tensor :)
+    # input = (batch,...)
+    def append_channel_batch(self, batch):
+        batch_shape = batch.shape
+
+        # reshape to (batch,pic)
+        reshaped = torch.transpose(batch,1,3)
+
+
+        # get masks from model
+        masks = self.model(reshaped)['out']
+
+        print(masks.shape)
+        # postprocess to classes
+        masks = torch.argmax(masks,dim=1)
+        print(masks.shape)
+        # add channel dimension
+        masks = torch.unsqueeze(masks, dim=3)
+        print(masks.shape)
+        # concat channels
+        masked = torch.cat((batch, masks), dim=3)
+
+
+        return masked
 
 #cmap = np.asarray([[0, 0, 0],
 #                   [0, 0, 1],
@@ -83,5 +110,17 @@ class MaskGeneratorResnet():
 #pred = resnet.transform_image(testfile)
 #padded = resnet.append_channel(testfile)
 
+# precompute masks for dataset.
+if __name__ == "__main__":
+    loader = minerl.data.make('MineRLTreechop-v0',data_dir='./data',num_workers=1)
+    resnet = MaskGeneratorResnet(device='cpu')
+    print(os.listdir('./data/MineRLTreechop-v0/train'))
+    f='v3_absolute_grape_changeling-15_10696-12887'
 
+    d = loader._load_data_pyfunc('./data/MineRLTreechop-v0/train/{}'.format(f), -1, None)
+    obs, act, reward, nextobs, done = d
+    print(obs['pov'][0:100].shape)
+    print(resnet.append_channel_batch(torch.tensor(obs['pov'][0:100], dtype=torch.float32)).shape)
+
+    #for f in tqdm(os.listdir('./data/MineRLTreechop-v0/train'),desc='loading'):
 

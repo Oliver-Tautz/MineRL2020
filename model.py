@@ -169,7 +169,7 @@ class Model(nn.Module):
 
         if self.with_masks:
             #spatialnp = spatial.numpy()
-            spatial = self.masksGenerator.append_channel_batch(spatial)
+            spatial = self.masksGenerator.append_channel_sequence_batch(spatial)
 
 
 
