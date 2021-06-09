@@ -38,5 +38,5 @@ class SimplePlotter():
 
 
 
-sp = SimplePlotter('loss_csv/working_closest.csv')
+#$#sp = SimplePlotter('loss_csv/working_closest.csv')
 

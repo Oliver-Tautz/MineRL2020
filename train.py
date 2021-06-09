@@ -213,7 +213,7 @@ def main():
 
     # shuffle only train set.
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE,
-                              shuffle=True, num_workers=0, drop_last=True,pin_memory=True)
+                              shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
 
     val_loader = DataLoader(val_set, batch_size=BATCH_SIZE,
                             shuffle=False, num_workers=0, drop_last=True,pin_memory=True)

@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simple_plotter.py" beforeDir="false" afterPath="$PROJECT_DIR$/simple_plotter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -201,11 +203,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.train" />
       <item itemvalue="Python.test_first_model" />
+      <item itemvalue="Python.train" />
+      <item itemvalue="Python.descrete_actions_transform" />
       <item itemvalue="Python.simple_plotter" />
       <item itemvalue="Python.test_descrete_preprocessing" />
-      <item itemvalue="Python.descrete_actions_transform" />
       <item itemvalue="Python.use_resnet" />
     </list>
     <recent_temporary>
@@ -225,13 +227,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00021" summary="python 3.5 ;(">
-      <created>1621758320077</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1621758320077</updated>
     </task>
     <task id="LOCAL-00022" summary="fix">
       <created>1621758497949</created>
@@ -569,14 +564,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623166219091</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="fix epochs">
+      <created>1623169570355</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1623169570356</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="change to no_classes = 30" />
     <MESSAGE value="commit for folder structure. unusable commit" />
     <MESSAGE value="resnet integration finished" />
     <MESSAGE value="use more threads for loading, asser padding. adjust train/test scripts" />
@@ -601,7 +602,8 @@
     <MESSAGE value="made precompute loop" />
     <MESSAGE value="refined precompuite loop" />
     <MESSAGE value="fix precompute 1" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix precompute 1" />
+    <MESSAGE value="fix epochs" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix epochs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
