@@ -45,7 +45,7 @@ for ac in acs:
 aclist = [functools.reduce(lambda x, y: x +'_' +y,ac,'')[1:] for ac in aclist]
 
 
-def visualize(pov,pred,label):
+def visualize(pov,pred,label,prev_label,next_label):
     y = Softmax(0)(pred.squeeze().detach())
     y_ = np.zeros(30)
     y_[label[0]] = 0.05
@@ -75,7 +75,7 @@ model.load_state_dict(torch.load(
     "train/batch2_with-masks=False_map-to-zero=True_no-classes=30_seq-len=100_epoch=99_time=2021-06-09 18:14:29.514103.tm",
     map_location='cpu'))
 
-train_set = MineDataset('data/MineRLTreechop-v0/val', sequence_length=1, map_to_zero=True,
+train_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=1, map_to_zero=True,
                         with_masks=False, no_classes=30, no_replays=1)
 
 model.eval()
