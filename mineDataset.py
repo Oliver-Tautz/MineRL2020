@@ -56,7 +56,8 @@ class MineDataset(Dataset):
         self.replays_pov = dict()
         # act of replay as [int]. Not batches in sequences
         self.replays_act = dict()
-        
+
+        self.original_act = dict()
         for i, replay in tqdm(enumerate(self.replay_queue),total=len(self.replay_queue),desc=f'{self.message_str}loading replays'):
             d = self.mine_loader._load_data_pyfunc(os.path.join(self.root_dir,replay), -1, None)
             obs, act, reward, nextobs, done = d
@@ -66,6 +67,7 @@ class MineDataset(Dataset):
             self.replays_length[i] = (len(obs['pov'])//sequence_length)-1
 
             self.replays_pov[i] = torch.tensor(obs['pov'],dtype=torch.float32)
+            self.original_act[i] = act
             self.replays_act[i] = torch.tensor(transform_actions(act,map_to_zero=map_to_zero,get_ints=True,no_classes=no_classes),dtype=torch.long)
             #replays[i] = d
 
@@ -89,6 +91,10 @@ class MineDataset(Dataset):
         # subtract len of replay from ix until we reach found replay
 
         while ix > 0:
+
+            # wrap around?!
+            #if i > max(self.replays_length.keys()):
+            #    i=0
             if ix > self.replays_length[i]:
                 ix-=self.replays_length[i]
                 i+=1

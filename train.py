@@ -145,6 +145,8 @@ def train(model, epochs, train_loader, val_loader):
             loss, ldict, hidden = model.get_loss(pov, nonspatial_dummy, nonspatial_dummy, hidden,
                                                  torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
 
+
+
             loss = loss.sum()
             loss.backward()
 
@@ -174,11 +176,11 @@ def train(model, epochs, train_loader, val_loader):
                 else:
                     print('this is actually useful maybe?')
 
-                loss, ldict, hidden = model.get_loss(pov, nonspatial_dummy, nonspatial_dummy, hidden,
+                val_loss, val_ldict, hidden = model.get_loss(pov, nonspatial_dummy, nonspatial_dummy, hidden,
                                                      torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
 
-                loss = loss.sum()
-                epoch_val_loss.append(loss.item())
+                val_loss = val_loss.sum()
+                epoch_val_loss.append(val_loss.item())
 
             if (epoch%5) == 0:
                 print("------------------Saving Model!-----------------------")
@@ -197,8 +199,6 @@ def train(model, epochs, train_loader, val_loader):
 
 
 def main():
-    # a bit of code that creates clearml logging (formerly trains) if clearml
-    # is available
 
     model = Model(deviceStr=deviceStr, verbose=False, no_classes=no_classes, with_masks=with_masks)
 
@@ -232,7 +232,6 @@ def main():
     train(model, epochs, train_loader, val_loader)
 
     print('training done!')
-    torch.save(model.state_dict(), "train/some_model.tm")
     print("ok", file=sys.stderr)
 
 

@@ -18,7 +18,7 @@ int_to_vec_filename = 'int_to_vec_dict'
 key_to_index_filename = 'key_to_index_dict'
 
 # Movement below this point will be regarded as no camera action.
-camera_noise_threshhold = 0.5
+camera_noise_threshhold = 0.1
 
 
 # save to pkl
@@ -146,10 +146,10 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
     return int_to_vector_dict, key_lookup
 
 
-def transform_int_to_actions(ints, camera_noise_threshhold=camera_noise_threshhold):
+def transform_int_to_actions(ints, camera_noise_threshhold=camera_noise_threshhold,no_actions=30):
 
-    key_lookup = load_obj(key_to_index_filename)
-    int_to_vector_dict = load_obj(int_to_vec_filename)
+    key_lookup = load_obj(f"{key_to_index_filename}_{no_actions}")
+    int_to_vector_dict = load_obj(f"{int_to_vec_filename}_{no_actions}")
 
     actions = defaultdict(lambda: [])
 
