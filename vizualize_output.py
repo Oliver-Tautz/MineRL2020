@@ -47,22 +47,45 @@ aclist = [functools.reduce(lambda x, y: x +'_' +y,ac,'')[1:] for ac in aclist]
 
 def visualize(pov,pred,label,prev_label,next_label):
     y = Softmax(0)(pred.squeeze().detach())
-    y_ = np.zeros(30)
-    y_[label[0]] = 0.05
+    width = 0.15
 
-    x = aclist
+
+
+    x = np.arange(len(aclist))
     # y = np.random.sample(30)
 
     ## plotting
     plt.rcdefaults()
     # similar to tight_layout, but works better!
     fig, (ax1, ax2) = plt.subplots(1, 2, constrained_layout=True)
-    ax2.barh(x, y)
-    ax2.barh(x, y_, left=y)
+
+
+
+    rects1 = ax2.barh(x+width/2, y,height=width,label='logits')
+
+    y_ = np.zeros(30)
+    y_[label[0]] = 1
+    rects0 = ax2.barh(x-width/2, y_,label='label',height=width)
+
+
+    if prev_label != None:
+        y_ = np.zeros(30)
+        y_[prev_label[0]] = 0.05
+        ax2.barh(x-width/4, y_,label='prev_label',height=width)
+
+
+    if next_label != None:
+        y_ = np.zeros(30)
+        y_[next_label[0]] = 0.05
+        ax2.barh(x+width/4, y_,label='next_label',height=width)
+
+
 
     plt.xlim(0, 1)
     ax1.imshow(pov.squeeze() / 255)
     ax1.axis('off')
+    ax2.set_yticks(x)
+    ax2.set_yticklabels(aclist)
     # This does not work well
     # plt.tight_layout()
 
@@ -75,7 +98,7 @@ model.load_state_dict(torch.load(
     "train/batch2_with-masks=False_map-to-zero=True_no-classes=30_seq-len=100_epoch=99_time=2021-06-09 18:14:29.514103.tm",
     map_location='cpu'))
 
-train_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=1, map_to_zero=True,
+train_set = MineDataset('data/MineRLTreechop-v0/val', sequence_length=1, map_to_zero=True,
                         with_masks=False, no_classes=30, no_replays=1)
 
 model.eval()
@@ -83,17 +106,28 @@ model.eval()
 states = model.get_zero_state(1)
 
 
+# consider how many actions +-?
+m = 2
 
-for i in trange(len(train_set)):
-    pov,action = train_set[i]
+
+
+for i in trange(1,len(train_set)-1):
+
+
+    _, prev = train_set[i-1]
+    pov,curr = train_set[i]
+    _,next = train_set[i+1]
+
 
     pov_plot = torch.unsqueeze(pov, 0)
     pov = pov_plot.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
-    hidden, pred, states = model.compute_front(pov, torch.zeros(64), states)
+    pred, states = model.forward(pov, torch.zeros(64), states)
 
-    visualize(pov_plot, pred, action)
+    visualize(pov_plot, pred, curr,prev,next)
+    plt.legend()
     plt.savefig(f"prediction_visualization/eval_episode0/{i}.png",dpi=200)
+    #plt.show()
     plt.close('all')
     plt.clf()
 

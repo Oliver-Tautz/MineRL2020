@@ -100,6 +100,7 @@ SEQ_LEN = args.seq_len
 
 if args.debug:
     no_replays = 2
+    epochs = 5
 else:
     no_replays =300
 
@@ -121,7 +122,7 @@ def train(model, epochs, train_loader, val_loader):
     simple_logger = SimpleLogger(f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={SEQ_LEN}_time={datetime.now()}.csv",
                                  ['epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate'])
 
-    nonspatial_dummy = torch.zeros(10)
+    additional_info_dummy = torch.zeros(10)
     best_val_loss = 1000
 
     for epoch in trange(epochs, desc='epochs'):
@@ -132,8 +133,8 @@ def train(model, epochs, train_loader, val_loader):
 
         # train on batches
         for pov, act in tqdm(train_loader, desc='batch_train',position=0,leave=True):
-            # reset hidden
-            hidden = model.get_zero_state(BATCH_SIZE)
+            # reset lstm_state after each sequence
+            lstm_state = model.get_zero_state(BATCH_SIZE)
 
             # swap batch and seq; swap x and c; swap x and y back. Is this necessary? Be careful in testing! match this operation.
             pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
@@ -142,10 +143,12 @@ def train(model, epochs, train_loader, val_loader):
             if not pov.is_cuda or not act.is_cuda:
                 pov, act = pov.to(deviceStr), act.to(deviceStr)
 
-            loss, ldict, hidden = model.get_loss(pov, nonspatial_dummy, nonspatial_dummy, hidden,
-                                                 torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
+            #loss, ldict, lstm_state = model.get_loss(pov, additional_info_dummy, additional_info_dummy, lstm_state,
+             #                                    torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
 
+            prediciton, lstm_state = model.forward(pov,additional_info_dummy,lstm_state)
 
+            loss = categorical_loss(act,prediciton)
 
             loss = loss.sum()
             loss.backward()
@@ -153,7 +156,7 @@ def train(model, epochs, train_loader, val_loader):
             grad_norm = clip_grad_norm_(model.parameters(), 10)
             optimizer.step()
             optimizer.zero_grad()
-            scheduler.step()
+
 
             epoch_train_loss.append(loss.item())
 
@@ -163,8 +166,8 @@ def train(model, epochs, train_loader, val_loader):
             model.eval()
 
             for pov, act in tqdm(val_loader, desc='batch_eval',position=0,leave=True):
-                # reset hidden
-                hidden = model.get_zero_state(BATCH_SIZE)
+                # reset lstm_state
+                lstm_state = model.get_zero_state(BATCH_SIZE)
                 pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
                 # move to gpu
@@ -176,8 +179,9 @@ def train(model, epochs, train_loader, val_loader):
                 else:
                     print('this is actually useful maybe?')
 
-                val_loss, val_ldict, hidden = model.get_loss(pov, nonspatial_dummy, nonspatial_dummy, hidden,
-                                                     torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
+                prediciton, lstm_state = model.forward(pov,additional_info_dummy,lstm_state)
+
+                val_loss =  categorical_loss(act,prediciton)
 
                 val_loss = val_loss.sum()
                 epoch_val_loss.append(val_loss.item())
@@ -196,7 +200,40 @@ def train(model, epochs, train_loader, val_loader):
                  gradsum, float(optimizer.param_groups[0]["lr"])])
 
             gradsum = 0
+            scheduler.step()
 
+
+# drift : negative drift for drifting backwards in time, positive drift for drifting forward.
+def drift_loss(prediction,label,drift=1):
+
+    if drift > 0:
+        prediction = prediction[:-drift]
+        label      =  label [:,drift:]
+    elif drift < 0:
+        drift = abs(drift)
+        prediction = prediction[drift:]
+        label = label[:,:-drift]
+    else:
+        # here we compute normal loss
+        pass
+
+    return categorical_loss(label,prediction)
+
+
+# label     : label with shape (batch,sequence)
+# prediction: prediction with shape (sequence,batch,no_actions)
+
+def categorical_loss(label,prediction):
+
+    label = label.transpose(0,1)
+    loss = torch.nn.CrossEntropyLoss()
+
+    #flatten
+
+    label = label.reshape(-1)
+    prediction = prediction.view(-1,prediction.shape[-1])
+
+    return loss(prediction,label)
 
 def main():
 
@@ -218,7 +255,8 @@ def main():
     val_loader = DataLoader(val_set, batch_size=BATCH_SIZE,
                             shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
 
-
+    val_loader_nobatch = DataLoader(val_set, batch_size=1,
+                            shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
 
     if deviceStr == "cuda":
         model.cuda()
