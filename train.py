@@ -121,7 +121,7 @@ def train(model, epochs, train_loader, val_loader):
     gradsum = 0
 
     simple_logger = SimpleLogger(f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_time={datetime.now()}.csv",
-                                 ['epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate','seq_len','map_to_zero','batchsize','no_classes'])
+                                 ['epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate','seq_len','map_to_zero','batchsize','no_classes','no_sequences'])
 
     additional_info_dummy = torch.zeros(10)
     best_val_loss = 1000
@@ -205,7 +205,7 @@ def train(model, epochs, train_loader, val_loader):
             print("-------------Logging!!!-------------")
             simple_logger.log(
                 [epoch, sum(epoch_train_loss) / len(epoch_train_loss), sum(epoch_val_loss) / len(epoch_val_loss),
-                 gradsum, float(optimizer.param_groups[0]["lr"]),seq_len,map_to_zero,batchsize,no_classes])
+                 gradsum, float(optimizer.param_groups[0]["lr"]),seq_len,map_to_zero,batchsize,no_classes,no_sequences])
 
             gradsum = 0
             scheduler.step()
