@@ -160,8 +160,6 @@ class MineDataset(Dataset):
         for r_i in trange(self.no_random_sequences,desc='randomizing'):
 
 
-            print(replay_index)
-
             # roll random start
             sequence_start_index = np.random.randint(0,self.replays_length[replay_index])
 
@@ -186,7 +184,6 @@ if __name__ == '__main__':
     # test dataset.
 
     ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=300, random_sequences=None, sequence_length=1)
-    print(len(ds))
 
 
     ds = MineDataset('data/MineRLTreechop-v0/train',no_replays=10,random_sequences=100,sequence_length=100)
