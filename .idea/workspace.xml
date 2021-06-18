@@ -182,11 +182,11 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.mineDataset" />
-      <item itemvalue="Python.simple_plotter" />
-      <item itemvalue="Python.test_descrete_preprocessing" />
       <item itemvalue="Python.train" />
       <item itemvalue="Python.use_resnet" />
+      <item itemvalue="Python.simple_plotter" />
+      <item itemvalue="Python.test_descrete_preprocessing" />
+      <item itemvalue="Python.mineDataset" />
     </list>
     <recent_temporary>
       <list>
