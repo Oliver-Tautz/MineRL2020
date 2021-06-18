@@ -83,18 +83,18 @@ def concat_actions(actlist):
     return start
 
 
-loader = minerl.data.make('MineRLTreechop-v0',data_dir='./data',num_workers=1)
+
 
 
 
 # 210 max!
-no_streams = 30
+no_streams = 300
 actions = defaultdict(lambda : [])
 
+loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=4)
 
-
-for f in tqdm(os.listdir('./data/MineRLTreechop-v0'),desc='loading'):
-    d = loader._load_data_pyfunc('./data/MineRLTreechop-v0/{}'.format(f),-1,None)
+for f in tqdm(os.listdir('./data/MineRLTreechop-v0/train'),desc='loading'):
+    d = loader._load_data_pyfunc('./data/MineRLTreechop-v0/train/{}'.format(f),-1,None)
     obs, act, reward, nextobs, done = d
 
 

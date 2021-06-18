@@ -28,7 +28,7 @@ class EpisodeRecorder():
         pass
 
     # filepath must end in .avi!
-    def save_vid(self,filepath):
+    def save_vid(self,filepath,swap_RB = True):
         if self.frames:
 
             # remove filename
@@ -39,8 +39,11 @@ class EpisodeRecorder():
             dirpath = os.path.join(*dirpath)
 
             os.makedirs(dirpath,exist_ok=True)
-            out = cv2.VideoWriter(filepath, cv2.VideoWriter_fourcc(*'HFYU'), 30, self.frames[0].shape[0:2])
+            out = cv2.VideoWriter(filepath, cv2.VideoWriter_fourcc(*'HFYU'), 20, self.frames[0].shape[0:2])
             for frame in self.frames:
+                # taken from https://stackoverflow.com/questions/38538952/how-to-swap-blue-and-red-channel-in-an-image-using-opencv. Why does this work?
+                if swap_RB:
+                    frame = frame[:,:,::-1]
                 out.write(frame)
 
             out.release()
@@ -55,6 +58,10 @@ class EpisodeRecorder():
 
     def save_actions(self,filepath):
         pass
+
+    def reset(self):
+        self.frames=[]
+        self.actions=[]
 
     def __error_no_record(self):
         print('No frames to save!')

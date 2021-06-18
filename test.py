@@ -211,7 +211,7 @@ class MineRLNetworkAgent(MineRLAgentBase):
             self.model.load_state_dict(torch.load(f"train/{model_name}/{model_name}_{checkpoint_number}.tm", map_location=device))
 
         else:
-            self.model.load_state_dict(torch.load(f"train/{model_name}/{model_name}.tm", map_location=device))
+            self.model.load_state_dict(torch.load("train/unimportant/unimportant_with-masks]False_map-to-zero=False_no-classes=50_epoch=1_time=2021-06-08 15:40:30.410176.tm", map_location=device))
         # self.model.load_state_dict(torch.load("testing/m.tm", map_location=device))
 
         self.model.eval()

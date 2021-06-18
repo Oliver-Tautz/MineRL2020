@@ -145,7 +145,7 @@ class Model(nn.Module):
 
     def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False):
         super().__init__()
-        self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
+#        self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         if with_masks:
             self.core = Core(input_channels=4)
         else:
@@ -177,9 +177,6 @@ class Model(nn.Module):
         #verb_print('after core: hidden,new_state  = ',hidden[0].shape,new_state.shape)
         verb_print('after_selector : hidden state',self.selector(hidden)[0].shape)
         return hidden, self.selector(hidden), new_state
-
-    def forward(self, spatial, nonspatial, state, target):
-        pass
 
     def get_loss(self, spatial, nonspatial, prev_action, state, target, point):
 
@@ -213,3 +210,7 @@ class Model(nn.Module):
         s = dist.sample()
         s = s.squeeze().cpu().numpy()
         return s, state
+
+    def forward(self,pov,additional_info,state):
+        hidden, prediction, state = self.compute_front(pov, additional_info, state)
+        return prediction, state

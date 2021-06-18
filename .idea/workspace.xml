@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/obj/int_to_vec_dict_30.pkl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/obj/int_to_vec_dict_50.pkl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/obj/key_to_index_dict_30.pkl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/obj/key_to_index_dict_50.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vizualize_output.py" beforeDir="false" afterPath="$PROJECT_DIR$/vizualize_output.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,12 +22,12 @@
     </option>
   </component>
   <component name="Git.Merge.Settings">
-    <option name="BRANCH" value="origin/random_dataloading" />
+    <option name="BRANCH" value="custom_dataloader" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Treechop" />
+        <entry key="$PROJECT_DIR$" value="custom_dataloader" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -75,8 +78,8 @@
       <recent name="$PROJECT_DIR$/train/trained_models" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.train">
-    <configuration name="mineDataset" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.vizualize_output">
+    <configuration name="descrete_actions_transform" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -88,7 +91,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mineDataset.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/descrete_actions_transform.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -139,7 +142,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="train" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="test_first_model" type="PythonConfigurationType" factoryName="Python">
+      <module name="MichalOpMineRL2020" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$PROJECT_DIR$/../Minecraft72/venv/bin/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="working_closest --test-checkpoints --checkpoint-range [1,5,10,15,20] --save-vids --no-classes 30 --no-cpu 2" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="train" type="PythonConfigurationType" factoryName="Python">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -152,7 +176,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/train.py" />
-      <option name="PARAMETERS" value="unimportant --batchsize 8" />
+      <option name="PARAMETERS" value="unimportant --no-classes 50 --debug --c 4 --epochs 11" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -181,20 +205,43 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="vizualize_output" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="MichalOpMineRL2020" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/vizualize_output.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue="Python.test_first_model" />
       <item itemvalue="Python.train" />
-      <item itemvalue="Python.use_resnet" />
+      <item itemvalue="Python.descrete_actions_transform" />
       <item itemvalue="Python.simple_plotter" />
       <item itemvalue="Python.test_descrete_preprocessing" />
-      <item itemvalue="Python.mineDataset" />
+      <item itemvalue="Python.use_resnet" />
+      <item itemvalue="Python.vizualize_output" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.train" />
-        <item itemvalue="Python.mineDataset" />
+        <item itemvalue="Python.vizualize_output" />
+        <item itemvalue="Python.use_resnet" />
+        <item itemvalue="Python.descrete_actions_transform" />
         <item itemvalue="Python.test_descrete_preprocessing" />
         <item itemvalue="Python.simple_plotter" />
-        <item itemvalue="Python.use_resnet" />
       </list>
     </recent_temporary>
   </component>
@@ -206,125 +253,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00007" summary="nvm, adding kmeans to git.">
-      <created>1621688026963</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1621688026963</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Also added translation dicts.">
-      <created>1621688085276</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1621688085276</updated>
-    </task>
-    <task id="LOCAL-00009" summary="change pickle settings for support.">
-      <created>1621688558999</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1621688558999</updated>
-    </task>
-    <task id="LOCAL-00010" summary="added new files.">
-      <created>1621688611865</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1621688611865</updated>
-    </task>
-    <task id="LOCAL-00011" summary="added logs folder">
-      <created>1621688690940</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1621688690940</updated>
-    </task>
-    <task id="LOCAL-00012" summary="add option for short runs.">
-      <created>1621755727898</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1621755727898</updated>
-    </task>
-    <task id="LOCAL-00013" summary="add option for short runs.">
-      <created>1621756625264</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1621756625264</updated>
-    </task>
-    <task id="LOCAL-00014" summary="merge some stupid stuff">
-      <created>1621756667714</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1621756667714</updated>
-    </task>
-    <task id="LOCAL-00015" summary="correct python 3.9 syntax AHRG">
-      <created>1621756924773</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1621756924773</updated>
-    </task>
-    <task id="LOCAL-00016" summary="revert change.">
-      <created>1621757189398</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1621757189398</updated>
-    </task>
-    <task id="LOCAL-00017" summary="revert revert change">
-      <created>1621757541275</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1621757541276</updated>
-    </task>
-    <task id="LOCAL-00018" summary="python 3.5 ;(">
-      <created>1621758164433</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1621758164433</updated>
-    </task>
-    <task id="LOCAL-00019" summary="python 3.5 ;(">
-      <created>1621758204978</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1621758204978</updated>
-    </task>
-    <task id="LOCAL-00020" summary="python 3.5 ;(">
-      <created>1621758235343</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1621758235343</updated>
-    </task>
-    <task id="LOCAL-00021" summary="python 3.5 ;(">
-      <created>1621758320077</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1621758320077</updated>
-    </task>
-    <task id="LOCAL-00022" summary="fix">
-      <created>1621758497949</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1621758497949</updated>
-    </task>
-    <task id="LOCAL-00023" summary="fix">
-      <created>1621844832769</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1621844832769</updated>
     </task>
     <task id="LOCAL-00024" summary="make printing optional. Dirty implementation">
       <created>1621846010714</created>
@@ -536,40 +464,146 @@
       <option name="project" value="LOCAL" />
       <updated>1623059689808</updated>
     </task>
-    <task id="LOCAL-00054" summary="added simple loader py. updated use_resnet.py">
-      <created>1623134775467</created>
+    <task id="LOCAL-00054" summary="updated simple plotter">
+      <created>1623151666405</created>
       <option name="number" value="00054" />
       <option name="presentableId" value="LOCAL-00054" />
       <option name="project" value="LOCAL" />
-      <updated>1623134775468</updated>
+      <updated>1623151666405</updated>
     </task>
-    <task id="LOCAL-00055" summary="MineDataset custom pipeline working">
-      <created>1623144178005</created>
+    <task id="LOCAL-00055" summary="updated simple plotter">
+      <created>1623152127604</created>
       <option name="number" value="00055" />
       <option name="presentableId" value="LOCAL-00055" />
       <option name="project" value="LOCAL" />
-      <updated>1623144178005</updated>
+      <updated>1623152127604</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="remove kmeans">
+      <created>1623152858363</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1623152858363</updated>
+    </task>
+    <task id="LOCAL-00057" summary="set reasonable value for torch cpus.">
+      <created>1623152935463</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1623152935463</updated>
+    </task>
+    <task id="LOCAL-00058" summary="make no_classes selectable in training">
+      <created>1623155739854</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1623155739854</updated>
+    </task>
+    <task id="LOCAL-00059" summary="make dataloader single threaded">
+      <created>1623156086892</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1623156086892</updated>
+    </task>
+    <task id="LOCAL-00060" summary="set no replays to max">
+      <created>1623156205257</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1623156205257</updated>
+    </task>
+    <task id="LOCAL-00061" summary="add debug option, pin memro =true">
+      <created>1623156713345</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1623156713345</updated>
+    </task>
+    <task id="LOCAL-00062" summary="check what device is used">
+      <created>1623157421241</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1623157421241</updated>
+    </task>
+    <task id="LOCAL-00063" summary="fix">
+      <created>1623159250410</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1623159250410</updated>
+    </task>
+    <task id="LOCAL-00064" summary="made files more verbose and seperated">
+      <created>1623160980008</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1623160980008</updated>
+    </task>
+    <task id="LOCAL-00065" summary="made precompute loop">
+      <created>1623162574538</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1623162574538</updated>
+    </task>
+    <task id="LOCAL-00066" summary="made precompute loop">
+      <created>1623162764227</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1623162764227</updated>
+    </task>
+    <task id="LOCAL-00067" summary="refined precompuite loop">
+      <created>1623162899863</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1623162899864</updated>
+    </task>
+    <task id="LOCAL-00068" summary="fix precompute 1">
+      <created>1623162981032</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1623162981032</updated>
+    </task>
+    <task id="LOCAL-00069" summary="fix precompute 1">
+      <created>1623166219091</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1623166219091</updated>
+    </task>
+    <task id="LOCAL-00070" summary="fix epochs">
+      <created>1623169570355</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1623169570356</updated>
+    </task>
+    <task id="LOCAL-00071" summary="set shuffle False">
+      <created>1623220708395</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1623220708396</updated>
+    </task>
+    <task id="LOCAL-00072" summary="add vizualizer. change camera_noise_threshhold.">
+      <created>1623847064429</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1623847064430</updated>
+    </task>
+    <option name="localTasksCounter" value="73" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="use 3 cpus in torch." />
-    <MESSAGE value="change_saving" />
-    <MESSAGE value="integrate testing, add plotter, make model training ready." />
-    <MESSAGE value="add proper folder structure ..." />
-    <MESSAGE value="make no_checkpoints adjustable in script." />
-    <MESSAGE value="change map to zero" />
-    <MESSAGE value="change to no softmax" />
-    <MESSAGE value="get 50 action dict." />
-    <MESSAGE value="debug model. add option for different output size in model.py" />
-    <MESSAGE value="new dict. some cleanup and option for map to zero" />
-    <MESSAGE value="change to no_classes = 30" />
-    <MESSAGE value="commit for folder structure. unusable commit" />
-    <MESSAGE value="resnet integration finished" />
     <MESSAGE value="use more threads for loading, asser padding. adjust train/test scripts" />
     <MESSAGE value="eval added to train. This is rudimentary implementation ..." />
     <MESSAGE value="fix eval" />
@@ -580,13 +614,51 @@
     <MESSAGE value="remove old logger" />
     <MESSAGE value="make resnet model path relative" />
     <MESSAGE value="updated simple plotter" />
-    <MESSAGE value="added simple loader py. updated use_resnet.py" />
-    <MESSAGE value="MineDataset custom pipeline working" />
-    <option name="LAST_COMMIT_MESSAGE" value="MineDataset custom pipeline working" />
+    <MESSAGE value="remove kmeans" />
+    <MESSAGE value="set reasonable value for torch cpus." />
+    <MESSAGE value="make no_classes selectable in training" />
+    <MESSAGE value="make dataloader single threaded" />
+    <MESSAGE value="set no replays to max" />
+    <MESSAGE value="add debug option, pin memro =true" />
+    <MESSAGE value="check what device is used" />
+    <MESSAGE value="fix" />
+    <MESSAGE value="made files more verbose and seperated" />
+    <MESSAGE value="made precompute loop" />
+    <MESSAGE value="refined precompuite loop" />
+    <MESSAGE value="fix precompute 1" />
+    <MESSAGE value="fix epochs" />
+    <MESSAGE value="set shuffle False" />
+    <MESSAGE value="add vizualizer. change camera_noise_threshhold." />
+    <option name="LAST_COMMIT_MESSAGE" value="add vizualizer. change camera_noise_threshhold." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>198</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>200</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>117</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test.py</url>
+          <line>256</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/loader.py</url>
+          <line>66</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/pretrainedResnetMasks/main.py</url>
           <line>179</line>
@@ -598,14 +670,79 @@
           <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>45</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>169</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test.py</url>
+          <line>258</line>
+          <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>134</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/loader.py</url>
           <line>241</line>
           <option name="timeStamp" value="44" />
         </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>186</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>117</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>119</line>
+          <option name="timeStamp" value="50" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>121</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>110</line>
+          <option name="timeStamp" value="54" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>115</line>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>136</line>
+          <option name="timeStamp" value="57" />
+        </line-breakpoint>
+        <line-breakpoint suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/model.py</url>
+          <line>91</line>
+          <option name="timeStamp" value="67" />
+        </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/loader.py</url>
-          <line>66</line>
-          <option name="timeStamp" value="62" />
+          <url>file://$PROJECT_DIR$/descrete_actions_transform.py</url>
+          <line>142</line>
+          <option name="timeStamp" value="68" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/train.py</url>
+          <line>61</line>
+          <option name="timeStamp" value="69" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
