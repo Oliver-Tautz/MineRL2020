@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/obj/int_to_vec_dict_30.pkl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/obj/int_to_vec_dict_50.pkl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/obj/key_to_index_dict_30.pkl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/obj/key_to_index_dict_50.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vizualize_output.py" beforeDir="false" afterPath="$PROJECT_DIR$/vizualize_output.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,7 +23,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="custom_dataloader" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -78,7 +74,7 @@
       <recent name="$PROJECT_DIR$/train/trained_models" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.vizualize_output">
+  <component name="RunManager" selected="Python.train">
     <configuration name="descrete_actions_transform" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -253,13 +249,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00024" summary="make printing optional. Dirty implementation">
-      <created>1621846010714</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1621846010714</updated>
     </task>
     <task id="LOCAL-00025" summary="make printing optional, very dirty. Make cuda and cpu viable, also dirty.">
       <created>1621850989634</created>
@@ -597,14 +586,20 @@
       <option name="project" value="LOCAL" />
       <updated>1623847064430</updated>
     </task>
-    <option name="localTasksCounter" value="73" />
+    <task id="LOCAL-00073" summary="remove print">
+      <created>1624030968517</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1624030968517</updated>
+    </task>
+    <option name="localTasksCounter" value="74" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="use more threads for loading, asser padding. adjust train/test scripts" />
     <MESSAGE value="eval added to train. This is rudimentary implementation ..." />
     <MESSAGE value="fix eval" />
     <MESSAGE value="remove unessecary imports from train.py" />
@@ -629,7 +624,8 @@
     <MESSAGE value="fix epochs" />
     <MESSAGE value="set shuffle False" />
     <MESSAGE value="add vizualizer. change camera_noise_threshhold." />
-    <option name="LAST_COMMIT_MESSAGE" value="add vizualizer. change camera_noise_threshhold." />
+    <MESSAGE value="remove print" />
+    <option name="LAST_COMMIT_MESSAGE" value="remove print" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
