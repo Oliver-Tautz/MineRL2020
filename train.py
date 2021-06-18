@@ -25,7 +25,7 @@ from simple_logger import SimpleLogger
 import numpy as np
 import random
 from mineDataset import MineDataset
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 import matplotlib.pyplot as plt
 
 import argparse
@@ -42,16 +42,24 @@ parser.add_argument('--batchsize', help="make torch use number of cpus",type=int
 parser.add_argument('--seq-len', help="make torch use number of cpus",type=int, default=100)
 parser.add_argument('--no-classes', help="use number of distcrete actions",type=int, default=30)
 parser.add_argument('--debug', help="use small number of samples for debugging faster",action='store_true')
+parser.add_argument('--no-shuffle', help="dont shuffle train set after each epoch",action='store_true')
+parser.add_argument('--no-sequences', help="use number of sequences for train/val dataset",type=int, default=30000)
+parser.add_argument('--val-split', help="split into val set. ",type=float, default=0.2)
 
 args = parser.parse_args()
 
-# In ONLINE=True mode the code saves only the final version with early stopping,
-# in ONLINE=False it saves 20 intermediate versions during training.
-ONLINE = True
 
-trains_loaded = True
-
+# there are 448480 unique steps in the dataset.
+# so choose > 450000/seq len sequences ...
+no_sequences = args.no_sequences
+val_split    = args.val_split
+no_shuffle   = args.no_shuffle
 modelname = args.modelname
+map_to_zero = args.map_to_zero
+with_masks = args.with_masks
+verb = args.verbose
+epochs = args.epochs
+no_classes = args.no_classes
 
 # ensure reproducability
 
@@ -70,11 +78,6 @@ while (True):
         model_index+=1
 
 
-map_to_zero = args.map_to_zero
-with_masks = args.with_masks
-verb = args.verbose
-epochs = args.epochs
-no_classes = args.no_classes
 
 
 def verb_print(*strings):
@@ -87,20 +90,18 @@ deviceStr = "cuda" if torch.cuda.is_available() else "cpu"
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 print('using device:', device,file=sys.stderr)
 
-try:
-    from clearml import Task
-except:
-    trains_loaded = False
+
 from random import shuffle
 
 from minerl.data import DataPipeline
 
-BATCH_SIZE = args.batchsize
-SEQ_LEN = args.seq_len
+batchsize = args.batchsize
+seq_len = args.seq_len
 
 if args.debug:
     no_replays = 2
     epochs = 5
+    no_sequences = 40
 else:
     no_replays =300
 
@@ -119,13 +120,20 @@ def train(model, epochs, train_loader, val_loader):
 
     gradsum = 0
 
-    simple_logger = SimpleLogger(f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={SEQ_LEN}_time={datetime.now()}.csv",
+    simple_logger = SimpleLogger(f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_time={datetime.now()}.csv",
                                  ['epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate'])
 
     additional_info_dummy = torch.zeros(10)
     best_val_loss = 1000
 
+
+
+
     for epoch in trange(epochs, desc='epochs'):
+
+
+
+
         model.train()
         # save batch losses
         epoch_train_loss = []
@@ -134,7 +142,7 @@ def train(model, epochs, train_loader, val_loader):
         # train on batches
         for pov, act in tqdm(train_loader, desc='batch_train',position=0,leave=True):
             # reset lstm_state after each sequence
-            lstm_state = model.get_zero_state(BATCH_SIZE)
+            lstm_state = model.get_zero_state(batchsize)
 
             # swap batch and seq; swap x and c; swap x and y back. Is this necessary? Be careful in testing! match this operation.
             pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
@@ -167,7 +175,7 @@ def train(model, epochs, train_loader, val_loader):
 
             for pov, act in tqdm(val_loader, desc='batch_eval',position=0,leave=True):
                 # reset lstm_state
-                lstm_state = model.get_zero_state(BATCH_SIZE)
+                lstm_state = model.get_zero_state(batchsize)
                 pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
                 # move to gpu
@@ -188,11 +196,11 @@ def train(model, epochs, train_loader, val_loader):
 
             if (epoch%5) == 0:
                 print("------------------Saving Model!-----------------------")
-                torch.save(model.state_dict(), f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={SEQ_LEN}_epoch={epoch}_time={datetime.now()}.tm")
+                torch.save(model.state_dict(), f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
 
             if (sum(epoch_train_loss) / len(epoch_train_loss)) < best_val_loss:
                 best_val_loss = (sum(epoch_train_loss) / len(epoch_train_loss))
-                torch.save(model.state_dict(),f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={SEQ_LEN}_epoch={epoch}_time={datetime.now()}.tm")
+                torch.save(model.state_dict(),f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
 
             print("-------------Logging!!!-------------")
             simple_logger.log(
@@ -241,22 +249,27 @@ def main():
 
     os.makedirs("train", exist_ok=True)
 
-    train_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=SEQ_LEN, map_to_zero=map_to_zero,
-                            with_masks=with_masks,no_classes=no_classes,no_replays=no_replays)
-
-    val_set = MineDataset('data/MineRLTreechop-v0/val', sequence_length=SEQ_LEN, map_to_zero=map_to_zero,
-                          with_masks=with_masks,no_classes=no_classes,no_replays=no_replays)
+    full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=seq_len, map_to_zero=map_to_zero,
+                           with_masks=with_masks, no_classes=no_classes, no_replays=no_replays, random_sequences=no_sequences)
 
 
-    # shuffle only train set.
-    train_loader = DataLoader(train_set, batch_size=BATCH_SIZE,
+    val_split = 0.2
+    train_set, val_set = random_split(full_set,[int(no_sequences*(1-val_split)),int(no_sequences*val_split)],generator=torch.Generator().manual_seed(42))
+
+
+    if no_shuffle:
+        train_loader = DataLoader(train_set, batch_size=batchsize,
+                              shuffle=True, num_workers=0, drop_last=True,pin_memory=True)
+
+    else:
+        train_loader = DataLoader(train_set, batch_size=batchsize,
                               shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
 
-    val_loader = DataLoader(val_set, batch_size=BATCH_SIZE,
-                            shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
+    val_loader =     DataLoader(val_set, batch_size=batchsize,
+                              shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
 
-    val_loader_nobatch = DataLoader(val_set, batch_size=1,
-                            shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
+
+    print(f"training on {len(train_set)} sequences of length {seq_len}, validation on {len(val_set)}")
 
     if deviceStr == "cuda":
         model.cuda()
