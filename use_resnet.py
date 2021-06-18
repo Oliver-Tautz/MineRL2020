@@ -144,5 +144,5 @@ def precompute_dir(filepath, device):
     del obs
 
 if __name__ == '__main__':
-    precompute_dir('data/MineRLTreechop-v0/val',device='cuda')
-    precompute_dir('data/MineRLTreechop-v0/train',device='cuda')
+    precompute_dir('data/MineRLTreechop-v0/val',device='cpu')
+    precompute_dir('data/MineRLTreechop-v0/train',device='cpu')

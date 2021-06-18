@@ -69,6 +69,7 @@ class MineDataset(Dataset):
             self.replays_pov[i] = torch.tensor(obs['pov'],dtype=torch.float32)
             self.original_act[i] = act
             self.replays_act[i] = torch.tensor(transform_actions(act,map_to_zero=map_to_zero,get_ints=True,no_classes=no_classes),dtype=torch.long)
+            print(self.replays_act[i].shape)
             #replays[i] = d
 
 
@@ -120,6 +121,7 @@ class MineDataset(Dataset):
 
         pov = self.replays_pov[replay_ix][start_ix:end_ix]
         act = self.replays_act[replay_ix][start_ix:end_ix]
+
 
         return pov, act
 
