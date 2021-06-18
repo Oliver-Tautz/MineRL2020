@@ -50,7 +50,6 @@ class MineDataset(Dataset):
 
         self.replay_queue = os.listdir(root_dir)[0:no_replays]
 
-        print(self.replay_queue)
 
         self.mine_loader = minerl.data.make('MineRLTreechop-v0',data_dir=self.root_dir,num_workers=cpus)
 
