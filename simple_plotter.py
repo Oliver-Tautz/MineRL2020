@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import csv
 import pandas as pd
 from collections import defaultdict
+import os
+from functools import reduce
 
 class SimplePlotter():
     def __init__(self,csv_filename):
@@ -14,7 +16,10 @@ class SimplePlotter():
 
         for row in self.csv_reader:
             for key in row.keys():
-                self.data_dict[key].append(float(row[key]))
+                try :
+                    self.data_dict[key].append(float(row[key]))
+                except:
+                    self.data_dict[key].append(str(row[key]))
 
         self.df = pd.DataFrame(self.data_dict)
         self.checkpoint_x = x = [350000/20*i for i in range(1,20)]
@@ -35,8 +40,32 @@ class SimplePlotter():
     def plot_vlines(self,x):
         plt.vlines(x,linestyles = 'dotted',  color="green",ymin=0,ymax=3,label='checkpoints')
 
-
-
+    def set_title(self,title):
+        plt.title(title)
 
 #$#sp = SimplePlotter('loss_csv/working_closest.csv')
 
+def wrap_string(string,max_len):
+    l = 0
+    substrings = []
+    while l < len(string):
+        print(l,len(string))
+        substrings.append(string[l:l+max_len])
+        l+=max_len
+
+    print(substrings)
+    return reduce(lambda x,y: x+'\n'+y,substrings,'')
+
+batchdir = '/home/olli/remote/techfak/compute/gits/MineRL2020/train'
+
+for batch in os.listdir(batchdir):
+    for file in os.listdir(f'{batchdir}/{batch}'):
+        if '.csv' in file:
+            sp = SimplePlotter(f'{batchdir}/{batch}/{file}')
+            sp.plot_line('epoch',['loss','val_loss'])
+            filename = file.split('.cs')[0]
+            sp.set_title(wrap_string(filename,50))
+
+            plt.savefig(f'{batchdir}/{batch}/{filename}.pdf')
+
+            plt.clf()

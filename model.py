@@ -196,7 +196,7 @@ class Model(nn.Module):
         #verb_print('l1 shape: ', l1.item())
         return l1, {"action":l1.item()}, state
 
-    def sample(self, spatial, nonspatial, prev_action, state, target):
+    def sample(self, spatial, nonspatial, state):
         verb_print('pov_input = ',spatial.shape)
         verb_print('obfs_input = ',nonspatial.shape)
         verb_print('hidden_states = ',state[0].shape)
@@ -204,8 +204,11 @@ class Model(nn.Module):
         verb_print(self.core)
 
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
+
+        print(((d)))
         verb_print('d', d)
         verb_print('d.shape' ,d.shape)
+
         dist = D.Categorical(logits = d)
         s = dist.sample()
         s = s.squeeze().cpu().numpy()

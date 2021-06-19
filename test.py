@@ -33,14 +33,13 @@ import ast
 import simple_logger
 
 
-parser = argparse.ArgumentParser(description='train the model ...')
-parser.add_argument('modelname',help="name of the model",type=str)
+parser = argparse.ArgumentParser(description='test the model')
+parser.add_argument('modelpath',help='use saved model at path',type=str)
+parser.add_argument('--use-multiple',help="given modelpath is a directory. Use all models inside. (Not implemented yet!)",action="store_true")
 parser.add_argument('--no_episodes',help="how many episodes to test per model?",type=int,default=10)
 parser.add_argument('--no-classes',help="how many actions are there?",type=int,default=30)
-parser.add_argument('--no-cpu',help="number of eval threads to start",type=int,default=2)
+parser.add_argument('--no-cpu',help="number of eval threads to start",type=int,default=1)
 parser.add_argument('--verbose',help="print more stuff",action="store_true")
-parser.add_argument('--test-checkpoints',help="test checkpoints?",action="store_true")
-parser.add_argument('--checkpoint-range',help="Range in format \"[i,j,k,...]\"",type=str,default='[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]')
 parser.add_argument('--with-masks',help="use extra mask channel",action="store_true")
 parser.add_argument('--save-vids',help="save videos of eval",action="store_true")
 parser.add_argument('--max-steps',help="max steps per episode",type=int,default=3000)
@@ -48,23 +47,23 @@ parser.add_argument('--max-steps',help="max steps per episode",type=int,default=
 
 args = parser.parse_args()
 
+print(args)
+
+modelpath = args.modelpath
+model_name = modelpath.split('/')[-1].split('.')[0]
+use_multiple = args.use_multiple
+no_episodes=args.no_episodes
+no_classes = args.no_classes
+no_cpu = args.no_cpu
+verbose = args.verbose
+with_masks=args.with_masks
+save_vids = args.save_vids
+max_steps=args.max_steps
 
 
-if args.test_checkpoints:
-
-
-    checkpoint_ix = ast.literal_eval(args.checkpoint_range)
-
-else:
-    checkpoint_ix = [0]
 
 
 
-model_name = args.modelname
-test_checkpoints = args.test_checkpoints
-
-
-sl = simple_logger.SimpleLogger(f"eval_csv/{model_name}.csv",['checkpoint','score','episodes','steps'])
 
 
 
@@ -80,6 +79,7 @@ EVALUATION_THREAD_COUNT = args.no_cpu#int(os.getenv('EPISODES_EVALUATION_THREAD_
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
+sl = simple_logger.SimpleLogger(f"eval/{model_name}.csv", ['seed', 'reward', 'episode', 'step', 'predicted action'])
 
 class EpisodeDone(Exception):
     pass
@@ -197,21 +197,16 @@ class MineRLNetworkAgent(MineRLAgentBase):
     Note, you MUST subclass MineRLAgentBase.
     """
 
-    def load_agent(self,model_name,checkpoint_number):
+    def load_agent(self,model_name):
         """In this example we make a random matrix which
         we will use to multiply the state by to produce an action!
 
         This is where you could load a neural network.
         """
         # Some helpful constants from the environment.
-        self.model = Model(deviceStr=device,verbose=args.verbose,no_classes=args.no_classes,with_masks=args.with_masks)
-        self.checkpoint_number = checkpoint_number
+        self.model = Model(deviceStr=device,verbose=verbose,no_classes=no_classes,with_masks=with_masks)
 
-        if test_checkpoints:
-            self.model.load_state_dict(torch.load(f"train/{model_name}/{model_name}_{checkpoint_number}.tm", map_location=device))
-
-        else:
-            self.model.load_state_dict(torch.load("train/unimportant/unimportant_with-masks]False_map-to-zero=False_no-classes=50_epoch=1_time=2021-06-08 15:40:30.410176.tm", map_location=device))
+        self.model.load_state_dict(torch.load(modelpath, map_location=device))
         # self.model.load_state_dict(torch.load("testing/m.tm", map_location=device))
 
         self.model.eval()
@@ -230,10 +225,10 @@ class MineRLNetworkAgent(MineRLAgentBase):
 
 
         max_steps = args.max_steps
-        seeds = [2, 12345, 45678, 303544, 744421, 816128, 406373, 99999, 88888, 76543,
-                 67345, 11342, 24337, 45547, 82666, 128939, 494668, 927113, 869989, 873766, 708928, 786039, 371309,
-                 281286]
+        seeds = [2, 12345, 45678, 303544, 744421, 816128, 406373, 99999, 88888, 76543]
+        seeds= [927113,11342]
 
+        steps = 0
         with torch.no_grad():
             seed = random.sample(seeds,1)
             single_episode_env.seed(seed)
@@ -245,41 +240,48 @@ class MineRLNetworkAgent(MineRLAgentBase):
             while not done:
 
                 # what is happening here?
-                spatial = torch.tensor(obs["pov"], device=device, dtype=torch.float32).unsqueeze(0).unsqueeze(0).transpose(2,4)
+                pov = torch.tensor(obs["pov"], device=device, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+                print(pov.shape)
+                pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
-
+                additional_info_dummy = torch.zeros(10)
                 #cv2.imshow("xdd", obs["pov"])
                 # cv2.waitKey(30)
                 #nonspatial = torch.cat([torch.tensor(obs["vector"], device=device, dtype=torch.float32),
                  #                       torch.ones((2,), device=device,dtype=torch.float32)], dim=0).unsqueeze(0).unsqueeze(0)
 
 
-                nonspatial = torch.zeros((1,1,64))
+                additional_info_dummy = torch.zeros(10)
 
-                s, state = self.model.sample(spatial, nonspatial, s, state, torch.zeros((1,1,64),dtype=torch.float32,device=device))
-
-
-                action = transform_int_to_actions([int(s)])
+                s, state = self.model.sample(pov,additional_info_dummy,state)
 
 
-                for i in range(1):
-                    obs,reward,done,_ = single_episode_env.step(action)
-                    er.record_frame(obs['pov'])
+                action = transform_int_to_actions([int(s)],no_actions=50)
 
-                    counter+=1
 
-                    reward_sum += reward
-                    if reward > 0:
-                        rewards.append(reward)
-                    if done :
-                        break
-                    if max_steps and counter > max_steps:
-                        done = True
+
+                obs,reward,done,_ = single_episode_env.step(action)
+                er.record_frame(obs['pov'])
+
+                counter+=1
+
+                reward_sum += reward
+                if steps%100 ==0:
+                    state= self.model.get_zero_state(1, device=device)
+
+                if reward > 0:
+                    rewards.append(reward)
+
+                sl.log([seed, sum(rewards), index, counter, int(s)])
+                counter +=1
+                if counter > max_steps:
+                    break
+
 
         if args.save_vids:
-            er.save_vid(f'train/{model_name}/eval_vids/checkpoint={self.checkpoint_number}/episode={index}_seed={seed}.avi')
-            sl = simple_logger.SimpleLogger(f"eval_csv/{model_name}.csv", ['checkpoint', 'score', 'episodes', 'steps'])
-        sl.log([self.checkpoint_number,reward_sum,1,max_steps])
+            er.save_vid(f'eval/{model_name}_seed={seed}_episode={index}.avi')
+
+
         
         
 
@@ -307,10 +309,10 @@ AGENT_TO_TEST = MineRLNetworkAgent # MineRLMatrixAgent, MineRLRandomAgent, YourA
 ####################
 def main():
 
-    for check_no in checkpoint_ix:
+
         agent = AGENT_TO_TEST()
         assert isinstance(agent, MineRLAgentBase)
-        agent.load_agent(model_name,check_no)
+        agent.load_agent(model_name)
 
         assert MINERL_MAX_EVALUATION_EPISODES > 0
         assert EVALUATION_THREAD_COUNT > 0
@@ -328,9 +330,9 @@ def main():
         def evaluate(i, env):
             print("[{}] Starting evaluator.".format(i))
 
-            for i in range(episodes_per_thread[i]):
+            for j in range(episodes_per_thread[i]):
                 try:
-                    agent.run_agent_on_episode(Episode(env),i)
+                    agent.run_agent_on_episode(Episode(env),i*episodes_per_thread[0]+j)
                 except EpisodeDone:
                     print("[{}] Episode complete".format(i))
 
