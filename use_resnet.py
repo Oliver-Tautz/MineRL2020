@@ -6,10 +6,12 @@ import os
 import minerl
 
 from torch.utils.data import DataLoader, Dataset
+import torchvision.transforms as T
 
 # Segmentation model
 from pretrainedResnetMasks.segm.model import load_fcn_resnet101
 from pretrainedResnetMasks.segm.data import MineDataset
+from pretrainedResnetMasks.segm.segm import Segmentation
 
 
 
@@ -100,9 +102,10 @@ class MaskGeneratorResnet():
 
         return masked
 
-    # batch = (batch,channel,
+    # batch = (batch,x,y,c)
     def return_masks(self, batch):
         batch_shape = batch.shape
+        print(batch_shape)
 
         prepped = self.__prepare_batch(batch)
         #print(reshaped.shape)
@@ -112,7 +115,6 @@ class MaskGeneratorResnet():
 
         # postprocess to classes
         masks = torch.argmax(masks, dim=1)
-        print(torch.max(masks.flatten(),dim=-1))
 
         # add channel dimension
         masks = torch.unsqueeze(masks, dim=3)
@@ -120,26 +122,6 @@ class MaskGeneratorResnet():
         return masks
 
 
-# cmap = np.asarray([[0, 0, 0],
-#                   [0, 0, 1],
-#                   [0, 1, 0],
-#                   [0, 1, 1],
-#                   [1, 0, 0],
-#                   [1, 0, 1],
-#                   [1, 1, 0],
-#                   [1, 1, 1]])
-#
-#
-#
-# img_file = 'pretrainedResnetMasks/data/X.npy'
-# msk_file = 'pretrainedResnetMasks/data/Y.npy'
-# dataset = MineDataset(img_file, msk_file, cmap)
-# testfile = dataset[137][0]
-# resnet = MaskGeneratorResnet('cpu')
-# pred = resnet.transform_image(testfile)
-# padded = resnet.append_channel(testfile)
-
-# precompute masks for dataset.
 
 
 
@@ -180,15 +162,10 @@ if __name__ == '__main__':
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     print('using device:', device)
 
-    torch.set_num_threads(10)
+    #torch.set_num_threads(10)
 
     precompute_dir('./data/MineRLTreechop-v0/train',device=deviceStr)
 
-    #masks = torch.load('./data/MineRLTreechop-v0/train/v3_absolute_grape_changeling-15_10696-12887/masks.pt')
-    #print(masks.shape)
 
-    #X = np.load(f"pretrainedResnetMasks/data/X.npy")
-    #X= torch.tensor(X,dtype=torch.double)
-    #print(X.shape)
-    #resnet = MaskGeneratorResnet(device=device)
-    #print(torch.max(resnet.transform_image(X[96]).flatten()))
+
+
