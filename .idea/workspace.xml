@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="8a374d82-e0f6-485f-a9a0-e7ae0f18d35c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/use_resnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/use_resnet.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +74,7 @@
       <recent name="$PROJECT_DIR$/train/trained_models" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.train">
+  <component name="RunManager" selected="Python.use_resnet">
     <configuration name="descrete_actions_transform" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MichalOpMineRL2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -98,7 +98,7 @@
     </configuration>
     <configuration name="simple_plotter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="MichalOpMineRL2020" />
-      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="INTERPRETER_OPTIONS" value="-i" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
@@ -151,7 +151,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
-      <option name="PARAMETERS" value="working_closest --test-checkpoints --checkpoint-range [1,5,10,15,20] --save-vids --no-classes 30 --no-cpu 2" />
+      <option name="PARAMETERS" value="$USER_HOME$/remote/techfak/compute/gits/MineRL2020/train/batch6_0/batch6_with-masks=False_map-to-zero=True_no-classes=30_seq-len=50_epoch=69_time=2021-06-18\ 23:04:48.714335.tm --save-vids" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -233,11 +233,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.vizualize_output" />
         <item itemvalue="Python.use_resnet" />
+        <item itemvalue="Python.simple_plotter" />
+        <item itemvalue="Python.vizualize_output" />
         <item itemvalue="Python.descrete_actions_transform" />
         <item itemvalue="Python.test_descrete_preprocessing" />
-        <item itemvalue="Python.simple_plotter" />
       </list>
     </recent_temporary>
   </component>
@@ -249,41 +249,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1618828739241</updated>
-    </task>
-    <task id="LOCAL-00025" summary="make printing optional, very dirty. Make cuda and cpu viable, also dirty.">
-      <created>1621850989634</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1621850989634</updated>
-    </task>
-    <task id="LOCAL-00026" summary="cleanup output.">
-      <created>1621851569916</created>
-      <option name="number" value="00026" />
-      <option name="presentableId" value="LOCAL-00026" />
-      <option name="project" value="LOCAL" />
-      <updated>1621851569916</updated>
-    </task>
-    <task id="LOCAL-00027" summary="fix late-logging">
-      <created>1621851753560</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1621851753560</updated>
-    </task>
-    <task id="LOCAL-00028" summary="use 3 cpus in torch.">
-      <created>1621853040900</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1621853040900</updated>
-    </task>
-    <task id="LOCAL-00029" summary="change_saving">
-      <created>1621857871334</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1621857871334</updated>
     </task>
     <task id="LOCAL-00030" summary="integrate testing, add plotter, make model training ready.">
       <created>1622278192568</created>
@@ -593,17 +558,48 @@
       <option name="project" value="LOCAL" />
       <updated>1624030968517</updated>
     </task>
-    <option name="localTasksCounter" value="74" />
+    <task id="LOCAL-00074" summary="add more logging">
+      <created>1624032284656</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1624032284656</updated>
+    </task>
+    <task id="LOCAL-00075" summary="add more logging">
+      <created>1624032374212</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1624032374212</updated>
+    </task>
+    <task id="LOCAL-00076" summary="change testing.">
+      <created>1624096661541</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1624096661542</updated>
+    </task>
+    <task id="LOCAL-00077" summary="finish masks precomputing script for citec">
+      <created>1624261199865</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1624261199865</updated>
+    </task>
+    <task id="LOCAL-00078" summary="fix cuda error">
+      <created>1624261883613</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1624261883613</updated>
+    </task>
+    <option name="localTasksCounter" value="79" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="eval added to train. This is rudimentary implementation ..." />
-    <MESSAGE value="fix eval" />
-    <MESSAGE value="remove unessecary imports from train.py" />
-    <MESSAGE value="add segm.data" />
     <MESSAGE value="add full segm" />
     <MESSAGE value="smal fix" />
     <MESSAGE value="remove old logger" />
@@ -625,7 +621,11 @@
     <MESSAGE value="set shuffle False" />
     <MESSAGE value="add vizualizer. change camera_noise_threshhold." />
     <MESSAGE value="remove print" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove print" />
+    <MESSAGE value="add more logging" />
+    <MESSAGE value="change testing." />
+    <MESSAGE value="finish masks precomputing script for citec" />
+    <MESSAGE value="fix cuda error" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix cuda error" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -647,7 +647,7 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/test.py</url>
-          <line>256</line>
+          <line>255</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
@@ -677,7 +677,7 @@
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/test.py</url>
-          <line>258</line>
+          <line>257</line>
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint suspend="THREAD" type="python-line">
