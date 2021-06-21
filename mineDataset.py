@@ -194,7 +194,7 @@ class MineDataset(Dataset):
 if __name__ == '__main__':
     # test dataset.
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=1, random_sequences=100, sequence_length=100,device='cpu',with_masks=True)
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=100, sequence_length=100,device='cpu',with_masks=True)
 
 
     dataloader = DataLoader(ds, batch_size=1,
