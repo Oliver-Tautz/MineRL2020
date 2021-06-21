@@ -19,20 +19,29 @@ class MaskGeneratorResnet():
         self.device = device
         self.model = load_fcn_resnet101(n_classes=8)
         self.model.load_state_dict(torch.load(model_filename, map_location=device))
-        self.model = self.model.to(device)
-        self.model = self.model.eval()
+        self.model.to(device)
+        self.model.eval()
+        self.model.double()
+
 
     def __prepare_img(self, img):
         IMG_SCALE = 1. / 255
         IMG_MEAN = np.array([0.485, 0.456, 0.406]).reshape((1, 1, 3))
         IMG_STD = np.array([0.229, 0.224, 0.225]).reshape((1, 1, 3))
-        return torch.tensor(((img * IMG_SCALE - IMG_MEAN) / IMG_STD).transpose(2, 0, 1), dtype=torch.float)
+        return ((img * IMG_SCALE - IMG_MEAN) / IMG_STD).transpose(0,2).transpose(1,2)
+
+    def __prepare_batch(self, batch):
+        IMG_SCALE = 1. / 255
+        IMG_MEAN = np.array([0.485, 0.456, 0.406]).reshape((1, 1, 3))
+        IMG_STD = np.array([0.229, 0.224, 0.225]).reshape((1, 1, 3))
+        return ((batch * IMG_SCALE - IMG_MEAN) / IMG_STD).transpose(1,3).transpose(2,3)
 
     def transform_image(self, img):
         prepped = self.__prepare_img(img)
         prepped = prepped.to(self.device).unsqueeze(0)
+        print(prepped)
         mask = self.model(prepped)['out']
-        mask = torch.argmax(mask.squeeze(), dim=0).detach().to(self.device).numpy()
+        mask = torch.argmax(mask.squeeze(), dim=0).detach().to(self.device)
         return mask
 
     def append_channel(self, img):
@@ -91,17 +100,19 @@ class MaskGeneratorResnet():
 
         return masked
 
+    # batch = (batch,channel,
     def return_masks(self, batch):
         batch_shape = batch.shape
 
-        # reshape to (batch,pic)
-        reshaped = torch.transpose(batch, 1, 3)
-
+        prepped = self.__prepare_batch(batch)
+        #print(reshaped.shape)
         # get masks from model
-        masks = self.model(reshaped)['out']
+        masks = self.model(prepped)['out']
+
 
         # postprocess to classes
         masks = torch.argmax(masks, dim=1)
+        print(torch.max(masks.flatten(),dim=-1))
 
         # add channel dimension
         masks = torch.unsqueeze(masks, dim=3)
@@ -132,11 +143,11 @@ class MaskGeneratorResnet():
 
 
 
-def precompute_dir(filepath, device,batchsize=200):
+def precompute_dir(filepath, device,batchsize=10):
     resnet = MaskGeneratorResnet(device=device)
     loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=4)
 
-    for replay in tqdm(os.listdir(filepath), desc='loading'):
+    for replay in tqdm(os.listdir(filepath)[0:1], desc='loading'):
         full_name = os.path.join(filepath, replay)
 
         d = loader._load_data_pyfunc(full_name, -1, None)
@@ -148,6 +159,7 @@ def precompute_dir(filepath, device,batchsize=200):
 
         masks = []
         for batch in tqdm(dl,desc=f'precomputing masks for dir {full_name}',position=0 , leave=True):
+
             masks.append(resnet.return_masks(batch))
 
         masks=torch.cat(masks,dim=0)
@@ -174,3 +186,9 @@ if __name__ == '__main__':
 
     #masks = torch.load('./data/MineRLTreechop-v0/train/v3_absolute_grape_changeling-15_10696-12887/masks.pt')
     #print(masks.shape)
+
+    #X = np.load(f"pretrainedResnetMasks/data/X.npy")
+    #X= torch.tensor(X,dtype=torch.double)
+    #print(X.shape)
+    #resnet = MaskGeneratorResnet(device=device)
+    #print(torch.max(resnet.transform_image(X[96]).flatten()))

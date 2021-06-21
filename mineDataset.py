@@ -193,6 +193,7 @@ class MineDataset(Dataset):
 
 if __name__ == '__main__':
     # test dataset.
+    torch.set_printoptions(threshold=10_000)
 
     ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=100, sequence_length=100,device='cpu',with_masks=True)
 
@@ -201,12 +202,18 @@ if __name__ == '__main__':
                             shuffle=False, num_workers=0, drop_last=True)
 
     recorder = EpisodeRecorder()
+    masks_recorder = EpisodeRecorder()
 
-    for i, (pov, _, _) in enumerate(dataloader):
+    for i, (pov, _, masks) in enumerate(dataloader):
         #print(pov.shape)
-        for frame in pov.squeeze():
+        for frame, mask in zip(pov.squeeze(),masks.squeeze()):
             #print(frame.shape)
             recorder.record_frame(frame.numpy().astype(np.uint8))
+            masks_recorder.record_frame(mask.numpy().astype(np.uint8))
+            print(mask)
 
-        recorder.save_vid(f'dataset_vids/{i}.mp4')
+        #recorder.save_vid(f'dataset_vids/{i}.mp4')
+        masks_recorder.save_vid(f'dataset_vids/{i}_masks.mp4',swap_RB = False)
+
         recorder.reset()
+        masks_recorder.reset()
