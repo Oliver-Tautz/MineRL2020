@@ -143,7 +143,7 @@ def precompute_dir(filepath, device,batchsize=200):
         obs, act, reward, nextobs, done = d
 
 
-        dl = DataLoader(dataset= torch.tensor(obs['pov'],dtype=torch.float32),batch_size=batchsize,shuffle=False,num_workers=0,drop_last=False,pin_memory=True)
+        dl = DataLoader(dataset= torch.tensor(obs['pov'],dtype=torch.float32,device=device),batch_size=batchsize,shuffle=False,num_workers=0,drop_last=False,pin_memory=True)
 
 
         masks = []
@@ -167,6 +167,8 @@ if __name__ == '__main__':
     deviceStr = "cuda" if torch.cuda.is_available() else "cpu"
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     print('using device:', device)
+
+    torch.set_num_threads(10)
 
     precompute_dir('./data/MineRLTreechop-v0/train',device=deviceStr)
 
