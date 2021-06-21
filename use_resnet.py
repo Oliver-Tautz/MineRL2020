@@ -125,7 +125,7 @@ class MaskGeneratorResnet():
 
 
 
-def precompute_dir(filepath, device,batchsize=10):
+def precompute_dir(filepath, device,batchsize=100):
     resnet = MaskGeneratorResnet(device=device)
     loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=4)
 
