@@ -6,11 +6,9 @@ from tqdm import tqdm, trange
 from descrete_actions_transform import transform_actions
 from record_episode import EpisodeRecorder
 
-
 import numpy as np
 import time
 import sys
-
 
 
 class MineDataset(Dataset):
@@ -23,13 +21,10 @@ class MineDataset(Dataset):
     # no_replays        = choose lower number of replays if ram is an issue.
     # random_sequences  = want randomized data? how many? set ==0 or None for sequential load.
 
-
     # there are 448480 unique steps in the dataset.
 
-
-    def __init__(self,root_dir, sequence_length=100,with_masks=False,map_to_zero = True,cpus=3, no_replays = 300,no_classes=30,random_sequences=1000):
-
-
+    def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
+                 no_classes=30, random_sequences=1000,device='cuda'):
 
         self.no_random_sequences = random_sequences
 
@@ -45,22 +40,15 @@ class MineDataset(Dataset):
         # sequence length per sample
         self.sequence_length = sequence_length
 
-
-
-
         self.replay_queue = os.listdir(root_dir)[0:no_replays]
 
-
-        self.mine_loader = minerl.data.make('MineRLTreechop-v0',data_dir=self.root_dir,num_workers=cpus)
-
-
+        self.mine_loader = minerl.data.make('MineRLTreechop-v0', data_dir=self.root_dir, num_workers=cpus)
 
         # full replay. Probably not needed
         # replays = dict()
 
-
         # length of replays in steps
-        self.replays_length_raw=dict()
+        self.replays_length_raw = dict()
 
         # number of sequences in replay
         self.replays_length = dict()
@@ -72,38 +60,44 @@ class MineDataset(Dataset):
 
         self.original_act = dict()
 
+        if with_masks:
+            self.replays_masks = dict()
 
-        for i, replay in tqdm(enumerate(self.replay_queue),total=len(self.replay_queue),desc=f'{self.message_str}loading replays'):
-            d = self.mine_loader._load_data_pyfunc(os.path.join(self.root_dir,replay), -1, None)
+        for i, replay in tqdm(enumerate(self.replay_queue), total=len(self.replay_queue),
+                              desc=f'{self.message_str}loading replays'):
+            d = self.mine_loader._load_data_pyfunc(os.path.join(self.root_dir, replay), -1, None)
             obs, act, reward, nextobs, done = d
 
-
             # -1 because we start at 0
-            self.replays_length[i] = (len(obs['pov'])//sequence_length)-1
-            self.replays_length_raw[i]  = len(obs['pov'])
-            self.replays_pov[i] = torch.tensor(obs['pov'],dtype=torch.float32)
+            self.replays_length[i] = (len(obs['pov']) // sequence_length) - 1
+            self.replays_length_raw[i] = len(obs['pov'])
+            self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32)
             self.original_act[i] = act
-            self.replays_act[i] = torch.tensor(transform_actions(act,map_to_zero=map_to_zero,get_ints=True,no_classes=no_classes),dtype=torch.long)
+            self.replays_act[i] = torch.tensor(
+                transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes), dtype=torch.long)
 
-            #replays[i] = d
+            if with_masks:
+                self.replays_masks[i] = torch.load(os.path.join(self.root_dir, replay, 'masks.pt'),map_location=device)
 
+            # replays[i] = d
 
-
-        if random_sequences :
+        if random_sequences:
             self.random_sequences = []
             self.__randomize_sequences()
+        else:
+            self.random_sequences = None
 
         self.len = sum(self.replays_length.values())
 
         if random_sequences:
             self.len = random_sequences
 
-    def __print(self,str):
+    def __print(self, str):
         print(f'{self.message_str}{str}')
 
     # returns (a,b) with a being the replay, and b being the start index in that replay.
     # Note: seems to be working
-    def __map_ix_to_tuple(self,ix):
+    def __map_ix_to_tuple(self, ix):
 
         if ix > self.len:
             self.__print('WARNING: Index too high!')
@@ -115,41 +109,46 @@ class MineDataset(Dataset):
         while ix > 0:
 
             # wrap around?!
-            #if i > max(self.replays_length.keys()):
+            # if i > max(self.replays_length.keys()):
             #    i=0
             if ix > self.replays_length[i]:
-                ix-=self.replays_length[i]
-                i+=1
+                ix -= self.replays_length[i]
+                i += 1
 
             else:
                 break
 
-        return (i,ix)
-
-
-
+        return (i, ix)
 
     def __len__(self):
         return self.len
 
-    def __getitem__(self,idx):
+    def __getitem__(self, idx):
 
         if not self.random_sequences:
             replay_ix, sequence_ix = self.__map_ix_to_tuple(idx)
 
-            start_ix = sequence_ix*self.sequence_length
+            start_ix = sequence_ix * self.sequence_length
 
-            end_ix = start_ix+self.sequence_length
-
+            end_ix = start_ix + self.sequence_length
 
             pov = self.replays_pov[replay_ix][start_ix:end_ix]
             act = self.replays_act[replay_ix][start_ix:end_ix]
 
+            if self.with_masks:
+                mask = self.replays_masks[replay_ix][start_ix:end_ix]
+
         else:
-            pov,act = self.random_sequences[idx]
+
+            if self.with_masks:
+                pov, act, mask = self.random_sequences[idx]
+            else:
+                pov, act = self.random_sequences[idx]
+
+        if self.with_masks:
+            return pov, act, mask
 
         return pov, act
-
 
     def __randomize_sequences(self):
 
@@ -157,50 +156,57 @@ class MineDataset(Dataset):
         replay_index = 0
 
         # number of replays -1
-        last_replay_index = len(self.replay_queue)-1
+        last_replay_index = len(self.replay_queue) - 1
 
         # get number of sequences
-        for r_i in trange(self.no_random_sequences,desc='randomizing'):
-
+        for r_i in trange(self.no_random_sequences, desc='randomizing'):
 
             # roll random start
-            sequence_start_index = np.random.randint(0,self.replays_length[replay_index])
+            sequence_start_index = np.random.randint(0, self.replays_length_raw[replay_index])
+            print(sequence_start_index,self.replays_length[replay_index])
 
             # reroll if too high ...
-            while sequence_start_index+self.sequence_length >  self.replays_length_raw[replay_index]:
-                sequence_start_index = np.random.randint(0, self.replays_length[replay_index])
+            while sequence_start_index + self.sequence_length > self.replays_length_raw[replay_index]:
+                print(sequence_start_index)
+                sequence_start_index = np.random.randint(0, self.replays_length_raw[replay_index])
 
             # append random sequence
 
-            self.random_sequences.append((self.replays_pov[replay_index][sequence_start_index:sequence_start_index+self.sequence_length],
-                                         self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length]))
-            replay_index= (replay_index+1) % len(self.replay_queue)
+            if self.with_masks:
+                self.random_sequences.append(
+                    (self.replays_pov[replay_index][sequence_start_index:sequence_start_index + self.sequence_length],
+                     self.replays_act[replay_index][sequence_start_index:sequence_start_index + self.sequence_length],
+                     self.replays_masks[replay_index][sequence_start_index:sequence_start_index + self.sequence_length]))
+            else:
+
+                self.random_sequences.append(
+                    (self.replays_pov[replay_index][sequence_start_index:sequence_start_index + self.sequence_length],
+                     self.replays_act[replay_index][sequence_start_index:sequence_start_index + self.sequence_length]))
+
+            replay_index = (replay_index + 1) % len(self.replay_queue)
 
         # delete unused stuff.
-        del(self.replays_pov)
-        del(self.replays_act)
-
-
+        del (self.replays_pov)
+        del (self.replays_act)
+        del (self.replays_masks)
 
 
 if __name__ == '__main__':
     # test dataset.
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=300, random_sequences=None, sequence_length=1)
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=1, random_sequences=100, sequence_length=100,device='cpu',with_masks=True)
 
 
-    ds = MineDataset('data/MineRLTreechop-v0/train',no_replays=10,random_sequences=100,sequence_length=100)
     dataloader = DataLoader(ds, batch_size=1,
-                        shuffle=False, num_workers=0,drop_last=True)
+                            shuffle=False, num_workers=0, drop_last=True)
 
     recorder = EpisodeRecorder()
 
-
-    for i, (pov ,_)  in enumerate(dataloader):
+    for i, (pov, _, _) in enumerate(dataloader):
+        #print(pov.shape)
         for frame in pov.squeeze():
+            #print(frame.shape)
             recorder.record_frame(frame.numpy().astype(np.uint8))
 
-        recorder.save_vid(f'dataset_vids/{i}.avi')
+        recorder.save_vid(f'dataset_vids/{i}.mp4')
         recorder.reset()
-
-

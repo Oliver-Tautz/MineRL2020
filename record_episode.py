@@ -39,7 +39,7 @@ class EpisodeRecorder():
             dirpath = os.path.join(*dirpath)
 
             os.makedirs(dirpath,exist_ok=True)
-            out = cv2.VideoWriter(filepath, cv2.VideoWriter_fourcc(*'HFYU'), 20, self.frames[0].shape[0:2])
+            out = cv2.VideoWriter(filepath, cv2.VideoWriter_fourcc(*'mp4v'), 20, self.frames[0].shape[0:2])
             for frame in self.frames:
                 # taken from https://stackoverflow.com/questions/38538952/how-to-swap-blue-and-red-channel-in-an-image-using-opencv. Why does this work?
                 if swap_RB:
