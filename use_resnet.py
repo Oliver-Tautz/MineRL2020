@@ -143,7 +143,7 @@ def precompute_dir(filepath, device,batchsize=200):
         obs, act, reward, nextobs, done = d
 
 
-        dl = DataLoader(dataset= torch.tensor(obs['pov'],dtype=torch.float32,device=device),batch_size=batchsize,shuffle=False,num_workers=0,drop_last=False,pin_memory=True)
+        dl = DataLoader(dataset= torch.tensor(obs['pov'],dtype=torch.float32,device=device),batch_size=batchsize,shuffle=False,num_workers=0,drop_last=False,pin_memory=False)
 
 
         masks = []
