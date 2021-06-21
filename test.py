@@ -79,7 +79,7 @@ EVALUATION_THREAD_COUNT = args.no_cpu#int(os.getenv('EPISODES_EVALUATION_THREAD_
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-sl = simple_logger.SimpleLogger(f"eval/{model_name}.csv", ['seed', 'reward', 'episode', 'step', 'predicted action'])
+sl = simple_logger.SimpleLogger(f"eval/{model_name}.csv", ['seed', 'reward', 'episode', 'step', 'sampled_pred','pred'])
 
 class EpisodeDone(Exception):
     pass
@@ -230,6 +230,7 @@ class MineRLNetworkAgent(MineRLAgentBase):
 
         steps = 0
         with torch.no_grad():
+
             seed = random.sample(seeds,1)
             single_episode_env.seed(seed)
             obs = single_episode_env.reset()
@@ -238,10 +239,11 @@ class MineRLNetworkAgent(MineRLAgentBase):
             state = self.model.get_zero_state(1, device=device)
             s = torch.zeros((1,1,64), dtype=torch.float32, device=device)
             while not done:
+                steps += 1
 
                 # what is happening here?
                 pov = torch.tensor(obs["pov"], device=device, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
-                print(pov.shape)
+
                 pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
                 additional_info_dummy = torch.zeros(10)
@@ -253,7 +255,7 @@ class MineRLNetworkAgent(MineRLAgentBase):
 
                 additional_info_dummy = torch.zeros(10)
 
-                s, state = self.model.sample(pov,additional_info_dummy,state)
+                s,p, state = self.model.sample(pov,additional_info_dummy,state)
 
 
                 action = transform_int_to_actions([int(s)],no_actions=50)
@@ -267,12 +269,13 @@ class MineRLNetworkAgent(MineRLAgentBase):
 
                 reward_sum += reward
                 if steps%100 ==0:
+                    print('resetting states')
                     state= self.model.get_zero_state(1, device=device)
 
                 if reward > 0:
                     rewards.append(reward)
 
-                sl.log([seed, sum(rewards), index, counter, int(s)])
+                sl.log([seed, sum(rewards), index, counter, int(s),int(p)])
                 counter +=1
                 if counter > max_steps:
                     break

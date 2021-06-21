@@ -5,11 +5,13 @@ from tqdm import tqdm
 import os
 import minerl
 
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 # Segmentation model
 from pretrainedResnetMasks.segm.model import load_fcn_resnet101
 from pretrainedResnetMasks.segm.data import MineDataset
+
+
 
 
 class MaskGeneratorResnet():
@@ -128,21 +130,45 @@ class MaskGeneratorResnet():
 
 # precompute masks for dataset.
 
-def precompute_dir(filepath, device):
-    loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=1)
+
+
+def precompute_dir(filepath, device,batchsize=200):
     resnet = MaskGeneratorResnet(device=device)
+    loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=4)
+
+    for replay in tqdm(os.listdir(filepath), desc='loading'):
+        full_name = os.path.join(filepath, replay)
+
+        d = loader._load_data_pyfunc(full_name, -1, None)
+        obs, act, reward, nextobs, done = d
 
 
-    set = MineDataset(filepath, sequence_length=1)
+        dl = DataLoader(dataset= torch.tensor(obs['pov'],dtype=torch.float32),batch_size=batchsize,shuffle=False,num_workers=0,drop_last=False,pin_memory=True)
 
 
-    masks = resnet.return_masks(obs)
-    torch.save(masks, os.path.join(filepath, replay, 'mask.pt'))
-    set = DataLoader(set, batch_size=100,
-                              shuffle=True, num_workers=0, drop_last=False)
-    del masks
-    del obs
+        masks = []
+        for batch in tqdm(dl,desc=f'precomputing masks for dir {full_name}',position=0 , leave=True):
+            masks.append(resnet.return_masks(batch))
+
+        masks=torch.cat(masks,dim=0)
+
+        torch.save(masks,os.path.join(full_name,'masks.pt'))
+
+
+
+
+
+
+
+    #torch.save(masks, os.path.join(filepath, replay, 'mask.pt'))
+
 
 if __name__ == '__main__':
-    precompute_dir('data/MineRLTreechop-v0/val',device='cpu')
-    precompute_dir('data/MineRLTreechop-v0/train',device='cpu')
+    deviceStr = "cuda" if torch.cuda.is_available() else "cpu"
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    print('using device:', device)
+
+    precompute_dir('./data/MineRLTreechop-v0/train',device=deviceStr)
+
+    #masks = torch.load('./data/MineRLTreechop-v0/train/v3_absolute_grape_changeling-15_10696-12887/masks.pt')
+    #print(masks.shape)

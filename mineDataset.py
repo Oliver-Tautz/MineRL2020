@@ -71,6 +71,8 @@ class MineDataset(Dataset):
         self.replays_act = dict()
 
         self.original_act = dict()
+
+
         for i, replay in tqdm(enumerate(self.replay_queue),total=len(self.replay_queue),desc=f'{self.message_str}loading replays'):
             d = self.mine_loader._load_data_pyfunc(os.path.join(self.root_dir,replay), -1, None)
             obs, act, reward, nextobs, done = d
@@ -123,6 +125,7 @@ class MineDataset(Dataset):
                 break
 
         return (i,ix)
+
 
 
 

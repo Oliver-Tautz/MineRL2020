@@ -205,14 +205,15 @@ class Model(nn.Module):
 
         hidden, d, state = self.compute_front(spatial, nonspatial, state)
 
-        print(((d)))
+        pred = torch.argmax((torch.nn.Softmax(dim=0)(d.view(-1))))
+
         verb_print('d', d)
         verb_print('d.shape' ,d.shape)
 
         dist = D.Categorical(logits = d)
-        s = dist.sample()
-        s = s.squeeze().cpu().numpy()
-        return s, state
+        sampled_pred = dist.sample()
+        sampled_pred = sampled_pred.squeeze().cpu().numpy()
+        return sampled_pred, pred, state
 
     def forward(self,pov,additional_info,state):
         hidden, prediction, state = self.compute_front(pov, additional_info, state)
