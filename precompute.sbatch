@@ -9,4 +9,4 @@
 
 #export PYTHONPATH=/media/compute/homes/otautz/gits/MineRL2020/env/bin
 source /media/compute/homes/otautz/gits/MineRL2020/env3.8/bin/activate
-srun python train.py "$@"
+srun python use_resnet.py
