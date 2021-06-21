@@ -53,54 +53,12 @@ class MaskGeneratorResnet():
         combined = np.concatenate((img, mask), axis=2)
         return combined
 
-    # input and output = torch.tensor :)
-    # input = (batch,sequence,...)
-    def append_channel_sequence_batch(self, batch):
-        batch_shape = batch.shape
 
-        # reshape to (batch,pic)
-        reshaped = torch.reshape(batch, (batch_shape[0] * batch_shape[1], *batch_shape[2:]))
-
-        # get masks from model
-        masks = self.model(reshaped)['out']
-
-        # postprocess to classes
-        masks = torch.argmax(masks, dim=1)
-
-        # reshape back to original shape
-        masks = torch.reshape(masks, (batch_shape[0], batch_shape[1], *masks.shape[1:]))
-
-        # add channel dimension
-        masks = torch.unsqueeze(masks, dim=2)
-
-        # concat channels
-        masked = torch.cat((batch, masks), dim=2)
-
-        return masked
-
-    # input and output = torch.tensor :)
-    # input = (batch,...)
+    # input = (batch,x,y,c)
 
     def append_channel_batch(self, batch):
-        batch_shape = batch.shape
-
-        # reshape to (batch,pic)
-        reshaped = torch.transpose(batch, 1, 3)
-
-        # get masks from model
-        masks = self.model(reshaped)['out']
-
-        print(masks.shape)
-        # postprocess to classes
-        masks = torch.argmax(masks, dim=1)
-        print(masks.shape)
-        # add channel dimension
-        masks = torch.unsqueeze(masks, dim=3)
-        print(masks.shape)
-        # concat channels
-        masked = torch.cat((batch, masks), dim=3)
-
-        return masked
+        masks = self.return_masks(batch)
+        return torch.concat(batch,masks,dim=-1)
 
     # batch = (batch,x,y,c)
     def return_masks(self, batch):
@@ -129,7 +87,7 @@ def precompute_dir(filepath, device,batchsize=100):
     resnet = MaskGeneratorResnet(device=device)
     loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=4)
 
-    for replay in tqdm(os.listdir(filepath)[0:1], desc='loading'):
+    for replay in tqdm(os.listdir(filepath), desc='loading'):
         full_name = os.path.join(filepath, replay)
 
         d = loader._load_data_pyfunc(full_name, -1, None)
