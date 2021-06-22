@@ -38,7 +38,7 @@ parser.add_argument('--c', help="make torch use number of cpus", type=int, defau
 parser.add_argument('--epochs', help="make torch use number of cpus", type=int, default=100)
 parser.add_argument('--batchsize', help="make torch use number of cpus", type=int, default=4)
 parser.add_argument('--seq-len', help="make torch use number of cpus", type=int, default=100)
-parser.add_argument('--no-classes', help="use number of distcrete actions", type=int, default=30)
+parser.add_argument('--no-classes', help="use number of discrete actions", type=int, default=30)
 parser.add_argument('--debug', help="use small number of samples for debugging faster", action='store_true')
 parser.add_argument('--no-shuffle', help="dont shuffle train set after each epoch", action='store_true')
 parser.add_argument('--no-sequences', help="use number of sequences for train/val dataset", type=int, default=5000)
