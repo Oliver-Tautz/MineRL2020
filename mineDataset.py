@@ -214,7 +214,7 @@ class MineDataset(Dataset):
                 #print('not enoug reward=', not_enough_reward)
                 #print('not_enough_variance', not_enough_variance)
 
-                print(too_high,not_enough_reward,not_enough_variance)
+
                 sequence_start_index = np.random.randint(0, self.replays_length_raw[replay_index])
 
                 # reroll if too high ...
@@ -226,7 +226,9 @@ class MineDataset(Dataset):
 
                 # reroll if actions not diverse enough
                 not_enough_variance = np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()) < self.min_variance
-
+                print(too_high,'\t',sequence_start_index + self.sequence_length,'\n'
+                      ,not_enough_reward,'\t',sum(self.replays_reward[replay_index][sequence_start_index:sequence_start_index+self.sequence_length]),'\n'
+                      ,not_enough_variance,'\t',np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()))
 
             print('accepted')
             rej.append(rejected)
