@@ -24,7 +24,7 @@ class MineDataset(Dataset):
     # there are 448480 unique steps in the dataset.
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
-                 no_classes=30, random_sequences=1000,device='cuda'):
+                 no_classes=30, random_sequences=1000,device='cuda',return_float = True):
 
         self.no_random_sequences = random_sequences
 
@@ -71,7 +71,7 @@ class MineDataset(Dataset):
             # -1 because we start at 0
             self.replays_length[i] = (len(obs['pov']) // sequence_length) - 1
             self.replays_length_raw[i] = len(obs['pov'])
-            self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32)
+            self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32)/255
             self.original_act[i] = act
             self.replays_act[i] = torch.tensor(
                 transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes), dtype=torch.long)
@@ -163,7 +163,7 @@ class MineDataset(Dataset):
 
             # roll random start
             sequence_start_index = np.random.randint(0, self.replays_length_raw[replay_index])
-            print(sequence_start_index,self.replays_length[replay_index])
+
 
             # reroll if too high ...
             while sequence_start_index + self.sequence_length > self.replays_length_raw[replay_index]:
@@ -188,7 +188,8 @@ class MineDataset(Dataset):
         # delete unused stuff.
         del (self.replays_pov)
         del (self.replays_act)
-        del (self.replays_masks)
+        if self.with_masks:
+            del (self.replays_masks)
 
 
 if __name__ == '__main__':

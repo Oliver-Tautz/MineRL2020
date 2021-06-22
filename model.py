@@ -89,6 +89,7 @@ class InputProcessor(nn.Module):
         #self.nonspatial_reshape = nn.Sequential(nn.Linear(32,128),nn.ReLU(),nn.LayerNorm(128))
 
     def forward(self, spatial, nonspatial):
+        print(spatial)
         shape = spatial.shape
         spatial = spatial.view((shape[0]*shape[1],)+shape[2:])/255.0
         verb_print('pov before Core:', spatial.shape)
@@ -143,7 +144,14 @@ class Core(nn.Module):
 
 class Model(nn.Module):
 
-    def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False):
+
+    # verbose    : print lots of  stuff
+    # deviceStr  : use device for model functions
+    # no_classes : number of classes to predict
+    # with_masks : is a mask channel (c=4) supplied?
+    # mode       : if mode = train: don't compute masks , else : do it!
+
+    def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False,mode='train'):
         super().__init__()
 #        self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         if with_masks:
@@ -158,7 +166,7 @@ class Model(nn.Module):
         verb = verbose
         self.deviceStr=deviceStr
         self.with_masks = with_masks
-        if with_masks:
+        if with_masks and mode != 'train':
             self.masksGenerator = use_resnet.MaskGeneratorResnet(self.deviceStr)
 
 
@@ -167,11 +175,12 @@ class Model(nn.Module):
 
     def compute_front(self, spatial, nonspatial, state):
 
-        if self.with_masks:
+        if self.with_masks and self.mode != 'train':
             #spatialnp = spatial.numpy()
-            spatial = self.masksGenerator.append_channel_sequence_batch(spatial)
+            sequence , batch , c , x , y  = spatial.shape
+            spatial = self.masksGenerator.append_channel_in_model(spatial)
 
-
+        #print(spatial)
 
         hidden, new_state = self.core(spatial, nonspatial, state)
         #verb_print('after core: hidden,new_state  = ',hidden[0].shape,new_state.shape)

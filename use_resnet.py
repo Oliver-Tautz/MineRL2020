@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import torch
 # import matplotlib.pyplot as plt
 import numpy as np
@@ -12,6 +13,7 @@ import torchvision.transforms as T
 from pretrainedResnetMasks.segm.model import load_fcn_resnet101
 from pretrainedResnetMasks.segm.data import MineDataset
 from pretrainedResnetMasks.segm.segm import Segmentation
+from mineDataset import MineDataset as MyMineDs
 
 
 
@@ -60,6 +62,34 @@ class MaskGeneratorResnet():
         masks = self.return_masks(batch)
         return torch.concat(batch,masks,dim=-1)
 
+    # input = (sequence,batch,c,x,y)
+    def append_channel_in_model(self, batch):
+        s,b,c,x,y = batch .shape
+
+        batched = batch.reshape((s*b,c,x,y))
+        print(batched.shape)
+
+        IMG_SCALE = torch.tensor(1. / 255,device=self.device)
+        IMG_MEAN = torch.tensor(np.array([0.485, 0.456, 0.406]).reshape((3,1, 1)),device=self.device)
+        IMG_STD = torch.tensor(np.array([0.229, 0.224, 0.225]).reshape((3,1, 1)),device=self.device)
+
+        prepped = ((batched * IMG_SCALE - IMG_MEAN) / IMG_STD)
+        print('prepped',prepped.shape)
+        masks = self.model(prepped)['out']
+        print('masks',masks.shape)
+        masks = torch.argmax(masks, dim=1)
+        print('masks',masks.shape)
+        masks = masks.reshape(s,b,x,y)
+        print('masks',masks.shape)
+        masks = masks.unsqueeze(2)
+        print('masks',masks.shape)
+        print('batch',batch.shape)
+
+        return torch.cat((batch,masks),dim=2)
+
+
+
+
     # batch = (batch,x,y,c)
     def return_masks(self, batch):
         batch_shape = batch.shape
@@ -83,7 +113,7 @@ class MaskGeneratorResnet():
 
 
 
-def precompute_dir(filepath, device,batchsize=100):
+def precompute_dir(filepath, device,batchsize=50):
     resnet = MaskGeneratorResnet(device=device)
     loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=4)
 
@@ -109,21 +139,55 @@ def precompute_dir(filepath, device,batchsize=100):
 
 
 
+def visualize_mask(pov,mask,i=0):
 
 
+    fig, (ax1, ax2) = plt.subplots(nrows=1,ncols=2)
+
+    #pov = pov.transpose(0,2)
+
+    print(pov.shape,mask.shape)
+    ax1.imshow(pov)
+    ax2.imshow(mask)
+    #ax3.imshow(mask.transpose(0,1))
+    #plt.show()
+    plt.savefig(f'mask_visuals/{i}.jpg')
+    fig.clf()
+    plt.clf()
 
     #torch.save(masks, os.path.join(filepath, replay, 'mask.pt'))
 
 
 if __name__ == '__main__':
+
+    ### precompute masks
     deviceStr = "cuda" if torch.cuda.is_available() else "cpu"
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     print('using device:', device)
-
-    #torch.set_num_threads(10)
-
-    precompute_dir('./data/MineRLTreechop-v0/train',device=deviceStr)
-
-
+    #
+    torch.set_num_threads(10)
+    #
+    #precompute_dir('./data/MineRLTreechop-v0/train',device=deviceStr)
 
 
+    ### test in model processing
+    resnet = MaskGeneratorResnet(deviceStr)
+    full_set = MyMineDs('data/MineRLTreechop-v0/train', sequence_length=1, map_to_zero=True,
+                               with_masks=True, no_classes=30, no_replays=10, random_sequences=None,device='cpu')
+    #
+    train_loader = DataLoader(full_set, batch_size=1,
+                                  shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
+    #
+    #for pov, _ in train_loader:
+    #    pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
+    #    appended = resnet.append_channel_in_model(pov).squeeze()
+    #    print(appended.shape)
+    #
+    #    visualize_mask(appended[0:3],appended[3])
+
+
+    for i, (pov, _ , mask) in enumerate(train_loader):
+        pov = pov.squeeze()
+        mask = mask.squeeze()
+
+        visualize_mask(pov,mask,i)
