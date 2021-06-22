@@ -214,6 +214,7 @@ class MineDataset(Dataset):
                 #print('not enoug reward=', not_enough_reward)
                 #print('not_enough_variance', not_enough_variance)
 
+                print(too_high,not_enough_reward,not_enough_variance)
                 sequence_start_index = np.random.randint(0, self.replays_length_raw[replay_index])
 
                 # reroll if too high ...
