@@ -86,11 +86,12 @@ class MineDataset(Dataset):
 
             self.original_act[i] = act
             self.replays_act[i] = torch.tensor(
+
                 transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes), dtype=torch.long)
             self.replays_reward[i] = reward
 
             if with_masks:
-                self.replays_masks[i] = torch.load(os.path.join(self.root_dir, replay, 'masks.pt'),map_location=device)
+                self.replays_masks[i] = torch.load(os.path.join(self.root_dir, replay, 'masks.pt'),map_location='cpu')
 
             # replays[i] = d
 

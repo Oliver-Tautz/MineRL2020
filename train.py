@@ -244,7 +244,7 @@ def main():
 
     full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=seq_len, map_to_zero=map_to_zero,
                            with_masks=with_masks, no_classes=no_classes, no_replays=no_replays,
-                           random_sequences=no_sequences, min_variance=min_var, min_reward=min_reward, device=deviceStr,)
+                           random_sequences=no_sequences, min_variance=min_var, min_reward=min_reward, device=deviceStr)
 
     val_split = 0.2
     train_set, val_set = random_split(full_set, [int(no_sequences * (1 - val_split)), int(no_sequences * val_split)],
