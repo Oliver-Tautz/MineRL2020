@@ -89,7 +89,6 @@ class InputProcessor(nn.Module):
         #self.nonspatial_reshape = nn.Sequential(nn.Linear(32,128),nn.ReLU(),nn.LayerNorm(128))
 
     def forward(self, spatial, nonspatial):
-        print(spatial)
         shape = spatial.shape
         spatial = spatial.view((shape[0]*shape[1],)+shape[2:])/255.0
         verb_print('pov before Core:', spatial.shape)
@@ -153,6 +152,7 @@ class Model(nn.Module):
 
     def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False,mode='train'):
         super().__init__()
+        self.mode = mode
 #        self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         if with_masks:
             self.core = Core(input_channels=4)
@@ -168,6 +168,7 @@ class Model(nn.Module):
         self.with_masks = with_masks
         if with_masks and mode != 'train':
             self.masksGenerator = use_resnet.MaskGeneratorResnet(self.deviceStr)
+
 
 
     def get_zero_state(self, batch_size, device="cuda"):
@@ -225,5 +226,13 @@ class Model(nn.Module):
         return sampled_pred, pred, state
 
     def forward(self,pov,additional_info,state):
+
+        if self.with_masks and self.mode != 'train':
+            # spatialnp = spatial.numpy()
+            sequence, batch, c, x, y = pov.shape
+            spatial = self.masksGenerator.append_channel_in_model(pov)
+
         hidden, prediction, state = self.compute_front(pov, additional_info, state)
+
+
         return prediction, state

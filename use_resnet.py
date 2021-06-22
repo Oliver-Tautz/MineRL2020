@@ -154,6 +154,7 @@ def visualize_mask(pov,mask,i=0):
     plt.savefig(f'mask_visuals/{i}.jpg')
     fig.clf()
     plt.clf()
+    plt.close(fig)
 
     #torch.save(masks, os.path.join(filepath, replay, 'mask.pt'))
 
@@ -172,8 +173,8 @@ if __name__ == '__main__':
 
     ### test in model processing
     resnet = MaskGeneratorResnet(deviceStr)
-    full_set = MyMineDs('data/MineRLTreechop-v0/train', sequence_length=1, map_to_zero=True,
-                               with_masks=True, no_classes=30, no_replays=10, random_sequences=None,device='cpu')
+    full_set = MyMineDs('data/MineRLTreechop-v0/train', sequence_length=100, map_to_zero=True,
+                               with_masks=True, no_classes=30, no_replays=30, random_sequences=10000,device='cpu',min_reward=3,min_variance=30)
     #
     train_loader = DataLoader(full_set, batch_size=1,
                                   shuffle=False, num_workers=0, drop_last=True,pin_memory=True)
@@ -186,8 +187,10 @@ if __name__ == '__main__':
     #    visualize_mask(appended[0:3],appended[3])
 
 
-    for i, (pov, _ , mask) in enumerate(train_loader):
-        pov = pov.squeeze()
-        mask = mask.squeeze()
-
-        visualize_mask(pov,mask,i)
+    for i, (X,_) in enumerate(train_loader):
+         pass
+        #X=X.squeeze()
+        #for j,x in enumerate(X):
+        #    pov = x[:,:,0:3]
+        #    mask = x[:,:,3]
+        #    visualize_mask(pov,mask,f"{i}_{j}")

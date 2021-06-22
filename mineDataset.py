@@ -20,12 +20,17 @@ class MineDataset(Dataset):
     # cpus              = mnake dataloader use multiple cores. Can not utilize more than 3 really
     # no_replays        = choose lower number of replays if ram is an issue.
     # random_sequences  = want randomized data? how many? set ==0 or None for sequential load.
+    # return_float      = return RGB data normalized to 0-1
+    # min_reward        = only use randoms sequences with at least this many rewards. Dataset has about ~2.8 reward mean in 100 steps, with 1.7 stddev
+    # min_variance      = only use randoms sequences with at least this high action variance. Dataset has about ~41 reward mean in 100 steps, with ~20 stddev
 
     # there are 448480 unique steps in the dataset.
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
-                 no_classes=30, random_sequences=1000,device='cuda',return_float = True):
+                 no_classes=30, random_sequences=1000,device='cuda',return_float = True,min_reward=4,min_variance=30):
 
+        self.min_reward = min_reward
+        self.min_variance = min_variance
         self.no_random_sequences = random_sequences
 
         self.map_to_zero = map_to_zero
@@ -59,6 +64,7 @@ class MineDataset(Dataset):
         self.replays_act = dict()
 
         self.original_act = dict()
+        self.replays_reward = dict()
 
         if with_masks:
             self.replays_masks = dict()
@@ -68,18 +74,49 @@ class MineDataset(Dataset):
             d = self.mine_loader._load_data_pyfunc(os.path.join(self.root_dir, replay), -1, None)
             obs, act, reward, nextobs, done = d
 
+
             # -1 because we start at 0
             self.replays_length[i] = (len(obs['pov']) // sequence_length) - 1
             self.replays_length_raw[i] = len(obs['pov'])
-            self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32)/255
+
+            if return_float:
+                self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32)/255
+            else:
+                self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32)
+
             self.original_act[i] = act
             self.replays_act[i] = torch.tensor(
                 transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes), dtype=torch.long)
+            self.replays_reward[i] = reward
 
             if with_masks:
                 self.replays_masks[i] = torch.load(os.path.join(self.root_dir, replay, 'masks.pt'),map_location=device)
 
             # replays[i] = d
+
+        # compute reward mean and std.
+        sums = []
+        for reward in self.replays_reward.values():
+            start = 0
+            while start+99<len(reward):
+                sums.append(sum(reward[start:start+100]))
+                start=start+100
+        print('reward mean = ',np.mean(sums))
+        print('reward std  = ',np.std(sums))
+
+        # compute action variance
+        vars = []
+        for acs in self.replays_act.values():
+            start = 0
+            while start+99<len(acs):
+                vars.append(np.var(acs.numpy()[start:start+100]))
+                start=start+100
+
+        print('action_var mean = ', np.mean(vars))
+        print('action_var std = ',np.std(vars))
+
+
+
 
         if random_sequences:
             self.random_sequences = []
@@ -136,17 +173,20 @@ class MineDataset(Dataset):
             act = self.replays_act[replay_ix][start_ix:end_ix]
 
             if self.with_masks:
+
                 mask = self.replays_masks[replay_ix][start_ix:end_ix]
+                pov = torch.cat((pov,mask),dim=-1)
 
         else:
 
             if self.with_masks:
                 pov, act, mask = self.random_sequences[idx]
+                pov = torch.cat((pov,mask),dim=-1)
+
             else:
                 pov, act = self.random_sequences[idx]
 
-        if self.with_masks:
-            return pov, act, mask
+
 
         return pov, act
 
@@ -159,16 +199,35 @@ class MineDataset(Dataset):
         last_replay_index = len(self.replay_queue) - 1
 
         # get number of sequences
+        rej = []
         for r_i in trange(self.no_random_sequences, desc='randomizing'):
 
-            # roll random start
-            sequence_start_index = np.random.randint(0, self.replays_length_raw[replay_index])
+            too_high = True
+            not_enough_reward = True
+            not_enough_variance = True
 
 
-            # reroll if too high ...
-            while sequence_start_index + self.sequence_length > self.replays_length_raw[replay_index]:
-                print(sequence_start_index)
+            rejected = -1
+            while too_high or not_enough_reward or not_enough_variance:
+                rejected +=1
+                #print('not enoug reward=', not_enough_reward)
+                #print('not_enough_variance', not_enough_variance)
+
                 sequence_start_index = np.random.randint(0, self.replays_length_raw[replay_index])
+
+                # reroll if too high ...
+                too_high = sequence_start_index + self.sequence_length > self.replays_length_raw[replay_index]
+
+
+                # reroll if not enough reward
+                not_enough_reward = sum(self.replays_reward[replay_index][sequence_start_index:sequence_start_index+self.sequence_length]) < self.min_reward
+
+                # reroll if actions not diverse enough
+                not_enough_variance = np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()) < self.min_variance
+
+
+                rej.append(rejected)
+
 
             # append random sequence
 
@@ -186,6 +245,7 @@ class MineDataset(Dataset):
             replay_index = (replay_index + 1) % len(self.replay_queue)
 
         # delete unused stuff.
+
         del (self.replays_pov)
         del (self.replays_act)
         if self.with_masks:
