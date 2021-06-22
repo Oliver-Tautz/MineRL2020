@@ -209,6 +209,7 @@ class MineDataset(Dataset):
 
             rejected = -1
             while too_high or not_enough_reward or not_enough_variance:
+                print('rejected')
                 rejected +=1
                 #print('not enoug reward=', not_enough_reward)
                 #print('not_enough_variance', not_enough_variance)
