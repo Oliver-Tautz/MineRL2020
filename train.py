@@ -74,6 +74,7 @@ while (True):
     try:
         os.makedirs(f"train/{modelname}_{model_index}", exist_ok=False)
         model_folder = f"train/{modelname}_{model_index}"
+        modelname= f"{modelname}_{model_index}"
         break
     except:
         model_index += 1
@@ -119,7 +120,7 @@ def train(model, epochs, train_loader, val_loader):
     timestring = "%Y-%m-%d-%H-%M-%S"
     simple_logger = SimpleLogger(
         f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_time={datetime.now().strftime(timestring)}.csv",
-        ['epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate', 'seq_len', 'map_to_zero', 'batchsize', 'no_classes',
+        ['modelname','epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate', 'seq_len', 'map_to_zero', 'batchsize', 'no_classes',
          'no_sequences','min_reward','min_var','with_masks'])
 
     additional_info_dummy = torch.zeros(10)
@@ -186,7 +187,7 @@ def train(model, epochs, train_loader, val_loader):
                 val_loss = val_loss.sum()
                 epoch_val_loss.append(val_loss.item())
 
-            if (epoch % 5) == 0:
+            if (epoch % 4) == 0:
                 print("------------------Saving Model!-----------------------")
                 torch.save(model.state_dict(),
                            f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
@@ -198,7 +199,7 @@ def train(model, epochs, train_loader, val_loader):
 
             print("-------------Logging!!!-------------")
             simple_logger.log(
-                [epoch, sum(epoch_train_loss) / len(epoch_train_loss), sum(epoch_val_loss) / len(epoch_val_loss),
+                [modelname,epoch, sum(epoch_train_loss) / len(epoch_train_loss), sum(epoch_val_loss) / len(epoch_val_loss),
                  gradsum, float(optimizer.param_groups[0]["lr"]), seq_len, map_to_zero, batchsize, no_classes,
                  no_sequences,min_reward,min_var,with_masks])
 

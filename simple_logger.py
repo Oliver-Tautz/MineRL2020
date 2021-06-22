@@ -1,12 +1,13 @@
 import csv
+import os
 from os import makedirs
 
 #creating this class will overwrite given filename!
+# maybe add 'append' option?
 class SimpleLogger():
 
     def __init__(self,filename,colnames):
-        makedirs('loss_csv',exist_ok=True)
-        makedirs('eval_csv',exist_ok=True)
+        makedirs(os.path.join(*filename.split('/')[:-1]),exist_ok=True)
         self.colnames = colnames
         self.no_cols = len(colnames)
         self.filename=filename

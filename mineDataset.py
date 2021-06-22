@@ -27,7 +27,7 @@ class MineDataset(Dataset):
     # there are 448480 unique steps in the dataset.
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
-                 no_classes=30, random_sequences=1000,device='cuda',return_float = True,min_reward=4,min_variance=30):
+                 no_classes=30, random_sequences=1000,device='cuda',return_float = True,min_reward=3,min_variance=30):
 
         self.min_reward = min_reward
         self.min_variance = min_variance
@@ -210,7 +210,7 @@ class MineDataset(Dataset):
 
             rejected = -1
             while too_high or not_enough_reward or not_enough_variance:
-                print('rejected')
+                #print('rejected')
                 rejected +=1
                 #print('not enoug reward=', not_enough_reward)
                 #print('not_enough_variance', not_enough_variance)
@@ -227,11 +227,11 @@ class MineDataset(Dataset):
 
                 # reroll if actions not diverse enough
                 not_enough_variance = np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()) < self.min_variance
-                print(too_high,'\t',sequence_start_index + self.sequence_length,'\n'
-                      ,not_enough_reward,'\t',sum(self.replays_reward[replay_index][sequence_start_index:sequence_start_index+self.sequence_length]),'\n'
-                      ,not_enough_variance,'\t',np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()))
+                #print(too_high,'\t',sequence_start_index + self.sequence_length,'\n'
+                #      ,not_enough_reward,'\t',sum(self.replays_reward[replay_index][sequence_start_index:sequence_start_index+self.sequence_length]),'\n'
+                #      ,not_enough_variance,'\t',np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()))
 
-            print('accepted')
+            #print('accepted')
             rej.append(rejected)
 
 
