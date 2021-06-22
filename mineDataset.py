@@ -226,7 +226,8 @@ class MineDataset(Dataset):
                 not_enough_variance = np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()) < self.min_variance
 
 
-                rej.append(rejected)
+            print('accepted')
+            rej.append(rejected)
 
 
             # append random sequence
