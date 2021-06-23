@@ -248,10 +248,11 @@ class MineDataset(Dataset):
                 # reroll if sequence already used!
                 already_used = diff_in((replay_index,sequence_start_index),used_indices,self.overlap_threshhold)
 
-                # make sure it always works!
+                # make sure it always works! lower overlap threshhold if too many sequences get rejected
 
+                print(rejected)
                 if rejected >= 100:
-                    print('warning! overlap_threwshold lowered')
+                    print(f'warning! overlap_threwshold lowered to {self.overlap_threshhold-1}')
                     self.overlap_threshhold-=1
                     break
 
@@ -291,7 +292,7 @@ if __name__ == '__main__':
     # test dataset.
     torch.set_printoptions(threshold=10_000)
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=100, sequence_length=100,device='cpu',with_masks=False,min_reward=2,min_variance=30)
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=1, random_sequences=10000, sequence_length=100,device='cpu',with_masks=False,min_reward=1,min_variance=20)
 
 
     dataloader = DataLoader(ds, batch_size=1,
@@ -308,7 +309,7 @@ if __name__ == '__main__':
             recorder.record_frame((frame*255).numpy().astype(np.uint8))
             #masks_recorder.record_frame(mask.numpy().astype(np.uint8))
 
-        recorder.save_vid(f'dataset_vids/{i}.mp4')
+        #recorder.save_vid(f'dataset_vids/{i}.mp4')
 
         recorder.reset()
         masks_recorder.reset()
