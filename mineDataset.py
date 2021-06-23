@@ -27,8 +27,10 @@ class MineDataset(Dataset):
     # there are 448480 unique steps in the dataset.
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
-                 no_classes=30, random_sequences=1000,device='cuda',return_float = True,min_reward=0,min_variance=0):
+                 no_classes=30, random_sequences=1000,device='cuda',return_float = True,min_reward=0,min_variance=0,max_overlap=50):
 
+
+        self.overlap_threshhold = sequence_length-max_overlap
         self.min_reward = min_reward
         self.min_variance = min_variance
         self.no_random_sequences = random_sequences
@@ -244,7 +246,16 @@ class MineDataset(Dataset):
                     return False
 
                 # reroll if sequence already used!
-                already_used = diff_in((replay_index,sequence_start_index),used_indices,50)
+                already_used = diff_in((replay_index,sequence_start_index),used_indices,self.overlap_threshhold)
+
+                # make sure it always works!
+
+                if rejected >= 100:
+                    print('warning! overlap_threwshold lowered')
+                    self.overlap_threshhold-=1
+                    break
+
+
 
             #print('accepted')
             rej.append(rejected)
@@ -269,7 +280,7 @@ class MineDataset(Dataset):
 
         # delete unused stuff.
 
-        print(sorted(used_indices,key=lambda x:x[0]))
+        #print(sorted(used_indices,key=lambda x:x[0]))
         del (self.replays_pov)
         del (self.replays_act)
         if self.with_masks:
