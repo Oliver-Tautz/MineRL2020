@@ -250,7 +250,8 @@ class MineDataset(Dataset):
 
                 # make sure it always works! lower overlap threshhold if too many sequences get rejected
 
-                print(rejected)
+               # print(rejected)
+
                 if rejected >= 100:
                     print(f'warning! overlap_threwshold lowered to {self.overlap_threshhold-1}')
                     self.overlap_threshhold-=1

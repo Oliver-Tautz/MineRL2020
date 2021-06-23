@@ -144,6 +144,8 @@ def train(model, epochs, train_loader, val_loader):
             # move to gpu if not there
             if not pov.is_cuda or not act.is_cuda:
                 pov, act = pov.to(deviceStr), act.to(deviceStr)
+            else:
+                pass
 
             # loss, ldict, lstm_state = model.get_loss(pov, additional_info_dummy, additional_info_dummy, lstm_state,
             #                                    torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
@@ -178,7 +180,7 @@ def train(model, epochs, train_loader, val_loader):
                 if not pov.is_cuda or not act.is_cuda:
                     pov, act = pov.to(deviceStr), act.to(deviceStr)
                 else:
-                    print('this is actually useful maybe?')
+                    pass#print('this is actually useful maybe?')
 
                 prediciton, lstm_state = model.forward(pov, additional_info_dummy, lstm_state)
 
