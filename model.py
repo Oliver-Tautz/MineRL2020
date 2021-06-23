@@ -152,6 +152,7 @@ class Model(nn.Module):
 
     def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False,mode='train'):
         super().__init__()
+        print(with_masks)
         self.mode = mode
 #        self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
         if with_masks:
@@ -230,7 +231,7 @@ class Model(nn.Module):
         if self.with_masks and self.mode != 'train':
             # spatialnp = spatial.numpy()
             sequence, batch, c, x, y = pov.shape
-            spatial = self.masksGenerator.append_channel_in_model(pov)
+            pov = self.masksGenerator.append_channel_in_model(pov)
 
         hidden, prediction, state = self.compute_front(pov, additional_info, state)
 

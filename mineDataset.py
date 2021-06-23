@@ -193,6 +193,8 @@ class MineDataset(Dataset):
 
     def __randomize_sequences(self):
 
+        used_indices = []
+
         # sample from replay. Maybe also randomize this? Take random shuffling?
         replay_index = 0
 
@@ -206,10 +208,11 @@ class MineDataset(Dataset):
             too_high = True
             not_enough_reward = True
             not_enough_variance = True
+            already_used = True
 
 
             rejected = -1
-            while too_high or not_enough_reward or not_enough_variance:
+            while too_high or not_enough_reward or not_enough_variance or already_used:
                 #print('rejected')
                 rejected +=1
                 #print('not enoug reward=', not_enough_reward)
@@ -231,9 +234,21 @@ class MineDataset(Dataset):
                 #      ,not_enough_reward,'\t',sum(self.replays_reward[replay_index][sequence_start_index:sequence_start_index+self.sequence_length]),'\n'
                 #      ,not_enough_variance,'\t',np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()))
 
+                def diff_in(tuple,list,threshhold):
+                    ri, si = tuple
+
+                    for ril,sil in list:
+                        if ril == ri and abs(si - sil) <= threshhold:
+                            return True
+
+                    return False
+
+                # reroll if sequence already used!
+                already_used = diff_in((replay_index,sequence_start_index),used_indices,20)
+
             #print('accepted')
             rej.append(rejected)
-
+            used_indices.append((replay_index,sequence_start_index))
 
             # append random sequence
 
@@ -262,25 +277,24 @@ if __name__ == '__main__':
     # test dataset.
     torch.set_printoptions(threshold=10_000)
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=100, sequence_length=100,device='cpu',with_masks=True)
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=200, sequence_length=100,device='cpu',with_masks=False,min_reward=2,min_variance=30)
 
 
     dataloader = DataLoader(ds, batch_size=1,
-                            shuffle=False, num_workers=0, drop_last=True)
+                            shuffle=True, num_workers=0, drop_last=True)
 
     recorder = EpisodeRecorder()
     masks_recorder = EpisodeRecorder()
 
-    for i, (pov, _, masks) in enumerate(dataloader):
+    for i, (pov, _) in enumerate(dataloader):
         #print(pov.shape)
-        for frame, mask in zip(pov.squeeze(),masks.squeeze()):
+        for frame in  pov.squeeze():
             #print(frame.shape)
-            recorder.record_frame(frame.numpy().astype(np.uint8))
-            masks_recorder.record_frame(mask.numpy().astype(np.uint8))
-            print(mask)
 
-        #recorder.save_vid(f'dataset_vids/{i}.mp4')
-        masks_recorder.save_vid(f'dataset_vids/{i}_masks.mp4',swap_RB = False)
+            recorder.record_frame((frame*255).numpy().astype(np.uint8))
+            #masks_recorder.record_frame(mask.numpy().astype(np.uint8))
+
+        recorder.save_vid(f'dataset_vids/{i}.mp4')
 
         recorder.reset()
         masks_recorder.reset()

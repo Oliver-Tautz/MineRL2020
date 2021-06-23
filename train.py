@@ -85,7 +85,7 @@ def verb_print(*strings):
     if verb:
         print(strings)
 
-
+torch.set_num_threads(8)
 deviceStr = "cuda" if torch.cuda.is_available() else "cpu"
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 print('using device:', device, file=sys.stderr)
@@ -192,8 +192,8 @@ def train(model, epochs, train_loader, val_loader):
                 torch.save(model.state_dict(),
                            f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
 
-            if (sum(epoch_train_loss) / len(epoch_train_loss)) < best_val_loss:
-                best_val_loss = (sum(epoch_train_loss) / len(epoch_train_loss))
+            elif (sum(epoch_val_loss) / len(epoch_val_loss)) < best_val_loss:
+                best_val_loss = (sum(epoch_val_loss) / len(epoch_val_loss))
                 torch.save(model.state_dict(),
                            f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
 
