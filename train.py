@@ -43,8 +43,8 @@ parser.add_argument('--debug', help="use small number of samples for debugging f
 parser.add_argument('--no-shuffle', help="dont shuffle train set after each epoch", action='store_true')
 parser.add_argument('--no-sequences', help="use number of sequences for train/val dataset", type=int, default=5000)
 parser.add_argument('--val-split', help="split into val set. ", type=float, default=0.2)
-parser.add_argument('--min-reward', help="min reward per sequence", type=int, default=4)
-parser.add_argument('--min-var', help="min action variance in sequence", type=int, default=30)
+parser.add_argument('--min-reward', help="min reward per sequence", type=int, default=0)
+parser.add_argument('--min-var', help="min action variance in sequence", type=int, default=0)
 
 args = parser.parse_args()
 

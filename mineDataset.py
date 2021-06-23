@@ -27,7 +27,7 @@ class MineDataset(Dataset):
     # there are 448480 unique steps in the dataset.
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
-                 no_classes=30, random_sequences=1000,device='cuda',return_float = True,min_reward=3,min_variance=30):
+                 no_classes=30, random_sequences=1000,device='cuda',return_float = True,min_reward=0,min_variance=0):
 
         self.min_reward = min_reward
         self.min_variance = min_variance
@@ -244,13 +244,15 @@ class MineDataset(Dataset):
                     return False
 
                 # reroll if sequence already used!
-                already_used = diff_in((replay_index,sequence_start_index),used_indices,20)
+                already_used = diff_in((replay_index,sequence_start_index),used_indices,50)
 
             #print('accepted')
             rej.append(rejected)
             used_indices.append((replay_index,sequence_start_index))
 
             # append random sequence
+
+
 
             if self.with_masks:
                 self.random_sequences.append(
@@ -267,6 +269,7 @@ class MineDataset(Dataset):
 
         # delete unused stuff.
 
+        print(sorted(used_indices,key=lambda x:x[0]))
         del (self.replays_pov)
         del (self.replays_act)
         if self.with_masks:
@@ -277,7 +280,7 @@ if __name__ == '__main__':
     # test dataset.
     torch.set_printoptions(threshold=10_000)
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=200, sequence_length=100,device='cpu',with_masks=False,min_reward=2,min_variance=30)
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=100, sequence_length=100,device='cpu',with_masks=False,min_reward=2,min_variance=30)
 
 
     dataloader = DataLoader(ds, batch_size=1,
