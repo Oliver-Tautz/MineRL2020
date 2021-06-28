@@ -11,6 +11,14 @@ from torch.nn import Softmax
 import argparse
 from test import get_model_info_from_name
 import os
+import logging
+
+
+for name in [
+             "matplotlib", "matplotlib.font", "matplotlib.pyplot"]:
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.CRITICAL)
+    logger.disabled = True
 
 parser = argparse.ArgumentParser(description='test the model')
 parser.add_argument('modelpath',help='use saved model at path',type=str)
@@ -20,7 +28,7 @@ parser.add_argument('--no-cpu',help="make torch use this number of threads",type
 parser.add_argument('--verbose',help="print more stuff",action="store_true")
 parser.add_argument('--with-masks',help="use extra mask channel",action="store_true")
 parser.add_argument('--save-vids',help="save videos of eval",action="store_true")
-parser.add_argument('--max-steps',help="max steps per episode",type=int,default=1000)
+parser.add_argument('--max-steps',help="max steps per episode",type=int,default=500)
 parser.add_argument('--sequence-len',help="reset states after how many steps?!",type=int,default=1000)
 parser.add_argument('--num-threads',help="how many eval threads?",type=int,default=2)
 
@@ -166,11 +174,13 @@ def visualize_output(modeldict):
         visualize(pov_plot, pred, curr,prev,next)
         plt.legend(bbox_to_anchor=(1.05, 1),loc='upper left',prop={'size': 5})
         os.makedirs(f"prediction_visualization/{modelname}",exist_ok=True)
-        plt.savefig(f"prediction_visualization/{modelname}/{i}.png",dpi=200)
+        _ = plt.savefig(f"prediction_visualization/{modelname}/{i}.png",dpi=200)
         #plt.show()
-        plt.close('all')
+        _  = plt.close('all')
         plt.clf()
 
+        if i > max_steps :
+            break
        # if i%99==0:
        #     states = model.get_zero_state(1)
 

@@ -27,10 +27,10 @@ class MineDataset(Dataset):
     # there are 448480 unique steps in the dataset.
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
-                 no_classes=30, random_sequences=1000,device='cuda',return_float = True,min_reward=0,min_variance=0,max_overlap=50):
+                 no_classes=30, random_sequences=5000, device='cuda', return_float=True, min_reward=0, min_variance=0,
+                 max_overlap=50):
 
-
-        self.overlap_threshhold = sequence_length-max_overlap
+        self.overlap_threshhold = sequence_length - max_overlap
         self.min_reward = min_reward
         self.min_variance = min_variance
         self.no_random_sequences = random_sequences
@@ -76,13 +76,12 @@ class MineDataset(Dataset):
             d = self.mine_loader._load_data_pyfunc(os.path.join(self.root_dir, replay), -1, None)
             obs, act, reward, nextobs, done = d
 
-
             # -1 because we start at 0
             self.replays_length[i] = (len(obs['pov']) // sequence_length) - 1
             self.replays_length_raw[i] = len(obs['pov'])
 
             if return_float:
-                self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32)/255
+                self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32) / 255
             else:
                 self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32)
 
@@ -93,7 +92,7 @@ class MineDataset(Dataset):
             self.replays_reward[i] = reward
 
             if with_masks:
-                self.replays_masks[i] = torch.load(os.path.join(self.root_dir, replay, 'masks.pt'),map_location='cpu')
+                self.replays_masks[i] = torch.load(os.path.join(self.root_dir, replay, 'masks.pt'), map_location='cpu')
 
             # replays[i] = d
 
@@ -101,25 +100,22 @@ class MineDataset(Dataset):
         sums = []
         for reward in self.replays_reward.values():
             start = 0
-            while start+99<len(reward):
-                sums.append(sum(reward[start:start+100]))
-                start=start+100
-        print('reward mean = ',np.mean(sums))
-        print('reward std  = ',np.std(sums))
+            while start + 99 < len(reward):
+                sums.append(sum(reward[start:start + 100]))
+                start = start + 100
+        print('reward mean = ', np.mean(sums))
+        print('reward std  = ', np.std(sums))
 
         # compute action variance
         vars = []
         for acs in self.replays_act.values():
             start = 0
-            while start+99<len(acs):
-                vars.append(np.var(acs.numpy()[start:start+100]))
-                start=start+100
+            while start + 99 < len(acs):
+                vars.append(np.var(acs.numpy()[start:start + 100]))
+                start = start + 100
 
         print('action_var mean = ', np.mean(vars))
-        print('action_var std = ',np.std(vars))
-
-
-
+        print('action_var std = ', np.std(vars))
 
         if random_sequences:
             self.random_sequences = []
@@ -176,20 +172,17 @@ class MineDataset(Dataset):
             act = self.replays_act[replay_ix][start_ix:end_ix]
 
             if self.with_masks:
-
                 mask = self.replays_masks[replay_ix][start_ix:end_ix]
-                pov = torch.cat((pov,mask),dim=-1)
+                pov = torch.cat((pov, mask), dim=-1)
 
         else:
 
             if self.with_masks:
                 pov, act, mask = self.random_sequences[idx]
-                pov = torch.cat((pov,mask),dim=-1)
+                pov = torch.cat((pov, mask), dim=-1)
 
             else:
                 pov, act = self.random_sequences[idx]
-
-
 
         return pov, act
 
@@ -212,66 +205,64 @@ class MineDataset(Dataset):
             not_enough_variance = True
             already_used = True
 
-
             rejected = -1
             while too_high or not_enough_reward or not_enough_variance or already_used:
-                #print('rejected')
-                rejected +=1
-                #print('not enoug reward=', not_enough_reward)
-                #print('not_enough_variance', not_enough_variance)
-
+                # print('rejected')
+                rejected += 1
+                # print('not enoug reward=', not_enough_reward)
+                # print('not_enough_variance', not_enough_variance)
 
                 sequence_start_index = np.random.randint(0, self.replays_length_raw[replay_index])
 
                 # reroll if too high ...
                 too_high = sequence_start_index + self.sequence_length > self.replays_length_raw[replay_index]
 
-
                 # reroll if not enough reward
-                not_enough_reward = sum(self.replays_reward[replay_index-150][sequence_start_index:sequence_start_index+self.sequence_length+150]) < self.min_reward
+
+                not_enough_reward = sum(self.replays_reward[replay_index][
+                                        sequence_start_index - 150:sequence_start_index + self.sequence_length + 150]) < self.min_reward
 
                 # reroll if actions not diverse enough
-                not_enough_variance = np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()) < self.min_variance
-                #print(too_high,'\t',sequence_start_index + self.sequence_length,'\n'
+                not_enough_variance = np.var(self.replays_act[replay_index][
+                                             sequence_start_index:sequence_start_index + self.sequence_length].numpy()) < self.min_variance
+
+                # print(too_high,'\t',sequence_start_index + self.sequence_length,'\n'
                 #      ,not_enough_reward,'\t',sum(self.replays_reward[replay_index][sequence_start_index:sequence_start_index+self.sequence_length]),'\n'
                 #      ,not_enough_variance,'\t',np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()))
 
-                def diff_in(tuple,list,threshhold):
+                def diff_in(tuple, list, threshhold):
                     ri, si = tuple
 
-                    for ril,sil in list:
+                    for ril, sil in list:
                         if ril == ri and abs(si - sil) <= threshhold:
                             return True
 
                     return False
 
                 # reroll if sequence already used!
-                already_used = diff_in((replay_index,sequence_start_index),used_indices,self.overlap_threshhold)
+                already_used = diff_in((replay_index, sequence_start_index), used_indices, self.overlap_threshhold)
 
                 # make sure it always works! lower overlap threshhold if too many sequences get rejected
 
-               # print(rejected)
+                # print(rejected)
 
                 if rejected >= 100:
-                    print(f'warning! overlap_threwshold lowered to {self.overlap_threshhold-1}')
-                    self.overlap_threshhold-=1
+                    print(f'warning! overlap_threwshold lowered to {self.overlap_threshhold - 1}')
+                    self.overlap_threshhold -= 1
                     break
 
-
-
-            #print('accepted')
+            # print('accepted')
             rej.append(rejected)
-            used_indices.append((replay_index,sequence_start_index))
+            used_indices.append((replay_index, sequence_start_index))
 
             # append random sequence
-
-
 
             if self.with_masks:
                 self.random_sequences.append(
                     (self.replays_pov[replay_index][sequence_start_index:sequence_start_index + self.sequence_length],
                      self.replays_act[replay_index][sequence_start_index:sequence_start_index + self.sequence_length],
-                     self.replays_masks[replay_index][sequence_start_index:sequence_start_index + self.sequence_length]))
+                     self.replays_masks[replay_index][
+                     sequence_start_index:sequence_start_index + self.sequence_length]))
             else:
 
                 self.random_sequences.append(
@@ -282,7 +273,8 @@ class MineDataset(Dataset):
 
         # delete unused stuff.
 
-        #print(sorted(used_indices,key=lambda x:x[0]))
+        print(used_indices)
+        # print(sorted(used_indices,key=lambda x:x[0]))
         del (self.replays_pov)
         del (self.replays_act)
         if self.with_masks:
@@ -293,8 +285,8 @@ if __name__ == '__main__':
     # test dataset.
     torch.set_printoptions(threshold=10_000)
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=1, random_sequences=10000, sequence_length=100,device='cpu',with_masks=False,min_reward=1,min_variance=20)
-
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=700, sequence_length=100,
+                     device='cpu', with_masks=False, min_reward=0, min_variance=30)
 
     dataloader = DataLoader(ds, batch_size=1,
                             shuffle=True, num_workers=0, drop_last=True)
@@ -303,14 +295,16 @@ if __name__ == '__main__':
     masks_recorder = EpisodeRecorder()
 
     for i, (pov, _) in enumerate(dataloader):
-        #print(pov.shape)
-        for frame in  pov.squeeze():
-            #print(frame.shape)
+        # print(pov.shape)
+        for frame in pov.squeeze():
+            # print(frame.shape)
 
-            recorder.record_frame((frame*255).numpy().astype(np.uint8))
-            #masks_recorder.record_frame(mask.numpy().astype(np.uint8))
+            recorder.record_frame((frame * 255).numpy().astype(np.uint8))
+            # masks_recorder.record_frame(mask.numpy().astype(np.uint8))
 
-        #recorder.save_vid(f'dataset_vids/{i}.mp4')
+        recorder.save_vid(f'dataset_vids/{i}.mp4')
 
         recorder.reset()
         masks_recorder.reset()
+        if i > 1000:
+            break
