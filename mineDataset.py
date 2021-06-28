@@ -198,7 +198,8 @@ class MineDataset(Dataset):
 
         # get number of sequences
         rej = []
-        for r_i in trange(self.no_random_sequences, desc='randomizing'):
+        r_i = 0
+        while r_i < self.no_random_sequences:
 
             too_high = True
             not_enough_reward = True
@@ -246,10 +247,12 @@ class MineDataset(Dataset):
 
                 # print(rejected)
 
+                # also check other replays?
                 if rejected >= 1000:
-                    print(f'warning! overlap_threwshold lowered to {self.overlap_threshhold - 1}')
+                    print(f'warning! overlap_threshold lowered to {self.overlap_threshhold - 1}')
                     self.overlap_threshhold -= 1
-                    break
+
+                    continue
 
             # print('accepted')
             rej.append(rejected)
@@ -263,17 +266,21 @@ class MineDataset(Dataset):
                      self.replays_act[replay_index][sequence_start_index:sequence_start_index + self.sequence_length],
                      self.replays_masks[replay_index][
                      sequence_start_index:sequence_start_index + self.sequence_length]))
+                r_i += 1
             else:
 
                 self.random_sequences.append(
                     (self.replays_pov[replay_index][sequence_start_index:sequence_start_index + self.sequence_length],
                      self.replays_act[replay_index][sequence_start_index:sequence_start_index + self.sequence_length]))
+                r_i+=1
+                if len(self.random_sequences[-1][0]) < 100:
+                    print(len(self.random_sequences[-1][0]))
 
             replay_index = (replay_index + 1) % len(self.replay_queue)
 
         # delete unused stuff.
 
-        print(used_indices)
+        #print(used_indices)
         # print(sorted(used_indices,key=lambda x:x[0]))
         del (self.replays_pov)
         del (self.replays_act)
@@ -285,26 +292,32 @@ if __name__ == '__main__':
     # test dataset.
     torch.set_printoptions(threshold=10_000)
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=700, sequence_length=100,
-                     device='cpu', with_masks=False, min_reward=1, min_variance=30)
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=20000, sequence_length=100,
+                     device='cpu', with_masks=False, min_reward=1, min_variance=20)
 
-    dataloader = DataLoader(ds, batch_size=1,
+    dataloader = DataLoader(ds, batch_size=4,
                             shuffle=True, num_workers=0, drop_last=True)
 
     recorder = EpisodeRecorder()
     masks_recorder = EpisodeRecorder()
 
-    for i, (pov, _) in enumerate(dataloader):
-        # print(pov.shape)
-        for frame in pov.squeeze():
-            # print(frame.shape)
 
-            recorder.record_frame((frame * 255).numpy().astype(np.uint8))
-            # masks_recorder.record_frame(mask.numpy().astype(np.uint8))
 
-        recorder.save_vid(f'dataset_vids/{i}.mp4')
 
-        recorder.reset()
-        masks_recorder.reset()
-        if i > 1000:
-            break
+    for i, (pov, _) in enumerate(ds):
+        #print(i)
+        if len(pov)<100:
+            print(len(pov))
+#        # print(pov.shape)
+#        for frame in pov.squeeze():
+#            # print(frame.shape)
+#
+#            recorder.record_frame((frame * 255).numpy().astype(np.uint8))
+#            # masks_recorder.record_frame(mask.numpy().astype(np.uint8))
+#
+#        recorder.save_vid(f'dataset_vids/{i}.mp4')
+#
+#        recorder.reset()
+#        masks_recorder.reset()
+#        if i > 1000:
+#            break

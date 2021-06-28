@@ -194,7 +194,7 @@ for modelname_epoch in os.listdir(modelpath):
     modeldict = get_model_info_from_name(modelname_epoch)
 
 
-    if modeldict['epoch'] % test_epochs !=0:
+    if not modeldict['epoch'] in [8]:
         continue
 
     visualize_output(modeldict)
