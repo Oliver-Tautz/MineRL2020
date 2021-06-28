@@ -246,7 +246,7 @@ class MineDataset(Dataset):
 
                 # print(rejected)
 
-                if rejected >= 100:
+                if rejected >= 1000:
                     print(f'warning! overlap_threwshold lowered to {self.overlap_threshhold - 1}')
                     self.overlap_threshhold -= 1
                     break
@@ -286,7 +286,7 @@ if __name__ == '__main__':
     torch.set_printoptions(threshold=10_000)
 
     ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=700, sequence_length=100,
-                     device='cpu', with_masks=False, min_reward=0, min_variance=30)
+                     device='cpu', with_masks=False, min_reward=1, min_variance=30)
 
     dataloader = DataLoader(ds, batch_size=1,
                             shuffle=True, num_workers=0, drop_last=True)
