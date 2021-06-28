@@ -32,14 +32,15 @@ import ast
 
 import simple_logger
 import re
-from tqdm import tqdm
+from tqdm import tqdm,trange
 from simple_logger import SimpleLogger
+
 
 parser = argparse.ArgumentParser(description='test the model')
 parser.add_argument('modelpath',help='use saved model at path',type=str)
 parser.add_argument('--test-epochs',help='test every x epochs',type=int,default=4)
 parser.add_argument('--no-classes',help="how many actions are there?",type=int,default=30)
-parser.add_argument('--no-cpu',help="number of eval threads to start. Doesnt do anything yet!",type=int,default=1)
+parser.add_argument('--no-cpu',help="make torch use this number of threads",type=int,default=4)
 parser.add_argument('--verbose',help="print more stuff",action="store_true")
 parser.add_argument('--with-masks',help="use extra mask channel",action="store_true")
 parser.add_argument('--save-vids',help="save videos of eval",action="store_true")
@@ -66,7 +67,7 @@ num_threads = args.num_threads
 
 
 
-
+torch.set_num_threads(no_cpu)
 
 
 
@@ -85,9 +86,49 @@ seeds = [2, 12345, 45678, 303544, 744421, 816128, 406373, 99999, 88888, 76543, 9
 
 
 
-####################
-# EVALUATION CODE  #
-####################
+def get_model_info_from_name(name):
+    if name.split('/')[-1].split('.')[-1] != 'tm':
+        return -1
+
+    # THIS PARSING IS NOT ROBUST AT ALL AND ONLY WORKS WITH MY NAMING SHEME(HOPEFULLY).!
+    def find_int(str):
+
+        int_regex = re.compile(r'[0-9][0-9]*')
+        return int(int_regex.search(str).group())
+
+    ## check if regex in name!
+    epoch_regex = re.compile(r'_epoch=[0-9]*_')
+
+    epoch = epoch_regex.search(name).group()
+    epoch = find_int(epoch)
+
+
+    classes_regex = re.compile(r'_no-classes=[0-9]*_')
+    no_classes = classes_regex.search(name).group()
+    no_classes = find_int(no_classes)
+
+    seq_regex = re.compile(r'_seq-len=[0-9]*_')
+    seq_len = seq_regex.search(name).group()
+    seq_len = find_int(seq_len)
+
+    masks_regex = re.compile(r'_with-masks=(False|True)_')
+    with_masks = masks_regex.search(name).group()
+    with_masks = (re.compile(r'(False|True)').search(with_masks).group())
+
+    if with_masks == 'True':
+        with_masks = True
+    else:
+        with_masks = False
+
+    modeldict = dict()
+    modeldict['name'] = name
+    modeldict['epoch'] = epoch
+    modeldict['with_masks'] = with_masks
+    modeldict['no_classes'] = no_classes
+    modeldict['seq_len'] = seq_len
+
+    return modeldict
+
 def main():
 
         reward_logger_lock = Lock()
@@ -96,17 +137,27 @@ def main():
 
         def thread_eval(models,env):
 
+
+
             er = EpisodeRecorder()
 
             for modeldict in models:
+
+                modelname = modeldict['name']
+                epoch = modeldict['epoch']
+                print(f"loading model {modeldict['name']}")
 
                 model = Model(deviceStr=device, verbose=verbose, no_classes=modeldict['no_classes'], with_masks=modeldict['with_masks'],mode='eval')
                 model.load_state_dict(torch.load(os.path.join(modelpath,modeldict['name']), map_location=device))
                 model.eval()
 
+                print(f"loaded model {modeldict['name']}")
 
                 with torch.no_grad():
+
+
                     for seed in tqdm(seeds,desc='testing seeds'):
+                        print(f"starting eval on {modeldict['name']} , epoch = {modeldict['epoch']}, seed= {seed}")
                         env.seed(seed)
                         obs= env.reset()
 
@@ -126,7 +177,7 @@ def main():
                             er.record_frame(obs['pov'])
 
                             act_logger_lock.acquire()
-                            action_logger.log([model_name,epoch,seed,int(p),int(s),step,reward])
+                            action_logger.log([modeldict['name'],modeldict['epoch'],seed,int(p),int(s),step,reward])
                             act_logger_lock.release()
 
                             if done:
@@ -136,24 +187,29 @@ def main():
                                 state  = model.get_zero_state(1,device)
 
                         mp4_lock.acquire()
-                        er.save_vid(f'eval/{model_name}/epoch={epoch}_seed={seed}.mp4')
+
+
+                        er.save_vid(f'eval/{modelname}/epoch={epoch}_seed={seed}.mp4')
                         mp4_lock.release()
 
                         er.reset()
 
                         reward_logger_lock.acquire()
-                        rewards_logger.log([model_name,epoch,seed,np.mean(rewards),np.std(rewards),np.var(rewards),np.sum(rewards)])
+                        rewards_logger.log([modeldict['name'],modeldict['epoch'],seed,np.mean(rewards),np.std(rewards),np.var(rewards),np.sum(rewards)])
                         reward_logger_lock.release()
 
         rewards_logger = SimpleLogger(f'eval/{model_name}/rewards.csv',
-                               ['modelname','epoch','seed','reward_sum','reward_sdt','reward_var','reward_sum'])
+                               ['modelname','epoch','seed','reward_mean','reward_sdt','reward_var','reward_sum'])
         action_logger = SimpleLogger(f'eval/{model_name}/actions.csv',
                                ['modelname','epoch','seed','predicted_action','sampled_action','step','reward'])
 
 
 
         additional_info_dummy = torch.zeros(10)
-        envs = [gym.make(MINERL_GYM_ENV) for i in range(num_threads)]
+        envs = []
+        for i in trange(num_threads, desc='creating_envs'):
+            envs.append(gym.make(MINERL_GYM_ENV) )
+            print(f'created env {i}')
 
         # dicts for thread!
         models = []
@@ -162,48 +218,16 @@ def main():
 
         for modelname_epoch in os.listdir(modelpath):
 
-
             if modelname_epoch.split('/')[-1].split('.')[-1] !='tm':
                 continue
 
-            # THIS PARSING IS NOT ROBUST AT ALL AND ONLY WORKS WITH MY NAMING SHEME(HOPEFULLY).!
-            def find_int(str):
+            modeldict = get_model_info_from_name(modelname_epoch)
 
-                int_regex = re.compile(r'[0-9][0-9]*')
-                return int(int_regex.search(str).group())
 
-            ## check if regex in name!
-            epoch_regex = re.compile(r'_epoch=[0-9]*_')
-
-            epoch = epoch_regex.search(modelname_epoch).group()
-            epoch = find_int(epoch)
-
-            if epoch % test_epochs !=0:
+            if modeldict['epoch'] % test_epochs !=0:
                 continue
 
-            classes_regex = re.compile(r'_no-classes=[0-9]*_')
-            no_classes = classes_regex.search(modelname_epoch).group()
-            no_classes = find_int(no_classes)
 
-            seq_regex = re.compile(r'_seq-len=[0-9]*_')
-            seq_len = seq_regex.search(modelname_epoch).group()
-            seq_len = find_int(seq_len)
-
-            masks_regex = re.compile(r'_with-masks=(False|True)_')
-            with_masks = masks_regex.search(modelname_epoch).group()
-            with_masks = (re.compile(r'(False|True)').search(with_masks).group())
-
-            if with_masks == 'True':
-                with_masks = True
-            else:
-                with_masks = False
-
-            modeldict = dict()
-            modeldict['name'] = modelname_epoch
-            modeldict['epoch'] = epoch
-            modeldict['with_masks'] = with_masks
-            modeldict['no_classes'] = no_classes
-            modeldict['seq_len'] = seq_len
 
             models.append(modeldict)
 
@@ -214,12 +238,15 @@ def main():
 
         threads = []
         for i,sublist in enumerate(models):
+            print(sublist)
             p = Process(target=thread_eval,args=(sublist,envs[i]))
             threads.append(p)
             p.start()
+            pass
 
         for thread in threads:
             thread.join()
+            pass
 
 
 

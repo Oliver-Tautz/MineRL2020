@@ -228,7 +228,7 @@ class MineDataset(Dataset):
 
 
                 # reroll if not enough reward
-                not_enough_reward = sum(self.replays_reward[replay_index][sequence_start_index:sequence_start_index+self.sequence_length]) < self.min_reward
+                not_enough_reward = sum(self.replays_reward[replay_index-150][sequence_start_index:sequence_start_index+self.sequence_length+150]) < self.min_reward
 
                 # reroll if actions not diverse enough
                 not_enough_variance = np.var(self.replays_act[replay_index][sequence_start_index:sequence_start_index+self.sequence_length].numpy()) < self.min_variance

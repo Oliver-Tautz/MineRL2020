@@ -8,7 +8,36 @@ from descrete_actions_transform import load_obj, transform_int_to_actions
 import functools
 import numpy as np
 from torch.nn import Softmax
+import argparse
+from test import get_model_info_from_name
+import os
 
+parser = argparse.ArgumentParser(description='test the model')
+parser.add_argument('modelpath',help='use saved model at path',type=str)
+parser.add_argument('--test-epochs',help='test every x epochs',type=int,default=4)
+parser.add_argument('--no-classes',help="how many actions are there?",type=int,default=30)
+parser.add_argument('--no-cpu',help="make torch use this number of threads",type=int,default=4)
+parser.add_argument('--verbose',help="print more stuff",action="store_true")
+parser.add_argument('--with-masks',help="use extra mask channel",action="store_true")
+parser.add_argument('--save-vids',help="save videos of eval",action="store_true")
+parser.add_argument('--max-steps',help="max steps per episode",type=int,default=1000)
+parser.add_argument('--sequence-len',help="reset states after how many steps?!",type=int,default=1000)
+parser.add_argument('--num-threads',help="how many eval threads?",type=int,default=2)
+
+args = parser.parse_args()
+
+
+
+modelpath = args.modelpath
+model_name = modelpath.split('/')[-1].split('.')[0]
+no_classes = args.no_classes
+no_cpu = args.no_cpu
+verbose = args.verbose
+with_masks=args.with_masks
+save_vids = args.save_vids
+max_steps=args.max_steps
+test_epochs = args.test_epochs
+num_threads = args.num_threads
 
 
 
@@ -20,7 +49,7 @@ torch.set_num_threads(10)
 
 # get action representations
 acs = [transform_int_to_actions([x],camera_noise_threshhold=0.1,) for x in range(30)]
-print(acs[9])
+
 
 # get active action names
 aclist = []
@@ -43,7 +72,7 @@ for i, ac in enumerate(acs):
     aclist.append(ac_name)
 
 
-print(list(enumerate(aclist)))
+
 # concat names to use as labels for plot
 aclist = [functools.reduce(lambda x, y: x +'_' +y,ac,'')[1:] for ac in aclist]
 
@@ -86,7 +115,7 @@ def visualize(pov,pred,label,prev_label,next_label):
 
     plt.xlim(0, 1)
 
-    ax1.imshow(pov.squeeze() / 255)
+    ax1.imshow(pov.squeeze())
     ax1.axis('off')
 
     ax2.set_yticks(x)
@@ -99,50 +128,66 @@ def visualize(pov,pred,label,prev_label,next_label):
    # plt.show()
 
 
-model = Model(deviceStr='cpu', verbose=False, no_classes=30, with_masks=False)
-
-model.load_state_dict(torch.load(
-    "train/batch2_with-masks=False_map-to-zero=True_no-classes=30_seq-len=100_epoch=99_time=2021-06-09 18:14:29.514103.tm",
-    map_location='cpu'))
-
-train_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=1, map_to_zero=True,
-                        with_masks=False, no_classes=30, no_replays=1)
-
-model.eval()
-
-states = model.get_zero_state(1)
-
-
-# consider how many actions +-?
-m = 2
 
 
 
-for i in trange(1,len(train_set)-1):
-
-
-    _, prev = train_set[i-1]
-    pov,curr = train_set[i]
-    _,next = train_set[i+1]
-
-
-    pov_plot = torch.unsqueeze(pov, 0)
-    pov = pov_plot.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
-
-    pred, states = model.forward(pov, torch.zeros(64), states)
-
-    visualize(pov_plot, pred, curr,prev,next)
-    plt.legend(bbox_to_anchor=(1.05, 1),loc='upper left',prop={'size': 5})
-    plt.savefig(f"prediction_visualization/train_episode0/{i}.png",dpi=200)
-    #plt.show()
-    plt.close('all')
-    plt.clf()
-
-    if i%99==0:
-        states = model.get_zero_state(1)
 
 
 
+def visualize_output(modeldict):
+
+
+    modelname = modeldict['name']
+    model = Model(deviceStr='cpu', verbose=False, no_classes=modeldict['no_classes'], with_masks=modeldict['with_masks'])
+
+    model.load_state_dict(torch.load(os.path.join(modelpath,modeldict['name']),
+        map_location='cpu'))
+
+    train_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=1, map_to_zero=True,
+                            with_masks=False, no_classes=modeldict['no_classes'], no_replays=1,random_sequences=None)
+
+    model.eval()
+
+    states = model.get_zero_state(1)
+
+    for i in trange(1,len(train_set)-1):
+
+
+        _, prev = train_set[i-1]
+        pov,curr = train_set[i]
+        _,next = train_set[i+1]
+
+
+        pov_plot = torch.unsqueeze(pov, 0)
+        pov = pov_plot.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
+
+        pred, states = model.forward(pov, torch.zeros(64), states)
+
+        visualize(pov_plot, pred, curr,prev,next)
+        plt.legend(bbox_to_anchor=(1.05, 1),loc='upper left',prop={'size': 5})
+        os.makedirs(f"prediction_visualization/{modelname}",exist_ok=True)
+        plt.savefig(f"prediction_visualization/{modelname}/{i}.png",dpi=200)
+        #plt.show()
+        plt.close('all')
+        plt.clf()
+
+       # if i%99==0:
+       #     states = model.get_zero_state(1)
+
+
+
+for modelname_epoch in os.listdir(modelpath):
+
+    if modelname_epoch.split('/')[-1].split('.')[-1] !='tm':
+        continue
+
+    modeldict = get_model_info_from_name(modelname_epoch)
+
+
+    if modeldict['epoch'] % test_epochs !=0:
+        continue
+
+    visualize_output(modeldict)
 
 
 #fig, ax = plt.subplots(nrows=1,ncols=2,sharex=False,sharey=False)
