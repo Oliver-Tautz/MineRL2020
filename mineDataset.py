@@ -161,7 +161,7 @@ class MineDataset(Dataset):
         return (i, ix)
 
     def __len__(self):
-        return len(self.random_sequences)
+        return self.len
 
     def __getitem__(self, idx):
 

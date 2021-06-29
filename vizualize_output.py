@@ -12,7 +12,7 @@ import argparse
 from test import get_model_info_from_name
 import os
 import logging
-
+from multiprocessing import Process, Lock
 
 for name in [
              "matplotlib", "matplotlib.font", "matplotlib.pyplot"]:
@@ -51,12 +51,12 @@ num_threads = args.num_threads
 
 
 torch.set_num_threads(10)
-
+no_actions = 50
 
 ### setup stuff
 
 # get action representations
-acs = [transform_int_to_actions([x],camera_noise_threshhold=0.1,) for x in range(30)]
+acs = [transform_int_to_actions([x],camera_noise_threshhold=0.1,no_actions=no_actions) for x in range(no_actions)]
 
 
 # get active action names
@@ -100,22 +100,22 @@ def visualize(pov,pred,label,prev_label,next_label):
     fig, (ax1, ax2) = plt.subplots(1, 2, constrained_layout=True)
 
 
-
+    print(x.shape,y.shape)
     rects1 = ax2.barh(x, y,height=width/4,label='logits')
 
-    y_ = np.zeros(30)
+    y_ = np.zeros(no_classes)
     y_[label[0]] = 1
     rects0 = ax2.barh(x-width/4, y_,label='label',height=width/4)
 
 
     if prev_label != None:
-        y_ = np.zeros(30)
+        y_ = np.zeros(no_classes)
         y_[prev_label[0]] = 1
         ax2.barh(x+width / 4, y_,label='prev_label',height=width/4)
 
 
     if next_label != None:
-        y_ = np.zeros(30)
+        y_ = np.zeros(no_classes)
         y_[next_label[0]] = 1
         ax2.barh(x-width/2, y_,label='next_label',height=width/4)
 
@@ -144,8 +144,11 @@ def visualize(pov,pred,label,prev_label,next_label):
 
 def visualize_output(modeldict):
 
-
+    global no_classes
+    no_classes = modeldict['no_classes']
+    print(modeldict)
     modelname = modeldict['name']
+
     model = Model(deviceStr='cpu', verbose=False, no_classes=modeldict['no_classes'], with_masks=modeldict['with_masks'])
 
     model.load_state_dict(torch.load(os.path.join(modelpath,modeldict['name']),
@@ -184,7 +187,7 @@ def visualize_output(modeldict):
        # if i%99==0:
        #     states = model.get_zero_state(1)
 
-
+threads = []
 
 for modelname_epoch in os.listdir(modelpath):
 
@@ -194,14 +197,21 @@ for modelname_epoch in os.listdir(modelpath):
     modeldict = get_model_info_from_name(modelname_epoch)
 
 
-    if not modeldict['epoch'] in [8]:
+
+    if not modeldict['epoch'] in [0,1,2]:
+        print('here')
         continue
 
+    print(len(modeldict))
+
+    #p = Process(target=visualize_output,args=modeldict)
     visualize_output(modeldict)
+    #threads.append(p)
+    #p.start()
 
-
-#fig, ax = plt.subplots(nrows=1,ncols=2,sharex=False,sharey=False)
-
+for thread in threads:
+    thread.join()
+    pass
 
 
 

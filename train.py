@@ -156,7 +156,7 @@ def train(model, epochs, train_loader, val_loader):
 
             loss = categorical_loss(act, prediciton)
 
-            loss = loss.sum()
+
             loss.backward()
 
             grad_norm = clip_grad_norm_(model.parameters(), 10)
@@ -188,7 +188,7 @@ def train(model, epochs, train_loader, val_loader):
 
                 val_loss = categorical_loss(act, prediciton)
 
-                val_loss = val_loss.sum()
+
                 epoch_val_loss.append(val_loss.item())
 
             if (epoch % 4) == 0:
@@ -239,8 +239,8 @@ def categorical_loss(label, prediction):
     label = label.reshape(-1)
     prediction = prediction.view(-1, prediction.shape[-1])
 
-    # normalize!
-    return loss(prediction, label)
+    # normalize by batchsize and seq len.
+    return loss(prediction, label)/len(prediction).sum()
 
 def categorical_loss_last_only(label,preditcion):
     label = label.reshape(-1)

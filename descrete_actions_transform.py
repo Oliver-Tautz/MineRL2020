@@ -211,10 +211,10 @@ def transform_int_to_actions(ints, camera_noise_threshhold=camera_noise_threshho
     return actions
 
 
-def transform_onehot_to_actions(X,camera_noise_threshhold=camera_noise_threshhold):
+def transform_onehot_to_actions(X,camera_noise_threshhold=camera_noise_threshhold,no_classes=30):
 
-    key_lookup = load_obj(key_to_index_filename)
-    int_to_vector_dict = load_obj(int_to_vec_filename)
+    key_lookup = load_obj(f'{key_to_index_filename}_{no_classes}')
+    int_to_vector_dict = load_obj(f'{int_to_vec_filename}_{no_classes}')
 
     actions = defaultdict(lambda :[])
     ints = onehot_to_int(X)
@@ -359,7 +359,9 @@ def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_thr
                 no_mapped += 1
                 smallest_dist = 1000000
                 for i,unique in enumerate(frequent_uniques):
-                    dist = np.sum(np.logical_not(np.logical_xor(x,unique)))
+
+                    # only map 1->0 but not 0->1 ! This way we dont brak the distribution
+                    dist = np.sum(np.where(x-unique==-1,1000,x-unique))
                     if dist < smallest_dist:
                         smallest_dist = dist
                         smallest_ix = i
