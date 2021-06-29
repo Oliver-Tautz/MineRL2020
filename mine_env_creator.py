@@ -29,9 +29,8 @@ def create_env(env_name, seed, pos,
 
     placement = agent_start.find('{http://ProjectMalmo.microsoft.com}Placement')
 
-    print(placement)
+
     if  placement is None:
-        print('not found')
         placement = ET.Element('{http://ProjectMalmo.microsoft.com}Placement')
         agent_start.append(placement)
 
