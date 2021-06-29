@@ -23,13 +23,15 @@ class MineDataset(Dataset):
     # return_float      = return RGB data normalized to 0-1
     # min_reward        = only use randoms sequences with at least this many rewards. Dataset has about ~2.8 reward mean in 100 steps, with 1.7 stddev
     # min_variance      = only use randoms sequences with at least this high action variance. Dataset has about ~41 reward mean in 100 steps, with ~20 stddev
+    # max_verlap        = define max overlap for sequences. If defined, only so many random sequences are returned to not make them overlap more.
 
     # there are 448480 unique steps in the dataset.
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
-                 no_classes=30, random_sequences=5000, device='cuda', return_float=True, min_reward=0, min_variance=0,
+                 no_classes=30, random_sequences=50000, device='cuda', return_float=True, min_reward=0, min_variance=0,
                  max_overlap=10):
-        self.max_overlap = 10
+
+        self.max_overlap = max_overlap
 
         # start with no overlap
         self.overlap_threshhold = sequence_length

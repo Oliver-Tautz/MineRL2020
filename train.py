@@ -39,6 +39,7 @@ parser.add_argument('--epochs', help="make torch use number of cpus", type=int, 
 parser.add_argument('--batchsize', help="make torch use number of cpus", type=int, default=4)
 parser.add_argument('--seq-len', help="make torch use number of cpus", type=int, default=100)
 parser.add_argument('--no-classes', help="use number of discrete actions", type=int, default=30)
+parser.add_argument('--max-overlap', help="max overlap of seueqnces in dataset in frames", type=int, default=10)
 parser.add_argument('--debug', help="use small number of samples for debugging faster", action='store_true')
 parser.add_argument('--no-shuffle', help="dont shuffle train set after each epoch", action='store_true')
 parser.add_argument('--no-sequences', help="use number of sequences for train/val dataset", type=int, default=5000)
@@ -61,6 +62,7 @@ epochs = args.epochs
 no_classes = args.no_classes
 min_reward = args.min_reward
 min_var = args.min_var
+max_overlap = args.max_overlap
 
 # ensure reproducability
 
@@ -252,7 +254,7 @@ def main():
 
     full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=seq_len, map_to_zero=map_to_zero,
                            with_masks=with_masks, no_classes=no_classes, no_replays=no_replays,
-                           random_sequences=no_sequences, min_variance=min_var, min_reward=min_reward, device=deviceStr)
+                           random_sequences=no_sequences, min_variance=min_var, min_reward=min_reward, device=deviceStr,max_overlap=max_overlap)
 
     val_split = 0.2
     train_set, val_set = random_split(full_set, [int(no_sequences * (1 - val_split)), int(no_sequences * val_split)],
