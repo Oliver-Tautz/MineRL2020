@@ -28,9 +28,11 @@ class MineDataset(Dataset):
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
                  no_classes=30, random_sequences=5000, device='cuda', return_float=True, min_reward=0, min_variance=0,
-                 max_overlap=50):
+                 max_overlap=10):
+        self.max_overlap = 10
 
-        self.overlap_threshhold = sequence_length - max_overlap
+        # start with no overlap
+        self.overlap_threshhold = sequence_length
         self.min_reward = min_reward
         self.min_variance = min_variance
         self.no_random_sequences = random_sequences
@@ -126,7 +128,7 @@ class MineDataset(Dataset):
         self.len = sum(self.replays_length.values())
 
         if random_sequences:
-            self.len = random_sequences
+            self.len = len(self.random_sequences)
 
     def __print(self, str):
         print(f'{self.message_str}{str}')
@@ -188,6 +190,14 @@ class MineDataset(Dataset):
 
     def __randomize_sequences(self):
 
+        # number of tries per replay for one sequence
+        # 100 seems to work. take 300 to be sure.
+        max_rejects_per_replay = 500
+
+        # try this many times to get another sequence
+        # try to get a sequence of each eposide 3 more times
+        max_rejects_on_max_threshold = len(self.replay_queue)*3
+
         used_indices = []
 
         # sample from replay. Maybe also randomize this? Take random shuffling?
@@ -199,7 +209,13 @@ class MineDataset(Dataset):
         # get number of sequences
         rej = []
         r_i = 0
+        max_overlap_rejection = 0
+
+        self.__print('Generating ramdon sequences, this could take a while!')
         while r_i < self.no_random_sequences:
+
+            if r_i %10 ==0:
+                self.__print(f"produced {r_i} random sequences!{max_overlap_rejection}")
 
             too_high = True
             not_enough_reward = True
@@ -207,6 +223,7 @@ class MineDataset(Dataset):
             already_used = True
 
             rejected = -1
+
             while too_high or not_enough_reward or not_enough_variance or already_used:
                 # print('rejected')
                 rejected += 1
@@ -216,6 +233,7 @@ class MineDataset(Dataset):
                 sequence_start_index = np.random.randint(0, self.replays_length_raw[replay_index])
 
                 # reroll if too high ...
+
                 too_high = sequence_start_index + self.sequence_length > self.replays_length_raw[replay_index]
 
                 # reroll if not enough reward
@@ -247,12 +265,31 @@ class MineDataset(Dataset):
 
                 # print(rejected)
 
-                # also check other replays?
-                if rejected >= 1000:
-                    print(f'warning! overlap_threshold lowered to {self.overlap_threshhold - 1}')
-                    self.overlap_threshhold -= 1
+                if rejected >=max_rejects_per_replay:
+
+                    current_overlap = self.sequence_length - self.overlap_threshhold
+                    #print(current_overlap, self.max_overlap)
+                    if current_overlap < self.max_overlap:
+                        self.overlap_threshhold -= 1
+                        self.__print(f'warning! overlap_threshold lowered to {self.overlap_threshhold - 1}, current max overlap is {current_overlap+1}')
+                    else:
+                        max_overlap_rejection += 1
+
+                    if max_overlap_rejection > max_rejects_on_max_threshold:
+                        break
+
+                    replay_index = (replay_index + 1) % len(self.replay_queue)
+
+                    too_high = True
+                    not_enough_reward = True
+                    not_enough_variance = True
+                    already_used = True
+                    rejected=-1
 
                     continue
+
+            if max_overlap_rejection > max_rejects_on_max_threshold:
+                break
 
             # print('accepted')
             rej.append(rejected)
@@ -272,15 +309,15 @@ class MineDataset(Dataset):
                 self.random_sequences.append(
                     (self.replays_pov[replay_index][sequence_start_index:sequence_start_index + self.sequence_length],
                      self.replays_act[replay_index][sequence_start_index:sequence_start_index + self.sequence_length]))
-                r_i+=1
+                r_i += 1
                 if len(self.random_sequences[-1][0]) < 100:
-                    print(len(self.random_sequences[-1][0]))
+                    self.__print(f"warning! sequence of length {len(self.random_sequences[-1][0])} produced")
 
             replay_index = (replay_index + 1) % len(self.replay_queue)
 
         # delete unused stuff.
 
-        #print(used_indices)
+        # print(used_indices)
         # print(sorted(used_indices,key=lambda x:x[0]))
         del (self.replays_pov)
         del (self.replays_act)
@@ -301,13 +338,13 @@ if __name__ == '__main__':
     recorder = EpisodeRecorder()
     masks_recorder = EpisodeRecorder()
 
-
-
-
+    print(len(ds))
     for i, (pov, _) in enumerate(ds):
-        #print(i)
-        if len(pov)<100:
-            print(len(pov))
+        # print(i)
+        if len(pov) < 100:
+            pass
+            #print(len(pov))
+
 #        # print(pov.shape)
 #        for frame in pov.squeeze():
 #            # print(frame.shape)

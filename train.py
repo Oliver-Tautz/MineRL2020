@@ -238,7 +238,7 @@ def categorical_loss(label, prediction):
     prediction = prediction.view(-1, prediction.shape[-1])
 
     # normalize!
-    return loss(prediction, label)/len(prediction)
+    return loss(prediction, label)
 
 def categorical_loss_last_only(label,preditcion):
     label = label.reshape(-1)
