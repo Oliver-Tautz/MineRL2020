@@ -192,10 +192,10 @@ class MineDataset(Dataset):
 
         # number of tries per replay for one sequence
         # 100 seems to work. take 300 to be sure.
-        max_rejects_per_replay = 500
+        max_rejects_per_replay = 300
 
         # try this many times to get another sequence
-        # try to get a sequence of each eposide 3 more times
+        # try to get a sequence of each episode 3 more times
         max_rejects_on_max_threshold = len(self.replay_queue)*3
 
         used_indices = []
