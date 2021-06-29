@@ -240,7 +240,7 @@ def categorical_loss(label, prediction):
     prediction = prediction.view(-1, prediction.shape[-1])
 
     # normalize by batchsize and seq len.
-    return loss(prediction, label)/len(prediction).sum()
+    return (loss(prediction, label)/len(prediction)).sum()
 
 def categorical_loss_last_only(label,preditcion):
     label = label.reshape(-1)
