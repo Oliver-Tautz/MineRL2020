@@ -161,7 +161,7 @@ class MineDataset(Dataset):
         return (i, ix)
 
     def __len__(self):
-        return self.len
+        return len(self.random_sequences)
 
     def __getitem__(self, idx):
 
@@ -347,16 +347,16 @@ if __name__ == '__main__':
             pass
             #print(len(pov))
 
-#        # print(pov.shape)
-#        for frame in pov.squeeze():
-#            # print(frame.shape)
-#
-#            recorder.record_frame((frame * 255).numpy().astype(np.uint8))
-#            # masks_recorder.record_frame(mask.numpy().astype(np.uint8))
-#
-#        recorder.save_vid(f'dataset_vids/{i}.mp4')
-#
-#        recorder.reset()
-#        masks_recorder.reset()
-#        if i > 1000:
-#            break
+        # print(pov.shape)
+        for frame in pov.squeeze():
+            # print(frame.shape)
+
+            recorder.record_frame((frame * 255).numpy().astype(np.uint8))
+            # masks_recorder.record_frame(mask.numpy().astype(np.uint8))
+
+        recorder.save_vid(f'dataset_vids/{i}.mp4')
+
+        recorder.reset()
+        masks_recorder.reset()
+        if i > 1000:
+            break

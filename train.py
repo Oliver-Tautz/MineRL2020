@@ -123,7 +123,7 @@ def train(model, epochs, train_loader, val_loader):
     simple_logger = SimpleLogger(
         f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_time={datetime.now().strftime(timestring)}.csv",
         ['modelname','epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate', 'seq_len', 'map_to_zero', 'batchsize', 'no_classes',
-         'no_sequences','min_reward','min_var','with_masks'])
+         'no_sequences','min_reward','min_var','with_masks','max_overlap'])
 
     additional_info_dummy = torch.zeros(10)
     best_val_loss = 1000
@@ -205,7 +205,7 @@ def train(model, epochs, train_loader, val_loader):
             simple_logger.log(
                 [modelname,epoch, sum(epoch_train_loss) / len(epoch_train_loss), sum(epoch_val_loss) / len(epoch_val_loss),
                  gradsum, float(optimizer.param_groups[0]["lr"]), seq_len, map_to_zero, batchsize, no_classes,
-                 no_sequences,min_reward,min_var,with_masks])
+                 no_sequences,min_reward,min_var,with_masks,max_overlap])
 
             gradsum = 0
             scheduler.step()
@@ -248,6 +248,7 @@ def categorical_loss_last_only(label,preditcion):
 
 
 def main():
+    global no_sequences
     model = Model(deviceStr=deviceStr, verbose=False, no_classes=no_classes, with_masks=with_masks)
 
     os.makedirs("train", exist_ok=True)
@@ -256,8 +257,16 @@ def main():
                            with_masks=with_masks, no_classes=no_classes, no_replays=no_replays,
                            random_sequences=no_sequences, min_variance=min_var, min_reward=min_reward, device=deviceStr,max_overlap=max_overlap)
 
+    no_sequences = len(full_set)
     val_split = 0.2
-    train_set, val_set = random_split(full_set, [int(no_sequences * (1 - val_split)), int(no_sequences * val_split)],
+
+    train_size = int(no_sequences * (1 - val_split))
+    val_size = int(no_sequences * val_split)
+
+    if train_size+val_size< no_sequences:
+        train_size+=1
+
+    train_set, val_set = random_split(full_set, [train_size, val_size],
                                       generator=torch.Generator().manual_seed(42))
 
     if no_shuffle:
