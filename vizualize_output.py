@@ -100,7 +100,7 @@ def visualize(pov,pred,label,prev_label,next_label):
     fig, (ax1, ax2) = plt.subplots(1, 2, constrained_layout=True)
 
 
-    print(x.shape,y.shape)
+
     rects1 = ax2.barh(x, y,height=width/4,label='logits')
 
     y_ = np.zeros(no_classes)
@@ -146,7 +146,7 @@ def visualize_output(modeldict):
 
     global no_classes
     no_classes = modeldict['no_classes']
-    print(modeldict)
+
     modelname = modeldict['name']
 
     model = Model(deviceStr='cpu', verbose=False, no_classes=modeldict['no_classes'], with_masks=modeldict['with_masks'])
@@ -202,12 +202,12 @@ for modelname_epoch in os.listdir(modelpath):
         print('here')
         continue
 
-    print(len(modeldict))
 
-    #p = Process(target=visualize_output,args=modeldict)
-    visualize_output(modeldict)
-    #threads.append(p)
-    #p.start()
+
+    p = Process(target=visualize_output,args=[modeldict])
+   # visualize_output(modeldict)
+    threads.append(p)
+    p.start()
 
 for thread in threads:
     thread.join()
