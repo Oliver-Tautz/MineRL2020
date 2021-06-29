@@ -75,6 +75,7 @@ torch.set_num_threads(no_cpu)
 # All the evaluations will be evaluated on MineRLObtainDiamondVectorObf-v0 environment
 MINERL_GYM_ENV = os.getenv('MINERL_GYM_ENV', 'MineRLTreechop-v0')
 
+print(MINERL_GYM_ENV)
 
 
 
