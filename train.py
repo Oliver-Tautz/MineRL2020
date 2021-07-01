@@ -25,6 +25,7 @@ import random
 from mineDataset import MineDataset
 from torch.utils.data import DataLoader, random_split
 import matplotlib.pyplot as plt
+import torch.nn.functional
 
 import argparse
 from datetime import datetime
@@ -46,6 +47,7 @@ parser.add_argument('--no-sequences', help="use number of sequences for train/va
 parser.add_argument('--val-split', help="split into val set. ", type=float, default=0.2)
 parser.add_argument('--min-reward', help="min reward per sequence", type=int, default=0)
 parser.add_argument('--min-var', help="min action variance in sequence", type=int, default=0)
+parser.add_argument('--loss-position', help="only predict one label at position in sequence. Set to -1 to predict all positions.", type=int, default=-1)
 
 args = parser.parse_args()
 
@@ -63,6 +65,8 @@ no_classes = args.no_classes
 min_reward = args.min_reward
 min_var = args.min_var
 max_overlap = args.max_overlap
+loss_position = args.loss_position
+class_weights = None
 
 # ensure reproducability
 
@@ -154,7 +158,11 @@ def train(model, epochs, train_loader, val_loader):
 
             prediciton, lstm_state = model.forward(pov, additional_info_dummy, lstm_state)
 
-            loss = categorical_loss(act, prediciton)
+            if loss_position < 0:
+
+                loss = categorical_loss(act, prediciton)
+            else:
+                loss = categorical_loss_one_action(act,prediciton,loss_position)
 
 
             loss.backward()
@@ -202,6 +210,7 @@ def train(model, epochs, train_loader, val_loader):
                            f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
 
             print("-------------Logging!!!-------------")
+            print(f"current loss = {sum(epoch_train_loss) / len(epoch_train_loss)}; val_loss={sum(epoch_val_loss) / len(epoch_val_loss)}")
             simple_logger.log(
                 [modelname,epoch, sum(epoch_train_loss) / len(epoch_train_loss), sum(epoch_val_loss) / len(epoch_val_loss),
                  gradsum, float(optimizer.param_groups[0]["lr"]), seq_len, map_to_zero, batchsize, no_classes,
@@ -231,8 +240,13 @@ def drift_loss(prediction, label, drift=1):
 # prediction: prediction with shape (sequence,batch,no_actions)
 
 def categorical_loss(label, prediction):
+    global class_weights
+
+    if class_weights == None:
+        class_weights=torch.zeros(no_classes)
+
     label = label.transpose(0, 1)
-    loss = torch.nn.CrossEntropyLoss()
+    loss = torch.nn.CrossEntropyLoss(weight=class_weights)
 
     # flatten
 
@@ -242,9 +256,36 @@ def categorical_loss(label, prediction):
     # normalize by batchsize and seq len.
     return (loss(prediction, label)/len(prediction)).sum()
 
-def categorical_loss_last_only(label,preditcion):
-    label = label.reshape(-1)
-    prediction = prediction.view(-1, prediction.shape[-1])
+def categorical_loss_one_action(label,prediction,position):
+    loss = torch.nn.BCEWithLogitsLoss()
+
+    #label = label.reshape(-1)
+    prediction = prediction.transpose(0,1)
+
+    for batch_label, batch_pred in zip(label,prediction):
+        print(batch_pred.shape,batch_pred.shape)
+
+    label_pos = label[position]
+    prediction_pos = prediction[position]
+    print(label_pos,prediction_pos)
+
+    return torch.nn.BCEWithLogitsLoss()(prediction_pos,label_pos)
+
+
+def compute_class_weights(mineDs):
+    acts = []
+    for pov, act in mineDs:
+        acts.append(act)
+
+    acts = np.concatenate(acts)
+    _, counts = np.unique(acts, return_counts=True)
+
+    # weight
+    weights = 1-(counts/sum(counts))*2
+    weights = torch.tensor(weights,device=deviceStr,dtype=torch.float32)
+
+
+    return  torch.nn.functional.pad(weights,(0,no_classes-len(weights)),mode='constant',value=1)
 
 
 def main():
@@ -262,6 +303,8 @@ def main():
 
     train_size = int(no_sequences * (1 - val_split))
     val_size = int(no_sequences * val_split)
+    global class_weights
+    class_weights = compute_class_weights(full_set)
 
     if train_size+val_size< no_sequences:
         train_size+=1

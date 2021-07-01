@@ -27,7 +27,9 @@ class SimplePlotter():
 
 
     def plot_line(self,colX,colY,startx=0):
+        #print(self.df)
         df = self.df.drop(range(0,startx))
+
 
         fig = df.plot(x=colX,y=colY,xlabel=colX,ylabel=colY)
 
@@ -49,21 +51,22 @@ def wrap_string(string,max_len):
     l = 0
     substrings = []
     while l < len(string):
-        print(l,len(string))
+       # print(l,len(string))
         substrings.append(string[l:l+max_len])
         l+=max_len
 
-    print(substrings)
+    #print(substrings)
     return reduce(lambda x,y: x+'\n'+y,substrings,'')
 
 batchdir = '/home/olli/remote/techfak/compute/gits/MineRL2020/train'
 
 for batch in os.listdir(batchdir):
     for file in os.listdir(f'{batchdir}/{batch}'):
-        if '.csv' in file:
+        if '.csv' in file  and 'lock' not in file:
+            print(file)
             sp = SimplePlotter(f'{batchdir}/{batch}/{file}')
             sp.plot_line('epoch',['loss','val_loss'])
-            filename = file.split('.cs')[0]
+            filename = file.split('.csv')[0]
             sp.set_title(wrap_string(filename,50))
 
             plt.savefig(f'{batchdir}/{batch}/{filename}.pdf')

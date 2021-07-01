@@ -55,37 +55,40 @@ no_actions = 50
 
 ### setup stuff
 
-# get action representations
-acs = [transform_int_to_actions([x],camera_noise_threshhold=0.1,no_actions=no_actions) for x in range(no_actions)]
 
 
-# get active action names
-aclist = []
-for i, ac in enumerate(acs):
-    ac_name = []
-    for k,v in ac.items():
-        if k == 'camera':
-            if i == 12:
-                print(v)
-            if v[0][0] < 0:
-                ac_name.append('pitch_negative')
-            if v[0][0] >0:
-                ac_name.append('pitch_positive')
-            if v[0][1] < 0:
+
+
+
+
+def visualize(pov,pred,label,prev_label,next_label,no_classes):
+    # get action representations
+
+    acs = [transform_int_to_actions([x], camera_noise_threshhold=0.1, no_actions=no_actions) for x in range(no_classes)]
+
+    # get active action names
+    aclist = []
+    for i, ac in enumerate(acs):
+        ac_name = []
+        for k, v in ac.items():
+            if k == 'camera':
+                if i == 12:
+                    print(v)
+                if v[0][0] < 0:
+                    ac_name.append('pitch_negative')
+                if v[0][0] > 0:
+                    ac_name.append('pitch_positive')
+                if v[0][1] < 0:
                     ac_name.append('yaw_negative')
-            if v[0][1] > 0:
+                if v[0][1] > 0:
                     ac_name.append('yaw_positive')
-        elif v[0] == 1:
-            ac_name.append(k)
-    aclist.append(ac_name)
+            elif v[0] == 1:
+                ac_name.append(k)
+        aclist.append(ac_name)
+    # concat names to use as labels for plot
+    aclist = [functools.reduce(lambda x, y: x + '_' + y, ac, '')[1:] for ac in aclist]
 
 
-
-# concat names to use as labels for plot
-aclist = [functools.reduce(lambda x, y: x +'_' +y,ac,'')[1:] for ac in aclist]
-
-
-def visualize(pov,pred,label,prev_label,next_label):
     y = Softmax(0)(pred.squeeze().detach())
     width = 0.8
 
@@ -98,8 +101,6 @@ def visualize(pov,pred,label,prev_label,next_label):
     plt.rcdefaults()
     # similar to tight_layout, but works better!
     fig, (ax1, ax2) = plt.subplots(1, 2, constrained_layout=True)
-
-
 
     rects1 = ax2.barh(x, y,height=width/4,label='logits')
 
@@ -150,10 +151,10 @@ def visualize_output(modeldict):
     modelname = modeldict['name']
 
     model = Model(deviceStr='cpu', verbose=False, no_classes=modeldict['no_classes'], with_masks=modeldict['with_masks'])
-
+    print(f'loading model {modelname}')
     model.load_state_dict(torch.load(os.path.join(modelpath,modeldict['name']),
         map_location='cpu'))
-
+    print(f'loaded model {modelname}')
     train_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=1, map_to_zero=True,
                             with_masks=False, no_classes=modeldict['no_classes'], no_replays=1,random_sequences=None)
 
@@ -173,8 +174,9 @@ def visualize_output(modeldict):
         pov = pov_plot.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
         pred, states = model.forward(pov, torch.zeros(64), states)
+        print(pred)
 
-        visualize(pov_plot, pred, curr,prev,next)
+        visualize(pov_plot, pred, curr,prev,next,modeldict['no_classes'])
         plt.legend(bbox_to_anchor=(1.05, 1),loc='upper left',prop={'size': 5})
         os.makedirs(f"prediction_visualization/{modelname}",exist_ok=True)
         _ = plt.savefig(f"prediction_visualization/{modelname}/{i}.png",dpi=200)
@@ -188,7 +190,7 @@ def visualize_output(modeldict):
        #     states = model.get_zero_state(1)
 
 threads = []
-
+maxthreads = 6
 for modelname_epoch in os.listdir(modelpath):
 
     if modelname_epoch.split('/')[-1].split('.')[-1] !='tm':
@@ -198,8 +200,7 @@ for modelname_epoch in os.listdir(modelpath):
 
 
 
-    if not modeldict['epoch'] in [0,1,2]:
-        print('here')
+    if not modeldict['epoch'] in [0,1,2,3,4]:
         continue
 
 
@@ -208,6 +209,12 @@ for modelname_epoch in os.listdir(modelpath):
    # visualize_output(modeldict)
     threads.append(p)
     p.start()
+
+    if len(threads) >= maxthreads:
+        for thread in threads:
+            thread.join()
+
+        threads = []
 
 for thread in threads:
     thread.join()

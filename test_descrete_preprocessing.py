@@ -88,7 +88,7 @@ def concat_actions(actlist):
 
 
 # 210 max!
-no_streams = 300
+no_streams = 10
 actions = defaultdict(lambda : [])
 
 loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=4)
@@ -140,8 +140,10 @@ def load_obj(name ):
 int_to_vec, key_to_ix = save_frequent_actions_and_mapping(actions,no_discrete_actions=30)
 
 def test(map_to_zero):
-    X = transform_actions(actions, map_to_zero=map_to_zero)
-
+    X = transform_actions(actions, map_to_zero=map_to_zero,get_ints=True)
+    print(X)
+    X= np.array(X)
+    print([np.count_nonzero(X[X==x]) for x in range(30)])
 
     print(X.shape)
     #print(int_to_vec)
