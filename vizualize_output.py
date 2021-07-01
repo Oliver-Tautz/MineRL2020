@@ -200,7 +200,7 @@ for modelname_epoch in os.listdir(modelpath):
 
 
 
-    if not modeldict['epoch'] in [0,1,2,3,4]:
+    if not modeldict['epoch'] in [0,5,10,15]:
         continue
 
 

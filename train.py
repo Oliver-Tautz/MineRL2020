@@ -281,9 +281,9 @@ def compute_class_weights(mineDs):
     _, counts = np.unique(acts, return_counts=True)
 
     # weight
-    weights = 1-(counts/sum(counts))*2
+    weights = counts/sum(counts)
     weights = torch.tensor(weights,device=deviceStr,dtype=torch.float32)
-
+    weights=1/weights
 
     return  torch.nn.functional.pad(weights,(0,no_classes-len(weights)),mode='constant',value=1)
 
