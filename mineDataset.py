@@ -312,7 +312,7 @@ class MineDataset(Dataset):
                     (self.replays_pov[replay_index][sequence_start_index:sequence_start_index + self.sequence_length],
                      self.replays_act[replay_index][sequence_start_index:sequence_start_index + self.sequence_length]))
                 r_i += 1
-                if len(self.random_sequences[-1][0]) < 100:
+                if len(self.random_sequences[-1][0]) < self.sequence_length:
                     self.__print(f"warning! sequence of length {len(self.random_sequences[-1][0])} produced")
 
             replay_index = (replay_index + 1) % len(self.replay_queue)

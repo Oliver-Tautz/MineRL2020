@@ -49,6 +49,8 @@ parser.add_argument('--min-reward', help="min reward per sequence", type=int, de
 parser.add_argument('--min-var', help="min action variance in sequence", type=int, default=0)
 parser.add_argument('--loss-position', help="only predict one label at position in sequence. Set to -1 to predict all positions.", type=int, default=-1)
 
+parser.add_argument('--weight_loss', help="wheight loss for under/overrepresented classes", action="store_true")
+
 args = parser.parse_args()
 
 # there are 448480 unique steps in the dataset.
@@ -66,6 +68,7 @@ min_reward = args.min_reward
 min_var = args.min_var
 max_overlap = args.max_overlap
 loss_position = args.loss_position
+weight_loss = args.weight_loss
 class_weights = None
 
 # ensure reproducability
@@ -131,7 +134,7 @@ def train(model, epochs, train_loader, val_loader):
 
     additional_info_dummy = torch.zeros(10)
     best_val_loss = 1000
-
+    lstm_state = model.get_zero_state(batchsize)
     for epoch in trange(epochs, desc='epochs'):
 
         model.train()
@@ -142,7 +145,7 @@ def train(model, epochs, train_loader, val_loader):
         # train on batches
         for pov, act in tqdm(train_loader, desc='batch_train', position=0, leave=True):
             # reset lstm_state after each sequence
-            lstm_state = model.get_zero_state(batchsize)
+            #lstm_state = model.get_zero_state(batchsize)
 
             # swap batch and seq; swap x and c; swap x and y back. Is this necessary? Be careful in testing! match this operation.
             pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
@@ -156,7 +159,7 @@ def train(model, epochs, train_loader, val_loader):
             # loss, ldict, lstm_state = model.get_loss(pov, additional_info_dummy, additional_info_dummy, lstm_state,
             #                                    torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
 
-            prediciton, lstm_state = model.forward(pov, additional_info_dummy, lstm_state)
+            prediciton, _ = model.forward(pov, additional_info_dummy, lstm_state)
 
             if loss_position < 0:
 
@@ -180,7 +183,7 @@ def train(model, epochs, train_loader, val_loader):
 
             for pov, act in tqdm(val_loader, desc='batch_eval', position=0, leave=True):
                 # reset lstm_state
-                lstm_state = model.get_zero_state(batchsize)
+                #lstm_state = model.get_zero_state(batchsize)
                 pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
                 # move to gpu
@@ -192,7 +195,7 @@ def train(model, epochs, train_loader, val_loader):
                 else:
                     pass#print('this is actually useful maybe?')
 
-                prediciton, lstm_state = model.forward(pov, additional_info_dummy, lstm_state)
+                prediciton, _ = model.forward(pov, additional_info_dummy, lstm_state)
 
                 val_loss = categorical_loss(act, prediciton)
 
@@ -243,7 +246,7 @@ def categorical_loss(label, prediction):
     global class_weights
 
     if class_weights == None:
-        class_weights=torch.zeros(no_classes)
+        class_weights=torch.ones(no_classes)
 
     label = label.transpose(0, 1)
     loss = torch.nn.CrossEntropyLoss(weight=class_weights)
@@ -303,8 +306,10 @@ def main():
 
     train_size = int(no_sequences * (1 - val_split))
     val_size = int(no_sequences * val_split)
-    global class_weights
-    class_weights = compute_class_weights(full_set)
+
+    if weight_loss:
+        global class_weights
+        class_weights = compute_class_weights(full_set)
 
     if train_size+val_size< no_sequences:
         train_size+=1

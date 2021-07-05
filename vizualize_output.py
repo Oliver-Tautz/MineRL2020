@@ -90,6 +90,10 @@ def visualize(pov,pred,label,prev_label,next_label,no_classes):
 
 
     y = Softmax(0)(pred.squeeze().detach())
+    #y = pred.squeeze().detach()
+    #y[torch.argmax(y)] = 1
+    #y[y<1] = 0
+    print(y)
     width = 0.8
 
 
@@ -174,7 +178,7 @@ def visualize_output(modeldict):
         pov = pov_plot.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
 
         pred, states = model.forward(pov, torch.zeros(64), states)
-        print(pred)
+
 
         visualize(pov_plot, pred, curr,prev,next,modeldict['no_classes'])
         plt.legend(bbox_to_anchor=(1.05, 1),loc='upper left',prop={'size': 5})
@@ -191,6 +195,7 @@ def visualize_output(modeldict):
 
 threads = []
 maxthreads = 6
+
 for modelname_epoch in os.listdir(modelpath):
 
     if modelname_epoch.split('/')[-1].split('.')[-1] !='tm':
@@ -200,8 +205,8 @@ for modelname_epoch in os.listdir(modelpath):
 
 
 
-    if not modeldict['epoch'] in [0,5,10,15]:
-        continue
+    if not modeldict['epoch'] in [0,1,2,3,4]:
+        pass
 
 
 
@@ -211,6 +216,7 @@ for modelname_epoch in os.listdir(modelpath):
     p.start()
 
     if len(threads) >= maxthreads:
+        print(f"waiting for {len(threads)} threads")
         for thread in threads:
             thread.join()
 

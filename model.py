@@ -137,7 +137,9 @@ class Core(nn.Module):
         lstm_output, new_state = self.lstm(processed, state)
         verb_print('lstm_out:',lstm_output.shape)
         verb_print('Core_out_total:',(lstm_output+processed).shape)
-        return lstm_output+processed, new_state
+
+        # why skip connection here?!
+        return lstm_output, new_state#+processed, new_state
 
 
 
