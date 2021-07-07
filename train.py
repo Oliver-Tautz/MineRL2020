@@ -246,7 +246,7 @@ def categorical_loss(label, prediction):
     global class_weights
 
     if class_weights == None:
-        class_weights=torch.ones(no_classes)
+        class_weights=torch.ones(no_classes,device=deviceStr)
 
     label = label.transpose(0, 1)
     loss = torch.nn.CrossEntropyLoss(weight=class_weights)
