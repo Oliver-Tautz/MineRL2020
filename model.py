@@ -108,39 +108,6 @@ class InputProcessor(nn.Module):
         return spatial
 
 
-class Core(nn.Module):
-    
-    def __init__(self,input_channels):
-        super().__init__()
-        self.input_proc = InputProcessor(input_channels=input_channels)
-        self.lstm = nn.LSTM(1024, 1024, 1)
-        
-    def forward(self, spatial, nonspatial, state):
-
-        verb_print("starting_timeit")
-
-
-
-#        verb_print('time_CNN:',timeit("processed = input_proc.forward(spatial, nonspatial)",number = 10,globals=locals()))
-
-
-
-        processed = self.input_proc.forward(spatial, nonspatial)
-
-        #verb_print('time_lstm:',timeit("lstm_output, new_state = lstm(processed, state)",number = 10,globals=locals()))
-
-        #print("finished_timeit")
-
-        verb_print('State0: ',state[0].shape)
-        verb_print('State1: ',state[0].shape)
-
-        lstm_output, new_state = self.lstm(processed, state)
-        verb_print('lstm_out:',lstm_output.shape)
-        verb_print('Core_out_total:',(lstm_output+processed).shape)
-
-        # why skip connection here?!
-        return lstm_output, new_state#+processed, new_state
-
 
 
 class Model(nn.Module):
@@ -152,15 +119,19 @@ class Model(nn.Module):
     # with_masks : is a mask channel (c=4) supplied?
     # mode       : if mode = train: don't compute masks , else : do it!
 
-    def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False,mode='train'):
+    def __init__(self, verbose=False, deviceStr='cuda',no_classes=30,with_masks = False,mode='train',with_lstm = True):
         super().__init__()
-        print(with_masks)
         self.mode = mode
-#        self.kmeans = cached_kmeans("train","MineRLObtainDiamondVectorObf-v0")
+
+        ## init model
+
         if with_masks:
-            self.core = Core(input_channels=4)
+            self.cnn_head = InputProcessor(input_channels=4)
         else:
-            self.core = Core(input_channels=3)
+            self.cnn_head = InputProcessor(input_channels=3)
+
+        if with_lstm:
+            self.lstm = nn.LSTM(1024,1024,1)
 
         # Dont use Softmax here! Its applied by nn.CrossEntropyLoss().
         self.no_classes=no_classes
@@ -169,45 +140,21 @@ class Model(nn.Module):
         verb = verbose
         self.deviceStr=deviceStr
         self.with_masks = with_masks
+        self.with_lstm = with_lstm
+
         if with_masks and mode != 'train':
             self.masksGenerator = use_resnet.MaskGeneratorResnet(self.deviceStr)
+
+        # init model
+
+
 
 
 
     def get_zero_state(self, batch_size, device="cuda"):
         return (torch.zeros((1, batch_size, 1024), device=self.deviceStr), torch.zeros((1, batch_size, 1024), device=self.deviceStr))
 
-    def compute_front(self, spatial, nonspatial, state):
 
-        if self.with_masks and self.mode != 'train':
-            #spatialnp = spatial.numpy()
-            sequence , batch , c , x , y  = spatial.shape
-            spatial = self.masksGenerator.append_channel_in_model(spatial)
-
-        #print(spatial)
-
-        hidden, new_state = self.core(spatial, nonspatial, state)
-        #verb_print('after core: hidden,new_state  = ',hidden[0].shape,new_state.shape)
-        verb_print('after_selector : hidden state',self.selector(hidden)[0].shape)
-        return hidden, self.selector(hidden), new_state
-
-    def get_loss(self, spatial, nonspatial, prev_action, state, target, point):
-
-
-        loss = nn.CrossEntropyLoss()
-        hidden, d, state = self.compute_front(spatial, nonspatial, state)
-
-
-        verb_print('d shape: ',d.shape)
-        verb_print('point shape: ',point.shape)
-        verb_print('d_view_shape: ',d.view(-1, d.shape[-1]).shape)
-        verb_print('point_view_shape: ',point.view(-1).shape)
-
-        verb_print(d)
-
-        l1 = loss(d.view(-1, d.shape[-1]), point.view(-1))
-        #verb_print('l1 shape: ', l1.item())
-        return l1, {"action":l1.item()}, state
 
     def sample(self, spatial, nonspatial, state):
         verb_print('pov_input = ',spatial.shape)
@@ -235,7 +182,15 @@ class Model(nn.Module):
             sequence, batch, c, x, y = pov.shape
             pov = self.masksGenerator.append_channel_in_model(pov)
 
-        hidden, prediction, state = self.compute_front(pov, additional_info, state)
+
+        latent_pov = self.cnn_head(pov,additional_info)
 
 
-        return prediction, state
+        if self.with_lstm:
+            out, new_state = self.lstm(latent_pov,state)
+        else:
+            out = latent_pov
+
+        out = self.selector(out)
+
+        return out, state

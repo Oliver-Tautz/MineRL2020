@@ -5,6 +5,7 @@ import os
 from tqdm import tqdm, trange
 from descrete_actions_transform import transform_actions
 from record_episode import EpisodeRecorder
+import matplotlib.pyplot as plt
 
 import numpy as np
 import time
@@ -14,7 +15,7 @@ import sys
 class MineDataset(Dataset):
 
     # root_dir          = path to minecraft replays
-    # sequence_length   = length of sequences to be generated
+    # sequence_length   = length of sequences to be generated. Set < 1 to just get all (pov,act) pairs in the dataset.
     # with_masks        = load masks. need to be present!
     # map_to_zero       = true: map vectors to zero false: map vectors to closest ones
     # cpus              = mnake dataloader use multiple cores. Can not utilize more than 3 really
@@ -121,6 +122,12 @@ class MineDataset(Dataset):
         print('action_var mean = ', np.mean(vars))
         print('action_var std = ', np.std(vars))
 
+        if sequence_length < 1:
+            self.samples = []
+            self.__init_samples()
+            self.len = len(self.samples)
+            return
+
         if random_sequences:
             self.random_sequences = []
             self.__randomize_sequences()
@@ -131,6 +138,21 @@ class MineDataset(Dataset):
 
         if random_sequences:
             self.len = len(self.random_sequences)
+
+    def __init_samples(self):
+        for replay in range(len(self.replay_queue)):
+            for i in range(self.replays_length_raw[replay]):
+                if self.with_masks:
+                    pov = torch.cat((self.replays_pov[replay][i], self.replays_masks[replay][i]), dim=-1)
+                else:
+                    pov = self.replays_pov[replay][i]
+                self.samples.append((pov,self.replays_act[replay][i],self.replays_reward[replay][i]))
+
+        del (self.replays_pov)
+        del (self.replays_act)
+        if self.with_masks:
+            del (self.replays_masks)
+
 
     def __print(self, str):
         print(f'{self.message_str}{str}')
@@ -164,6 +186,10 @@ class MineDataset(Dataset):
         return self.len
 
     def __getitem__(self, idx):
+
+        if self.sequence_length < 0:
+            # dont return reward ...
+            return self.samples[idx][0:2]
 
         if not self.random_sequences:
             replay_ix, sequence_ix = self.__map_ix_to_tuple(idx)
@@ -331,7 +357,7 @@ if __name__ == '__main__':
     # test dataset.
     torch.set_printoptions(threshold=10_000)
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=20000, sequence_length=100,
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=None, sequence_length=1,
                      device='cpu', with_masks=False, min_reward=1, min_variance=20)
 
     dataloader = DataLoader(ds, batch_size=4,
@@ -341,22 +367,30 @@ if __name__ == '__main__':
     masks_recorder = EpisodeRecorder()
 
     print(len(ds))
-    for i, (pov, _) in enumerate(ds):
-        # print(i)
-        if len(pov) < 100:
-            pass
-            #print(len(pov))
 
-        # print(pov.shape)
-        for frame in pov.squeeze():
-            # print(frame.shape)
-
-            recorder.record_frame((frame * 255).numpy().astype(np.uint8))
-            # masks_recorder.record_frame(mask.numpy().astype(np.uint8))
-
-        recorder.save_vid(f'dataset_vids/{i}.mp4')
-
-        recorder.reset()
-        masks_recorder.reset()
-        if i > 1000:
-            break
+    for i in range(len(ds)):
+        print(ds[i][0].shape)
+        print(ds[i][1])
+       # plt.imshow(pov)
+        #plt.show()
+      #  plt.clf()
+ #   for i, (pov, _, _) in enumerate(ds):
+ #       # print(i)
+ #       if len(pov) < 100:
+ #           pass
+ #           #print(len(pov))
+ #
+ #       # print(pov.shape)
+ #       for frame in pov.squeeze():
+ #           # print(frame.shape)
+ #
+ #           recorder.record_frame((frame * 255).numpy().astype(np.uint8))
+ #           # masks_recorder.record_frame(mask.numpy().astype(np.uint8))
+ #
+ #       recorder.save_vid(f'dataset_vids/{i}.mp4')
+ #
+ #       recorder.reset()
+ #       masks_recorder.reset()
+ #       if i > 1000:
+ #           break
+ #
