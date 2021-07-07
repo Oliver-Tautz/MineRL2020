@@ -48,14 +48,17 @@ parser.add_argument('--val-split', help="split into val set. ", type=float, defa
 parser.add_argument('--min-reward', help="min reward per sequence", type=int, default=0)
 parser.add_argument('--min-var', help="min action variance in sequence", type=int, default=0)
 parser.add_argument('--loss-position', help="only predict one label at position in sequence. Set to -1 to predict all positions.", type=int, default=-1)
-
+parser.add_argument('--skip-lstm', help="skip lstm and only use CNN head", action="store_true")
 parser.add_argument('--weight_loss', help="wheight loss for under/overrepresented classes", action="store_true")
+parser.add_argument('--skip-sequences', help="wheight loss for under/overrepresented classes", action="store_true")
 
 args = parser.parse_args()
 
 # there are 448480 unique steps in the dataset.
 # so choose > 450000/seq len sequences ...
 no_sequences = args.no_sequences
+batchsize = args.batchsize
+seq_len = args.seq_len
 val_split = args.val_split
 no_shuffle = args.no_shuffle
 modelname = args.modelname
@@ -70,6 +73,10 @@ max_overlap = args.max_overlap
 loss_position = args.loss_position
 weight_loss = args.weight_loss
 class_weights = None
+skip_lstm= args.skip_lstm
+
+
+
 
 # ensure reproducability
 
@@ -103,8 +110,7 @@ from random import shuffle
 
 from minerl.data import DataPipeline
 
-batchsize = args.batchsize
-seq_len = args.seq_len
+
 
 if args.debug:
     no_replays = 2
@@ -113,6 +119,9 @@ if args.debug:
 else:
     no_replays = 300
 
+if args.skip_sequences:
+    no_sequences=None
+    seq_len =1
 
 def train(model, epochs, train_loader, val_loader):
     torch.set_num_threads(args.c)
@@ -293,7 +302,7 @@ def compute_class_weights(mineDs):
 
 def main():
     global no_sequences
-    model = Model(deviceStr=deviceStr, verbose=False, no_classes=no_classes, with_masks=with_masks)
+    model = Model(deviceStr=deviceStr, verbose=False, no_classes=no_classes, with_masks=with_masks,with_lstm=not skip_lstm)
 
     os.makedirs("train", exist_ok=True)
 

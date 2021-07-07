@@ -189,6 +189,7 @@ class Model(nn.Module):
         if self.with_lstm:
             out, new_state = self.lstm(latent_pov,state)
         else:
+
             out = latent_pov
 
         out = self.selector(out)
