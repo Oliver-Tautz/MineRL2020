@@ -295,7 +295,7 @@ def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_thr
 
     if not os.path.isfile(f'obj/{key_to_index_filename}_{no_classes}.pkl') or not os.path.isfile(f'obj/{int_to_vec_filename}_{no_classes}.pkl'):
         print('descrete actions transform: no precomputed actions found! Computing new...')
-        save_frequent_actions_and_mapping_for_dir(['data/MineRLTreechop-v0/train','data/MineRLTreechop-v0/val'],no_discrete_actions=no_classes)
+        save_frequent_actions_and_mapping_for_dir(['data/MineRLTreechop-v0/train'],no_discrete_actions=no_classes)
 
     # this could be done only once ...
     key_lookup = load_obj(f'{key_to_index_filename}_{no_classes}')

@@ -6,10 +6,11 @@ from tqdm import tqdm, trange
 from descrete_actions_transform import transform_actions
 from record_episode import EpisodeRecorder
 import matplotlib.pyplot as plt
-
+from collections import defaultdict
 import numpy as np
 import time
 import sys
+from functools import reduce
 
 
 class MineDataset(Dataset):
@@ -30,9 +31,10 @@ class MineDataset(Dataset):
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
                  no_classes=30, random_sequences=50000, device='cuda', return_float=True, min_reward=0, min_variance=0,
-                 max_overlap=10):
+                 max_overlap=10,ros=True):
 
         self.max_overlap = max_overlap
+        self.ros = ros
 
         # start with no overlap
         self.overlap_threshhold = sequence_length
@@ -139,6 +141,11 @@ class MineDataset(Dataset):
         if random_sequences:
             self.len = len(self.random_sequences)
 
+
+
+        if self.ros:
+            self.len = len(self.ros_indexes)
+
     def __init_samples(self):
         for replay in range(len(self.replay_queue)):
             for i in range(self.replays_length_raw[replay]):
@@ -146,12 +153,40 @@ class MineDataset(Dataset):
                     pov = torch.cat((self.replays_pov[replay][i], self.replays_masks[replay][i]), dim=-1)
                 else:
                     pov = self.replays_pov[replay][i]
-                self.samples.append((pov,self.replays_act[replay][i],self.replays_reward[replay][i]))
+                self.samples.append((pov,self.replays_act[replay][i:i+1],self.replays_reward[replay][i]))
 
         del (self.replays_pov)
         del (self.replays_act)
         if self.with_masks:
             del (self.replays_masks)
+
+        if self.ros:
+            # split dataset by class
+            # this seems to work
+            class_indices = defaultdict(lambda :[])
+            for i, ( _, act, _) in enumerate(self.samples):
+                class_indices[act[0].item()].append(i)
+
+            class_counts =  dict()
+            for key in class_indices.keys():
+                class_counts[key]=(len(class_indices[key]))
+
+
+
+            # take middle off class counts as target sample size
+            target_sample_size =    (max(class_counts.values())-min(class_counts.values()))//2
+
+            for _class in class_indices.keys():
+
+                # oversample small classes
+                if class_counts[_class]<target_sample_size:
+                    new_samples = np.random.choice(class_indices[_class],target_sample_size-class_counts[_class])
+                    class_indices[_class].extend(new_samples)
+                else:
+                    class_indices[_class]=class_indices[_class][0:target_sample_size]
+
+            self.ros_indexes =    np.random.permutation(reduce(lambda x,y : x+y,class_indices.values(),[]))
+
 
 
     def __print(self, str):
@@ -188,8 +223,13 @@ class MineDataset(Dataset):
     def __getitem__(self, idx):
 
         if self.sequence_length < 0:
-            # dont return reward ...
-            return self.samples[idx][0:2]
+
+            if self.ros:
+                idx = self.ros_indexes[idx]
+                return self.samples[idx][0:2]
+            else:
+                # dont return reward ...
+                return self.samples[idx][0:2]
 
         if not self.random_sequences:
             replay_ix, sequence_ix = self.__map_ix_to_tuple(idx)
@@ -357,21 +397,17 @@ if __name__ == '__main__':
     # test dataset.
     torch.set_printoptions(threshold=10_000)
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=10, random_sequences=None, sequence_length=1,
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=3, random_sequences=None, sequence_length=-1,
                      device='cpu', with_masks=False, min_reward=1, min_variance=20)
 
-    dataloader = DataLoader(ds, batch_size=4,
-                            shuffle=True, num_workers=0, drop_last=True)
 
-    recorder = EpisodeRecorder()
-    masks_recorder = EpisodeRecorder()
+    acts = []
+    for _, act in ds:
+        acts.append(act)
 
-    print(len(ds))
-
-    for i in range(len(ds)):
-        print(ds[i][0].shape)
-        print(ds[i][1])
-       # plt.imshow(pov)
+    acts = torch.cat(acts,dim=0)
+    acts = acts.numpy()
+    print(np.unique(acts,return_counts=True))
         #plt.show()
       #  plt.clf()
  #   for i, (pov, _, _) in enumerate(ds):
