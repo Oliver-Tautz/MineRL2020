@@ -145,34 +145,33 @@ class Model(nn.Module):
         if with_masks and mode != 'train':
             self.masksGenerator = use_resnet.MaskGeneratorResnet(self.deviceStr)
 
-        # init model
-
-
-
+        self.logits_mean = nn.Parameter(torch.zeros(no_classes),requires_grad=False)
+        self.logits_sdt =  nn.Parameter(torch.zeros(no_classes),requires_grad=False)
 
 
     def get_zero_state(self, batch_size, device="cuda"):
         return (torch.zeros((1, batch_size, 1024), device=self.deviceStr), torch.zeros((1, batch_size, 1024), device=self.deviceStr))
 
+    def set_logits_mean_and_std(self,mean,std):
+        self.logits_mean =  nn.Parameter(mean,requires_grad=False)
+        self.logits_sdt =  nn.Parameter(std,requires_grad=False)
 
 
     def sample(self, spatial, nonspatial, state):
-        verb_print('pov_input = ',spatial.shape)
-        verb_print('obfs_input = ',nonspatial.shape)
-        verb_print('hidden_states = ',state[0].shape)
 
-        verb_print(self.core)
+        logits,state =  self.forward(spatial,nonspatial,state)
 
-        hidden, d, state = self.compute_front(spatial, nonspatial, state)
+        pred = torch.argmax((torch.nn.Softmax(dim=0)(logits.view(-1))))
 
-        pred = torch.argmax((torch.nn.Softmax(dim=0)(d.view(-1))))
+        # intialized with zeros, so always ok ...
+        logits = logits-self.logits_mean
 
-        verb_print('d', d)
-        verb_print('d.shape' ,d.shape)
-
-        dist = D.Categorical(logits = d)
+        dist = D.Categorical(logits = logits)
         sampled_pred = dist.sample()
         sampled_pred = sampled_pred.squeeze().cpu().numpy()
+
+
+
         return sampled_pred, pred, state
 
     def forward(self,pov,additional_info,state):

@@ -139,7 +139,7 @@ def train(model, epochs, train_loader, val_loader):
     simple_logger = SimpleLogger(
         f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_time={datetime.now().strftime(timestring)}.csv",
         ['modelname','epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate', 'seq_len', 'map_to_zero', 'batchsize', 'no_classes',
-         'no_sequences','min_reward','min_var','with_masks','max_overlap'])
+         'no_sequences','min_reward','min_var','with_masks','max_overlap','skip_lstm'])
 
     additional_info_dummy = torch.zeros(10)
     best_val_loss = 1000
@@ -150,6 +150,8 @@ def train(model, epochs, train_loader, val_loader):
         # save batch losses
         epoch_train_loss = []
         epoch_val_loss = []
+
+        predictions = []
 
         # train on batches
         for pov, act in tqdm(train_loader, desc='batch_train', position=0, leave=True):
@@ -169,6 +171,7 @@ def train(model, epochs, train_loader, val_loader):
             #                                    torch.zeros(act.shape, dtype=torch.float32, device=deviceStr), act)
 
             prediciton, _ = model.forward(pov, additional_info_dummy, lstm_state)
+            predictions.append(prediciton)
 
             if loss_position < 0:
 
@@ -205,28 +208,36 @@ def train(model, epochs, train_loader, val_loader):
                     pass#print('this is actually useful maybe?')
 
                 prediciton, _ = model.forward(pov, additional_info_dummy, lstm_state)
+                predictions.append(prediciton)
 
                 val_loss = categorical_loss(act, prediciton)
 
 
                 epoch_val_loss.append(val_loss.item())
 
+            #compute logits mean and std
+
+            predictions = torch.cat(predictions,dim=0)
+
+            predictions = torch.reshape(predictions,(np.prod(predictions.shape[0:2]),*predictions.shape[2:]))
+            model.set_logits_mean_and_std(torch.mean(predictions,dim=0),torch.std(predictions,dim=0))
+
             if (epoch % 4) == 0:
                 print("------------------Saving Model!-----------------------")
                 torch.save(model.state_dict(),
-                           f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
+                           f"{model_folder}/{modelname}_with-lstm={not skip_lstm}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
 
             elif (sum(epoch_val_loss) / len(epoch_val_loss)) < best_val_loss:
                 best_val_loss = (sum(epoch_val_loss) / len(epoch_val_loss))
                 torch.save(model.state_dict(),
-                           f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
+                           f"{model_folder}/{modelname}_with-lstm={not skip_lstm}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
 
             print("-------------Logging!!!-------------")
             print(f"current loss = {sum(epoch_train_loss) / len(epoch_train_loss)}; val_loss={sum(epoch_val_loss) / len(epoch_val_loss)}")
             simple_logger.log(
                 [modelname,epoch, sum(epoch_train_loss) / len(epoch_train_loss), sum(epoch_val_loss) / len(epoch_val_loss),
                  gradsum, float(optimizer.param_groups[0]["lr"]), seq_len, map_to_zero, batchsize, no_classes,
-                 no_sequences,min_reward,min_var,with_masks,max_overlap])
+                 no_sequences,min_reward,min_var,with_masks,max_overlap,skip_lstm])
 
             gradsum = 0
             scheduler.step()

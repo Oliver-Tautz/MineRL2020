@@ -17,7 +17,7 @@ import random
 
 import coloredlogs
 
-coloredlogs.install(logging.DEBUG)
+coloredlogs.install(logging.WARNING)
 
 from model import Model
 import torch
@@ -81,7 +81,7 @@ pos =  [ {'x': 50, 'y': 50, 'z': 50},
 
 # tested seeds.
 seeds = [2,12345, 45678]
-pos = [{'x': 100, 'y': 100, 'z': 100},{'x': 60, 'y': 60, 'z': 60},{'x': 1700, 'y': 80, 'z': 1060}]
+pos = [{'x': 100, 'y': 100, 'z': 80},{'x': 60, 'y': 60, 'z': 60},{'x': 1700, 'y': 80, 'z': 1060}]
 
 def get_model_info_from_name(name):
     if name.split('/')[-1].split('.')[-1] != 'tm':
@@ -110,11 +110,20 @@ def get_model_info_from_name(name):
     masks_regex = re.compile(r'_with-masks=(False|True)_')
     with_masks = masks_regex.search(name).group()
     with_masks = (re.compile(r'(False|True)').search(with_masks).group())
+    
+    lstm_regex = re.compile(r'_with-lstm=(False|True)_')
+    with_lstm = lstm_regex.search(name).group()
+    with_lstm = re.compile(r'(False|True)').search(with_lstm).group()
 
     if with_masks == 'True':
         with_masks = True
     else:
         with_masks = False
+        
+    if with_lstm == 'True':
+        with_lstm = True
+    else:
+        with_lstm = False
 
     modeldict = dict()
     modeldict['name'] = name
@@ -122,6 +131,7 @@ def get_model_info_from_name(name):
     modeldict['with_masks'] = with_masks
     modeldict['no_classes'] = no_classes
     modeldict['seq_len'] = seq_len
+    modeldict['with_lstm'] = with_lstm
 
     return modeldict
 
@@ -144,8 +154,9 @@ def main():
 
             print(f"testing on seed {seed} ")
             model = Model(deviceStr=device, verbose=verbose, no_classes=modeldict['no_classes'],
-                          with_masks=modeldict['with_masks'], mode='eval')
+                          with_masks=modeldict['with_masks'], mode='eval',with_lstm=modeldict['with_lstm'])
             model.load_state_dict(torch.load(os.path.join(modelpath, modeldict['name']), map_location=device))
+            print(model.logits_mean)
             model.eval()
 
             print(f"loaded model {modeldict['name']}")
@@ -223,12 +234,14 @@ def main():
     envs = []
     for seed, posit in zip(seeds, pos):
 
-        set_env_pos(posit)
+    #    set_env_pos(posit)
+        set_env_pos(None)
+
         env = gym.make(MINERL_GYM_ENV)
         env.seed(seed)
         envs.append(env)
 
-        p = Process(target=thread_eval_on_env, args=(models[0:1],env,seed,))
+        p = Process(target=thread_eval_on_env, args=(models,env,seed,))
         threads.append(p)
         print('starting thread!')
         p.start()

@@ -38,15 +38,18 @@ def set_env_pos(pos= None,
         placement = ET.Element('{http://ProjectMalmo.microsoft.com}Placement')
         agent_start.append(placement)
 
+
     if pos == None:
         agent_start.remove(placement)
+    else:
+        placement.set('x', str(pos['x']))
+        placement.set('y', str(pos['y']))
+        placement.set('z', str(pos['z']))
 
-    placement.set('x', str(pos['x']))
-    placement.set('y', str(pos['y']))
-    placement.set('z', str(pos['z']))
+        placement.set('yaw', '0')
+        placement.set('pitch', '0')
 
-    placement.set('yaw', '0')
-    placement.set('pitch', '0')
+
 
     ###
 

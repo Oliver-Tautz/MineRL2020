@@ -154,7 +154,7 @@ def visualize_output(modeldict):
 
     modelname = modeldict['name']
 
-    model = Model(deviceStr='cpu', verbose=False, no_classes=modeldict['no_classes'], with_masks=modeldict['with_masks'])
+    model = Model(deviceStr='cpu', verbose=False, no_classes=modeldict['no_classes'], with_masks=modeldict['with_masks'],with_lstm=False)
     print(f'loading model {modelname}')
     model.load_state_dict(torch.load(os.path.join(modelpath,modeldict['name']),
         map_location='cpu'))
@@ -205,8 +205,8 @@ for modelname_epoch in os.listdir(modelpath):
 
 
 
-    if not modeldict['epoch'] in [0,1,2,3,4]:
-        pass
+    if not modeldict['epoch'] in [0,3,7,8,20,30,40,99]:
+        continue
 
 
 
