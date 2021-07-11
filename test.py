@@ -35,10 +35,11 @@ import re
 from tqdm import tqdm, trange
 from simple_logger import SimpleLogger
 from mine_env_creator import set_env_pos
+from mineDataset import MineDataset
 
 parser = argparse.ArgumentParser(description='test the model')
 parser.add_argument('modelpath', help='use saved model at path', type=str)
-parser.add_argument('--test-epochs', help='test every x epochs', type=int, default=4)
+parser.add_argument('--test-epochs', help='test every x epochs', type=int, default=2)
 parser.add_argument('--no-classes', help="how many actions are there?", type=int, default=30)
 parser.add_argument('--no-cpu', help="make torch use this number of threads", type=int, default=4)
 parser.add_argument('--verbose', help="print more stuff", action="store_true")
@@ -103,7 +104,7 @@ def get_model_info_from_name(name):
     no_classes = classes_regex.search(name).group()
     no_classes = find_int(no_classes)
 
-    seq_regex = re.compile(r'_seq-len=[0-9]*_')
+    seq_regex = re.compile(r'_seq-len=-?[0-9]*_')
     seq_len = seq_regex.search(name).group()
     seq_len = find_int(seq_len)
 
@@ -152,10 +153,19 @@ def main():
             epoch = modeldict['epoch']
             print(f"loading model {modeldict['name']}")
 
+
+
             print(f"testing on seed {seed} ")
             model = Model(deviceStr=device, verbose=verbose, no_classes=modeldict['no_classes'],
                           with_masks=modeldict['with_masks'], mode='eval',with_lstm=modeldict['with_lstm'])
-            model.load_state_dict(torch.load(os.path.join(modelpath, modeldict['name']), map_location=device))
+            model.load_state_dict(torch.load(os.path.join(modelpath, modeldict['name']), map_location=device),strict=False)
+
+            if torch.equal(model.logits_mean,torch.zeros(modeldict['no_classes'])):
+                compute_logits_mean(model)
+                torch.save_to_state_dict(model.state_dict(),os.path.join(modelpath, modeldict['name']))
+                print(f"mean_computed")
+                continue
+
             print(model.logits_mean)
             model.eval()
 
@@ -163,7 +173,7 @@ def main():
 
             with torch.no_grad():
                 print(f"starting eval on {modeldict['name']} , epoch = {modeldict['epoch']}, seed= {seed}")
-                #env.seed(seed)
+                env.seed(seed)
                 obs = env.reset()
 
                 state = model.get_zero_state(1, device)
@@ -259,6 +269,25 @@ def main():
     for thread in threads:
         thread.join()
         pass
+
+
+def compute_logits_mean(model):
+    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=3, random_sequences=None, sequence_length=-1,
+                     device='cpu', with_masks=False, min_reward=1, min_variance=20, ros=False)
+
+    logits_list = []
+
+    for pov, _ in ds:
+        pov = pov.unsqueeze(0).unsqueeze(0)
+        pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
+        logits, _ = model.forward(pov, torch.zeros(10), model.get_zero_state(1, device='cpu'))
+        logits_list.append(logits)
+
+    logits = torch.cat(logits,dim=0)
+    logits = torch.mean(logits,dim=0)
+
+    print(logits_list)
+
 
 
 if __name__ == "__main__":

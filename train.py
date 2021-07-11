@@ -196,7 +196,7 @@ def train(model, epochs, train_loader, val_loader):
             optimizer.zero_grad()
 
             epoch_train_loss.append(loss.item())
-            epoch_train_acc.append(accuracy(act, prediciton))
+            epoch_train_acc.append(accuracy(act, prediciton).item())
 
         ### Eval  #####
 
@@ -227,7 +227,7 @@ def train(model, epochs, train_loader, val_loader):
                 val_loss = categorical_loss(act, prediciton)
 
                 epoch_val_loss.append(val_loss.item())
-                epoch_val_acc.append(accuracy(act, prediciton))
+                epoch_val_acc.append(accuracy(act, prediciton).item())
 
             # compute logits mean and std
 
@@ -256,7 +256,7 @@ def train(model, epochs, train_loader, val_loader):
                  sum(epoch_val_loss) / len(epoch_val_loss),
                  gradsum, float(optimizer.param_groups[0]["lr"]), seq_len, map_to_zero, batchsize, no_classes,
                  no_sequences, min_reward, min_var, with_masks, max_overlap, skip_lstm,
-                 sum(epoch_train_acc) / len(epoch_train_acc), sum(epoch_val_acc) / len(epoch_val_acc)])
+                 (sum(epoch_train_acc) / len(epoch_train_acc)), (sum(epoch_val_acc) / len(epoch_val_acc))])
 
             gradsum = 0
             scheduler.step()

@@ -157,14 +157,15 @@ class Model(nn.Module):
         self.logits_sdt =  nn.Parameter(std,requires_grad=False)
 
 
-    def sample(self, spatial, nonspatial, state):
+    def sample(self, spatial, nonspatial, state,mean_substract=False):
 
         logits,state =  self.forward(spatial,nonspatial,state)
 
         pred = torch.argmax((torch.nn.Softmax(dim=0)(logits.view(-1))))
 
+        if mean_substract:
         # intialized with zeros, so always ok ...
-        logits = logits-self.logits_mean
+            logits = logits-self.logits_mean
 
         dist = D.Categorical(logits = logits)
         sampled_pred = dist.sample()

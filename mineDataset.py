@@ -31,7 +31,7 @@ class MineDataset(Dataset):
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
                  no_classes=30, random_sequences=50000, device='cuda', return_float=True, min_reward=0, min_variance=0,
-                 max_overlap=10,ros=True):
+                 max_overlap=10,ros=False):
 
         self.max_overlap = max_overlap
         self.ros = ros
@@ -393,21 +393,20 @@ class MineDataset(Dataset):
             del (self.replays_masks)
 
 
+
+
+
+
+
 if __name__ == '__main__':
     # test dataset.
     torch.set_printoptions(threshold=10_000)
 
-    ds = MineDataset('data/MineRLTreechop-v0/train', no_replays=3, random_sequences=None, sequence_length=-1,
-                     device='cpu', with_masks=False, min_reward=1, min_variance=20)
 
 
-    acts = []
-    for _, act in ds:
-        acts.append(act)
 
-    acts = torch.cat(acts,dim=0)
-    acts = acts.numpy()
-    print(np.unique(acts,return_counts=True))
+
+
         #plt.show()
       #  plt.clf()
  #   for i, (pov, _, _) in enumerate(ds):
