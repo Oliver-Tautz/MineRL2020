@@ -205,7 +205,7 @@ def train(model, epochs, train_loader, val_loader):
                 loss = categorical_loss_one_action(act, prediciton, loss_position)
             else:
                 loss = multilabel_loss(act,prediciton)
-                epoch_train_hamming.append(hamming_loss(act,prediciton))
+                epoch_train_hamming.append(hamming_loss(act,prediciton).item())
 
             loss.backward()
 
@@ -248,7 +248,7 @@ def train(model, epochs, train_loader, val_loader):
                     val_loss = categorical_loss_one_action(act, prediciton, loss_position)
                 else:
                     val_loss = multilabel_loss(act, prediciton)
-                    epoch_val_hamming.append(hamming_loss(act, prediciton))
+                    epoch_val_hamming.append(hamming_loss(act, prediciton).item())
 
                 epoch_val_loss.append(val_loss.item())
                 epoch_val_acc.append(accuracy(act, prediciton).item())
