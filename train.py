@@ -26,6 +26,7 @@ from mineDataset import MineDataset
 from torch.utils.data import DataLoader, random_split
 import matplotlib.pyplot as plt
 import torch.nn.functional
+from sklearn.metrics import hamming_loss
 
 import argparse
 from datetime import datetime
@@ -53,8 +54,8 @@ parser.add_argument('--loss-position',
 parser.add_argument('--skip-lstm', help="skip lstm and only use CNN head", action="store_true")
 parser.add_argument('--weight-loss', help="wheight loss for under/overrepresented classes", action="store_true")
 parser.add_argument('--skip-sequences', help="wheight loss for under/overrepresented classes", action="store_true")
-
 parser.add_argument('--ros', help="use ros for CNN model", action="store_true")
+parser.add_argument('--use-multilabel-prediction', help="Dont predict discrete actions but compound actions. ", action="store_true")
 
 args = parser.parse_args()
 
@@ -80,6 +81,7 @@ class_weights = None
 skip_lstm = args.skip_lstm
 skip_sequences = args.skip_sequences
 ros = args.ros
+multilabel = args.use_multilabel_prediction
 
 # ensure reproducability
 
@@ -139,11 +141,16 @@ def train(model, epochs, train_loader, val_loader):
     gradsum = 0
 
     timestring = "%Y-%m-%d-%H-%M-%S"
+    logging_parameters = ['modelname', 'epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate', 'seq_len', 'map_to_zero', 'batchsize',
+         'no_classes',
+         'no_sequences', 'min_reward', 'min_var', 'with_masks', 'max_overlap', 'skip_lstm', 'acc', 'val_acc']
+
+    if multilabel :
+        logging_parameters.extend(['hamming','val_hamming'])
+
     simple_logger = SimpleLogger(
         f"{model_folder}/{modelname}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_time={datetime.now().strftime(timestring)}.csv",
-        ['modelname', 'epoch', 'loss', 'val_loss', 'grad_norm', 'learning_rate', 'seq_len', 'map_to_zero', 'batchsize',
-         'no_classes',
-         'no_sequences', 'min_reward', 'min_var', 'with_masks', 'max_overlap', 'skip_lstm', 'acc', 'val_acc'])
+        logging_parameters)
 
     additional_info_dummy = torch.zeros(10)
     best_val_loss = 1000
@@ -160,10 +167,17 @@ def train(model, epochs, train_loader, val_loader):
 
         predictions = []
 
+        if multilabel:
+            epoch_train_hamming = []
+            epoch_val_hamming = []
+
+
+
         # train on batches
         for pov, act in tqdm(train_loader, desc='batch_train', position=0, leave=True):
             # reset lstm_state after each sequence
             # lstm_state = model.get_zero_state(batchsize)
+
 
             if skip_sequences:
                 pov=pov.unsqueeze(0)
@@ -183,11 +197,15 @@ def train(model, epochs, train_loader, val_loader):
             prediciton, _ = model.forward(pov, additional_info_dummy, lstm_state)
             predictions.append(prediciton)
 
-            if loss_position < 0:
 
+
+            if loss_position < 0 and not multilabel:
                 loss = categorical_loss(act, prediciton)
-            else:
+            elif not multilabel:
                 loss = categorical_loss_one_action(act, prediciton, loss_position)
+            else:
+                loss = multilabel_loss(act,prediciton)
+                epoch_train_hamming.append(hamming_loss(act,prediciton))
 
             loss.backward()
 
@@ -224,7 +242,13 @@ def train(model, epochs, train_loader, val_loader):
                 prediciton, _ = model.forward(pov, additional_info_dummy, lstm_state)
                 predictions.append(prediciton)
 
-                val_loss = categorical_loss(act, prediciton)
+                if loss_position < 0 and not multilabel:
+                    val_loss = categorical_loss(act, prediciton)
+                elif not multilabel:
+                    val_loss = categorical_loss_one_action(act, prediciton, loss_position)
+                else:
+                    val_loss = multilabel_loss(act, prediciton)
+                    epoch_val_hamming.append(hamming_loss(act, prediciton))
 
                 epoch_val_loss.append(val_loss.item())
                 epoch_val_acc.append(accuracy(act, prediciton).item())
@@ -239,24 +263,28 @@ def train(model, epochs, train_loader, val_loader):
             if (epoch % 4) == 0:
                 print("------------------Saving Model!-----------------------")
                 torch.save(model.state_dict(),
-                           f"{model_folder}/{modelname}_with-lstm={not skip_lstm}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
+                           f"{model_folder}/{modelname}_with-lstm={not skip_lstm}_multilabel={multilabel}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
 
             elif (sum(epoch_val_loss) / len(epoch_val_loss)) < best_val_loss:
                 best_val_loss = (sum(epoch_val_loss) / len(epoch_val_loss))
                 torch.save(model.state_dict(),
-                           f"{model_folder}/{modelname}_with-lstm={not skip_lstm}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
+                           f"{model_folder}/{modelname}_with-lstm={not skip_lstm}_multilabel={multilabel}_with-masks={with_masks}_map-to-zero={map_to_zero}_no-classes={no_classes}_seq-len={seq_len}_epoch={epoch}_time={datetime.now()}.tm")
 
             print("-------------Logging!!!-------------")
             print(
                 f"current loss = {sum(epoch_train_loss) / len(epoch_train_loss)}; val_loss={sum(epoch_val_loss) / len(epoch_val_loss)}")
             print(
                 f"current acc = {sum(epoch_train_acc) / len(epoch_train_acc)}; val_acc={sum(epoch_val_acc) / len(epoch_val_acc)}")
+            if multilabel:
+                print(
+                    f"current hamming = {sum(epoch_train_hamming) / len(epoch_train_hamming)}; val_acc={sum(epoch_val_hamming) / len(epoch_val_hamming)}")
             simple_logger.log(
                 [modelname, epoch, sum(epoch_train_loss) / len(epoch_train_loss),
                  sum(epoch_val_loss) / len(epoch_val_loss),
                  gradsum, float(optimizer.param_groups[0]["lr"]), seq_len, map_to_zero, batchsize, no_classes,
                  no_sequences, min_reward, min_var, with_masks, max_overlap, skip_lstm,
-                 (sum(epoch_train_acc) / len(epoch_train_acc)), (sum(epoch_val_acc) / len(epoch_val_acc))])
+                 (sum(epoch_train_acc) / len(epoch_train_acc)), (sum(epoch_val_acc) / len(epoch_val_acc)),(sum(epoch_train_hamming) / len(epoch_train_hamming)),sum(epoch_val_hamming) / len(
+                    epoch_val_hamming)])
 
             gradsum = 0
             scheduler.step()
@@ -296,8 +324,13 @@ def categorical_loss(label, prediction):
     prediction = prediction.view(-1, prediction.shape[-1])
 
     # normalize by batchsize and seq len.
-    return (loss(prediction, label) / len(prediction)).sum()
+    return (loss(prediction, label) ).sum()/ len(prediction)
 
+def multilabel_loss(label,prediction):
+    # maybe use sum? weights?
+    loss = torch.nn.BCEWithLogitsLoss(reduction='mean')
+
+    return loss(prediction,label)
 
 def categorical_loss_one_action(label, prediction, position):
     loss = torch.nn.BCEWithLogitsLoss()
@@ -316,6 +349,11 @@ def categorical_loss_one_action(label, prediction, position):
 
 
 def accuracy(label, prediction):
+
+    if multilabel:
+        return (np.logical_and.reduce(label==prediction,axis=(1,2))).sum()/len(label)
+
+
     label = label.transpose(0, 1)
     label = label.reshape(-1)
     prediction = prediction.view(-1, prediction.shape[-1])
@@ -325,6 +363,14 @@ def accuracy(label, prediction):
     acc = torch.sum(prediction == label)
 
     return acc / len(prediction)
+
+
+def hamming_loss (label,prediction):
+    label = label.view(-1)
+    prediction = prediction.view(-1) > 0.5
+
+    hloss = torch.logical_xor(label,prediction).sum()/len(label)
+    return hloss
 
 
 def compute_class_weights(mineDs):
@@ -355,7 +401,7 @@ def main():
     full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=seq_len, map_to_zero=map_to_zero,
                            with_masks=with_masks, no_classes=no_classes, no_replays=no_replays,
                            random_sequences=no_sequences, min_variance=min_var, min_reward=min_reward, device=deviceStr,
-                           max_overlap=max_overlap,ros=ros)
+                           max_overlap=max_overlap,ros=ros,multilabel_actions=multilabel)
 
     no_sequences = len(full_set)
     val_split = 0.2
@@ -375,11 +421,11 @@ def main():
 
     if no_shuffle:
         train_loader = DataLoader(train_set, batch_size=batchsize,
-                                  shuffle=True, num_workers=0, drop_last=True, pin_memory=True)
+                                  shuffle=False, num_workers=0, drop_last=True, pin_memory=True)
 
     else:
         train_loader = DataLoader(train_set, batch_size=batchsize,
-                                  shuffle=False, num_workers=0, drop_last=True, pin_memory=True)
+                                  shuffle=True, num_workers=0, drop_last=True, pin_memory=True)
 
     val_loader = DataLoader(val_set, batch_size=batchsize,
                             shuffle=False, num_workers=0, drop_last=True, pin_memory=True)

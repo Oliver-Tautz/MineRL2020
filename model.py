@@ -149,6 +149,7 @@ class Model(nn.Module):
         self.logits_sdt =  nn.Parameter(torch.zeros(no_classes),requires_grad=False)
 
 
+
     def get_zero_state(self, batch_size, device="cuda"):
         return (torch.zeros((1, batch_size, 1024), device=self.deviceStr), torch.zeros((1, batch_size, 1024), device=self.deviceStr))
 

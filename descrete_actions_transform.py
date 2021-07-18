@@ -283,7 +283,7 @@ def transform_onehot_to_actions(X,camera_noise_threshhold=camera_noise_threshhol
 
 
 
-def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_threshhold=camera_noise_threshhold,get_ints=False):
+def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_threshhold=camera_noise_threshhold,get_ints=False,multilabel_actions=False):
     pitch_positive, pitch_negative, yaw_positive, yaw_negative = discreticize_camera_action(actions['camera'],
                                                                                             camera_noise_threshhold)
 
@@ -298,6 +298,7 @@ def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_thr
         save_frequent_actions_and_mapping_for_dir(['data/MineRLTreechop-v0/train'],no_discrete_actions=no_classes)
 
     # this could be done only once ...
+
     key_lookup = load_obj(f'{key_to_index_filename}_{no_classes}')
     int_to_vector_dict = load_obj(f'{int_to_vec_filename}_{no_classes}')
 
@@ -332,6 +333,8 @@ def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_thr
     X = np.array(vectors)
     # print('means: ',np.mean(X,axis=0))
 
+    if multilabel_actions:
+        return X
 
     no_discrete_actions = len(int_to_vector_dict.values())
     frequent_uniques = list(int_to_vector_dict.values())

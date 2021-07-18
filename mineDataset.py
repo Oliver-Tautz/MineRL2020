@@ -31,7 +31,7 @@ class MineDataset(Dataset):
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
                  no_classes=30, random_sequences=50000, device='cuda', return_float=True, min_reward=0, min_variance=0,
-                 max_overlap=10,ros=False):
+                 max_overlap=10,ros=False,multilabel_actions=False):
 
         self.max_overlap = max_overlap
         self.ros = ros
@@ -93,9 +93,13 @@ class MineDataset(Dataset):
                 self.replays_pov[i] = torch.tensor(obs['pov'], dtype=torch.float32)
 
             self.original_act[i] = act
-            self.replays_act[i] = torch.tensor(
-
-                transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes), dtype=torch.long)
+            if not multilabel_actions:
+                self.replays_act[i] = torch.tensor(
+                    transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes,multilabel_actions=multilabel_actions), dtype=torch.long)
+            else:
+                self.replays_act[i] = torch.tensor(
+                    transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes,
+                                      multilabel_actions=multilabel_actions), dtype=torch.float32)
             self.replays_reward[i] = reward
 
             if with_masks:
@@ -402,9 +406,13 @@ if __name__ == '__main__':
     # test dataset.
     torch.set_printoptions(threshold=10_000)
 
+    full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=-1, map_to_zero=False,
+                           with_masks=False, no_classes=30, no_replays=10,
+                            device='cpu', ros=False,multilabel_actions=True)
 
 
-
+    for pov,act in full_set:
+        print(act.squeeze())
 
 
         #plt.show()
