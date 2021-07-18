@@ -63,7 +63,7 @@ batchdir = '/home/olli/remote/techfak/compute/gits/MineRL2020/train'
 for batch in os.listdir(batchdir):
     for file in os.listdir(f'{batchdir}/{batch}'):
         if '.csv' in file  and 'lock' not in file:
-
+            print(f'plotting {file}')
             sp = SimplePlotter(f'{batchdir}/{batch}/{file}')
             sp.plot_line('epoch',['loss','val_loss'])
             filename = file.split('.csv')[0]

@@ -183,9 +183,10 @@ def main():
 
                     pov = torch.tensor(obs['pov'], device=device, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
                     pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
-                    s, p, state = model.sample(pov, additional_info_dummy, state)
+                    s, p, state = model.sample(pov, additional_info_dummy, state,mean_substract=True)
                     action = transform_int_to_actions([int(s)], no_actions=modeldict['no_classes'])
 
+                    print(int(s))
                     obs, reward, done, _ = env.step(action)
 
                     rewards.append(reward)
