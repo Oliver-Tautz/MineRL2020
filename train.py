@@ -168,6 +168,7 @@ def train(model, epochs, train_loader, val_loader):
         predictions = []
 
         if multilabel:
+
             epoch_train_hamming = []
             epoch_val_hamming = []
 
@@ -278,13 +279,22 @@ def train(model, epochs, train_loader, val_loader):
             if multilabel:
                 print(
                     f"current hamming = {sum(epoch_train_hamming) / len(epoch_train_hamming)}; val_acc={sum(epoch_val_hamming) / len(epoch_val_hamming)}")
-            simple_logger.log(
-                [modelname, epoch, sum(epoch_train_loss) / len(epoch_train_loss),
-                 sum(epoch_val_loss) / len(epoch_val_loss),
-                 gradsum, float(optimizer.param_groups[0]["lr"]), seq_len, map_to_zero, batchsize, no_classes,
-                 no_sequences, min_reward, min_var, with_masks, max_overlap, skip_lstm,
-                 (sum(epoch_train_acc) / len(epoch_train_acc)), (sum(epoch_val_acc) / len(epoch_val_acc)),(sum(epoch_train_hamming) / len(epoch_train_hamming)),sum(epoch_val_hamming) / len(
-                    epoch_val_hamming)])
+                simple_logger.log(
+                    [modelname, epoch, sum(epoch_train_loss) / len(epoch_train_loss),
+                     sum(epoch_val_loss) / len(epoch_val_loss),
+                     gradsum, float(optimizer.param_groups[0]["lr"]), seq_len, map_to_zero, batchsize, no_classes,
+                     no_sequences, min_reward, min_var, with_masks, max_overlap, skip_lstm,
+                     (sum(epoch_train_acc) / len(epoch_train_acc)), (sum(epoch_val_acc) / len(epoch_val_acc)),
+                     (sum(epoch_train_hamming) / len(epoch_train_hamming)), sum(epoch_val_hamming) / len(
+                        epoch_val_hamming)])
+
+            else:
+                simple_logger.log(
+                    [modelname, epoch, sum(epoch_train_loss) / len(epoch_train_loss),
+                     sum(epoch_val_loss) / len(epoch_val_loss),
+                     gradsum, float(optimizer.param_groups[0]["lr"]), seq_len, map_to_zero, batchsize, no_classes,
+                     no_sequences, min_reward, min_var, with_masks, max_overlap, skip_lstm,
+                     (sum(epoch_train_acc) / len(epoch_train_acc)), (sum(epoch_val_acc) / len(epoch_val_acc))])
 
             gradsum = 0
             scheduler.step()
@@ -351,7 +361,7 @@ def categorical_loss_one_action(label, prediction, position):
 def accuracy(label, prediction):
 
     if multilabel:
-        return (np.logical_and.reduce(label==prediction,axis=(1,2))).sum()/len(label)
+        return (np.logical_and.reduce(label.cpu()==prediction.cpu(),axis=(1,2))).sum()/len(label)
 
 
     label = label.transpose(0, 1)
