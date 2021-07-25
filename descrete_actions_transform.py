@@ -18,7 +18,7 @@ int_to_vec_filename = 'int_to_vec_dict'
 key_to_index_filename = 'key_to_index_dict'
 
 # Movement below this point will be regarded as no camera action.
-camera_noise_threshhold = 0.1
+camera_noise_threshhold = 0.5
 
 
 # save to pkl

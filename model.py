@@ -169,7 +169,8 @@ class Model(nn.Module):
         # intialized with zeros, so always ok ...
             logits = logits-self.logits_mean
 
-        dist = D.Categorical(logits = logits)
+        probs = Sigmoid()(logits)
+        dist = D.Categorical(probs = probs)
         sampled_pred = dist.sample()
         sampled_pred = sampled_pred.squeeze().cpu().numpy()
 
@@ -179,8 +180,8 @@ class Model(nn.Module):
 
         logits, state = self.forward(spatial, nonspatial, state)
 
-
-        pred = Sigmoid()(logits)>0.5
+        probs = Sigmoid()(logits)
+        pred = probs>0.5
 
         if mean_substract:
         # intialized with zeros, so always ok ...
@@ -188,11 +189,11 @@ class Model(nn.Module):
 
 
 
-        dist = D.bernoulli.Bernoulli(logits = logits)
+        dist = D.bernoulli.Bernoulli(probs=probs)
         sampled_pred = dist.sample()
         sampled_pred = sampled_pred.squeeze().cpu().numpy()
 
-        return sampled_pred, pred, state
+        return sampled_pred, pred, state, logits
 
 
     def forward(self,pov,additional_info,state):

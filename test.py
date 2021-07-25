@@ -14,7 +14,8 @@ import minerl
 import abc
 import numpy as np
 import random
-
+import torch.distributions as D
+from torch.nn import Sigmoid
 import coloredlogs
 
 coloredlogs.install(logging.WARNING)
@@ -49,6 +50,9 @@ parser.add_argument('--max-steps', help="max steps per episode", type=int, defau
 parser.add_argument('--sequence-len', help="reset states after how many steps?!", type=int, default=1000)
 parser.add_argument('--num-threads', help="how many eval threads?", type=int, default=1)
 parser.add_argument('--multilabel-prediction', help="model predicts multilabel and not discrete", action="store_true")
+parser.add_argument('--manual-frameskip', help="use manual framskip for predictions", action="store_true")
+
+parser.add_argument('--accumulate-prob', help="accumulate probabilities over number of actions", type = int, default=0)
 
 args = parser.parse_args()
 
@@ -63,7 +67,8 @@ max_steps = args.max_steps
 test_epochs = args.test_epochs
 num_threads = args.num_threads
 multilabel = args.multilabel_prediction
-manual_frameskip = True
+manual_frameskip = args.manual_frameskip
+accumulate_probs = args.accumulate_prob
 
 torch.set_num_threads(no_cpu)
 
@@ -141,6 +146,22 @@ def get_model_info_from_name(name):
     return modeldict
 
 
+def accumulate_actions(logit_list,no_actions):
+    s = torch.zeros(no_actions)
+
+    # add weighted logits
+    for i,logits in enumerate(reversed(logit_list)):
+        s+= Sigmoid()(logits.squeeze())*(1/(2**i))
+
+    # mean
+    s = s / len(logit_list)
+
+    # sample
+    s = D.bernoulli.Bernoulli(probs=s).sample().cpu().numpy()
+
+
+    return s
+
 def main():
     reward_logger_lock = Lock()
     act_logger_lock = Lock()
@@ -153,8 +174,11 @@ def main():
         action_names = {0: 'attack', 1: 'back', 2: 'forward', 3: 'jump', 4: 'left', 5: 'right', 6: 'sneak', 7: 'sprint',
                         8: 'pitch_positive', 9: 'pitch_negative', 10: 'yaw_positive', 11: 'yaw_negative'}
 
+#label means
+#[[0.6728029  0.00472992 0.27164885 0.04502885 0.0303661  0.02564563
+#  0.00161763 0.03583388 0.14151925 0.1690947  0.14615457 0.14349636]]
 
-        frameskips =np.array([24,3,5,1,3,3,1,3,3,3,3,3])
+        frameskips =np.array([30,1,1,1,1,1,1,1,1,1,1,1])
 
 
         er = EpisodeRecorder()
@@ -182,6 +206,8 @@ def main():
             model.eval()
 
             print(f"loaded model {modeldict['name']}")
+
+            logit_list= []
 
             with torch.no_grad():
                 print(f"starting eval on {modeldict['name']} , epoch = {modeldict['epoch']}, seed= {seed}")
@@ -212,20 +238,25 @@ def main():
                     else:
 
 
-                        s, p, state = model.sample_multilabel(pov, additional_info_dummy, state, mean_substract=False)
+                        s, p, state, logits = model.sample_multilabel(pov, additional_info_dummy, state, mean_substract=False)
+
+                        logit_list.append(logits)
+
+                        if accumulate_probs:
+                            s = accumulate_actions(logit_list[step-accumulate_probs:],no_classes)
 
                         if manual_frameskip:
                             # check if framskip over for all actions. Use long and not bool for more computation possibilities
                             mask = (framecount_per_action >= frameskips)
 
-                            # reset skipped actions
+                            # reset skipped actionsno
                             current_action = np.logical_and(current_action,~mask).astype(np.long)
 
                             # get rid of -1's.
                             current_action [current_action < 0] = 0
 
                             # update current action with sampled action
-                            current_action = np.logical_or(current_action,s)
+                            current_action = np.logical_or(current_action,s).astype(np.long)
 
 
                             print(f'framecount:{framecount_per_action}')
@@ -250,9 +281,9 @@ def main():
 
                     act_logger_lock.acquire()
                     if multilabel:
-                        action_logger.log([modeldict['name'], modeldict['epoch'], seed, p, s, step, reward])
+                        action_logger.log([modeldict['name'],manual_frameskip,accumulate_probs, modeldict['epoch'], seed, p, s, step, reward])
                     else:
-                        action_logger.log([modeldict['name'], modeldict['epoch'], seed, int(p), int(s), step, reward])
+                        action_logger.log([modeldict['name'],manual_frameskip,accumulate_probs, modeldict['epoch'], seed, int(p), int(s), step, reward])
                     act_logger_lock.release()
 
                     if done:
@@ -263,22 +294,22 @@ def main():
 
                 mp4_lock.acquire()
 
-                er.save_vid(f'eval/{modelname}/epoch={epoch}_seed={seed}.mp4')
+                er.save_vid(f'eval/{modelname}/epoch={epoch}_seed={seed}_manual-frameskip={manual_frameskip}_accumulate_probs={accumulate_probs}.mp4')
                 mp4_lock.release()
 
                 er.reset()
 
                 reward_logger_lock.acquire()
                 rewards_logger.log(
-                    [modeldict['name'], modeldict['epoch'], seed, np.mean(rewards), np.std(rewards), np.var(rewards),
+                    [modeldict['name'], modeldict['epoch'],manual_frameskip,accumulate_probs, seed, np.mean(rewards), np.std(rewards), np.var(rewards),
                      np.sum(rewards)])
                 reward_logger_lock.release()
 
     rewards_logger = SimpleLogger(f'eval/{model_name}/rewards.csv',
-                                  ['modelname', 'epoch', 'seed', 'reward_mean', 'reward_sdt', 'reward_var',
+                                  ['modelname','manual_frameskip','accumulate_probs', 'epoch', 'seed', 'reward_mean', 'reward_sdt', 'reward_var',
                                    'reward_sum'])
     action_logger = SimpleLogger(f'eval/{model_name}/actions.csv',
-                                 ['modelname', 'epoch', 'seed', 'predicted_action', 'sampled_action', 'step', 'reward'])
+                                 ['modelname','manual_frameskip','accumulate_probs','epoch', 'seed', 'predicted_action', 'sampled_action', 'step', 'reward'])
 
     additional_info_dummy = torch.zeros(10)
 

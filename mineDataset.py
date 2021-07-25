@@ -35,6 +35,7 @@ class MineDataset(Dataset):
 
         self.max_overlap = max_overlap
         self.ros = ros
+        self.multilabel_action = multilabel_actions
 
         # start with no overlap
         self.overlap_threshhold = sequence_length
@@ -114,6 +115,7 @@ class MineDataset(Dataset):
             while start + 99 < len(reward):
                 sums.append(sum(reward[start:start + 100]))
                 start = start + 100
+
         print('reward mean = ', np.mean(sums))
         print('reward std  = ', np.std(sums))
 
@@ -164,32 +166,111 @@ class MineDataset(Dataset):
         if self.with_masks:
             del (self.replays_masks)
 
+
+
         if self.ros:
             # split dataset by class
             # this seems to work
-            class_indices = defaultdict(lambda :[])
-            for i, ( _, act, _) in enumerate(self.samples):
-                class_indices[act[0].item()].append(i)
 
-            class_counts =  dict()
-            for key in class_indices.keys():
-                class_counts[key]=(len(class_indices[key]))
+            if self.multilabel_action:
+
+                split_by_class = defaultdict(lambda : [])
+                for i ,(_,act,_) in enumerate(self.samples):
+                    for c in range(len(act.squeeze())):
+                        if act.squeeze()[c] == 1:
+                            split_by_class[c].append(i)
 
 
 
-            # take middle off class counts as target sample size
-            target_sample_size =    (max(class_counts.values())-min(class_counts.values()))//2
+                counts = {x: len(y) for (x,y) in split_by_class.items() }
 
-            for _class in class_indices.keys():
+                biggest_class ,biggest_count = max(counts.items(),key=lambda x : x[1])
+                smallest_class , smallest_count = min(counts.items(),key=lambda x : x[1])
 
-                # oversample small classes
-                if class_counts[_class]<target_sample_size:
-                    new_samples = np.random.choice(class_indices[_class],target_sample_size-class_counts[_class])
-                    class_indices[_class].extend(new_samples)
-                else:
-                    class_indices[_class]=class_indices[_class][0:target_sample_size]
+                # oversample everything to half of most numerous class ...
+                desired_count = int((biggest_count -smallest_count )*2/3)
 
-            self.ros_indexes =    np.random.permutation(reduce(lambda x,y : x+y,class_indices.values(),[]))
+
+
+                # remove samples with complex compound actions
+
+                biggest_compound_cation = 4
+
+
+
+
+                # this is only computed for small classes
+                # oversampling pool will hold samples to  use in oversampling
+                oversampling_pool = split_by_class.copy()
+
+
+                for c in oversampling_pool.keys():
+                    number_of_new_samples = desired_count - counts[c]
+
+                    if number_of_new_samples <= 0 :
+                        continue
+
+                    ixs = []
+                    for i,idx in enumerate(oversampling_pool[c]):
+                        if self.samples[idx][1].sum()> biggest_compound_cation:
+                            ixs.append(i)
+
+                    #print('removed',len(ixs)/len(split_by_class[c])*100,f'% from class {c} for oversampling pool') ~10-20% of actions are complicated
+                    for i in reversed(ixs):
+                        oversampling_pool[c].pop(i)
+
+
+
+                    all_class_samples_idx = oversampling_pool[c]
+                    oversampling_pool[c] = defaultdict(lambda : [])
+
+                    # compound number is the number of actions in a given compound action
+                    for idx in all_class_samples_idx:
+                        compound_number = self.samples[idx][1].sum().item()
+                        oversampling_pool[c][compound_number].append(idx)
+
+
+                # construct oversampled dataset
+
+                for c in split_by_class.keys():
+                    if desired_count - counts[c] <= 0:
+                         continue
+
+                    for compound_number in range(1,biggest_compound_cation):
+                            sample_pool_size = len(oversampling_pool[c][compound_number])
+
+                            # get new samples from pool, bu at max 3 times its own size!
+                            number_of_samples_for_compound_level = min(int(number_of_new_samples*1/(2**compound_number)),3*sample_pool_size)
+
+                            self.__print(f'chose {number_of_samples_for_compound_level} from {sample_pool_size} samples')
+                            split_by_class[c].extend(np.random.choice(oversampling_pool[c][compound_number], number_of_samples_for_compound_level))
+
+                self.ros_indexes = np.random.permutation(reduce(lambda x, y: x + y, split_by_class.values(), []))
+            else:
+
+                class_indices = defaultdict(lambda :[])
+                for i, ( _, act, _) in enumerate(self.samples):
+                    class_indices[act[0].item()].append(i)
+
+                class_counts =  dict()
+                for key in class_indices.keys():
+                    class_counts[key]=(len(class_indices[key]))
+
+
+
+                # take middle off class counts as target sample size
+                target_sample_size =    (max(class_counts.values())-min(class_counts.values()))//2
+
+                for _class in class_indices.keys():
+
+                    # oversample small classes
+                    if class_counts[_class]<target_sample_size:
+                        new_samples = np.random.choice(class_indices[_class],target_sample_size-class_counts[_class])
+                        class_indices[_class].extend(new_samples)
+                    else:
+                        class_indices[_class]=class_indices[_class][0:target_sample_size]
+
+                self.ros_indexes = np.random.permutation(reduce(lambda x,y : x+y,class_indices.values(),[]))
 
 
 
@@ -407,14 +488,16 @@ if __name__ == '__main__':
     torch.set_printoptions(threshold=10_000)
 
     full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=-1, map_to_zero=False,
-                           with_masks=False, no_classes=30, no_replays=10,
-                            device='cpu', ros=False,multilabel_actions=True)
+                           with_masks=False, no_classes=12, no_replays=10,
+                            device='cpu', ros=True,multilabel_actions=True)
 
-
+    acts = []
     for pov,act in full_set:
-        print(act.squeeze())
+        acts.append(act)
 
-
+    acts= np.stack(acts)
+    acts = np.mean(acts,axis =0)
+    print(acts)
         #plt.show()
       #  plt.clf()
  #   for i, (pov, _, _) in enumerate(ds):

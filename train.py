@@ -278,7 +278,7 @@ def train(model, epochs, train_loader, val_loader):
                 f"current acc = {sum(epoch_train_acc) / len(epoch_train_acc)}; val_acc={sum(epoch_val_acc) / len(epoch_val_acc)}")
             if multilabel:
                 print(
-                    f"current hamming = {sum(epoch_train_hamming) / len(epoch_train_hamming)}; val_acc={sum(epoch_val_hamming) / len(epoch_val_hamming)}")
+                    f"current hamming = {sum(epoch_train_hamming) / len(epoch_train_hamming)}; val_hamming={sum(epoch_val_hamming) / len(epoch_val_hamming)}")
                 simple_logger.log(
                     [modelname, epoch, sum(epoch_train_loss) / len(epoch_train_loss),
                      sum(epoch_val_loss) / len(epoch_val_loss),
