@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
+from torch.nn import Sigmoid
 import torch.distributions as D
 import math
 from kmeans import cached_kmeans
@@ -172,9 +173,27 @@ class Model(nn.Module):
         sampled_pred = dist.sample()
         sampled_pred = sampled_pred.squeeze().cpu().numpy()
 
+        return sampled_pred, pred, state
 
+    def sample_multilabel(self,spatial, nonspatial, state,mean_substract=False):
+
+        logits, state = self.forward(spatial, nonspatial, state)
+
+
+        pred = Sigmoid()(logits)>0.5
+
+        if mean_substract:
+        # intialized with zeros, so always ok ...
+            logits = logits-self.logits_mean
+
+
+
+        dist = D.bernoulli.Bernoulli(logits = logits)
+        sampled_pred = dist.sample()
+        sampled_pred = sampled_pred.squeeze().cpu().numpy()
 
         return sampled_pred, pred, state
+
 
     def forward(self,pov,additional_info,state):
 

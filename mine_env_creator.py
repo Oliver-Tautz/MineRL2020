@@ -6,7 +6,7 @@ from lxml import etree as ET
 import shutil
 from os.path import isfile
 import numpy as np
-from descrete_actions_transform import transform_int_to_actions
+from descrete_actions_transform import transform_to_actions
 
 
 # simple method to set seed and pos in env. WARNING! Overrides global .xml by default. Saves old xml's in baks!
@@ -65,7 +65,7 @@ if __name__ == '__main__':
         set_env_pos(pos={'x': 110, 'y': 110, 'z': 1000+1000*i})
         for i in range(100):
             a = np.random.randint(0,30)
-            a = transform_int_to_actions([a])
+            a = transform_to_actions([a])
             observation, reward, done, info  =env.step(a)
             if done: break
 

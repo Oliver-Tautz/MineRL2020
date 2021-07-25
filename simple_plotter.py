@@ -28,6 +28,8 @@ class SimplePlotter():
 
     def plot_line(self,colX,colY,startx=0):
         #print(self.df)
+        if len(self.df) == 0:
+            return
         df = self.df.drop(range(0,startx))
 
 

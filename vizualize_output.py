@@ -4,10 +4,10 @@ from mineDataset import MineDataset
 from tqdm import tqdm, trange
 import torch
 import matplotlib.pyplot as plt
-from descrete_actions_transform import load_obj, transform_int_to_actions
+from descrete_actions_transform import load_obj, transform_to_actions
 import functools
 import numpy as np
-from torch.nn import Softmax
+from torch.nn import Softmax, Sigmoid
 import argparse
 from test import get_model_info_from_name
 import os
@@ -64,7 +64,7 @@ no_actions = 50
 def visualize(pov,pred,label,prev_label,next_label,no_classes):
     # get action representations
 
-    acs = [transform_int_to_actions([x], camera_noise_threshhold=0.1, no_actions=no_actions) for x in range(no_classes)]
+    acs = [transform_to_actions([x], camera_noise_threshhold=0.1, no_actions=no_actions) for x in range(no_classes)]
 
     # get active action names
     aclist = []
@@ -89,7 +89,7 @@ def visualize(pov,pred,label,prev_label,next_label,no_classes):
     aclist = [functools.reduce(lambda x, y: x + '_' + y, ac, '')[1:] for ac in aclist]
 
 
-    y = Softmax(0)(pred.squeeze().detach())
+    y = Sigmoid()(pred.squeeze().detach())
     #y = pred.squeeze().detach()
     #y[torch.argmax(y)] = 1
     #y[y<1] = 0
@@ -205,7 +205,7 @@ for modelname_epoch in os.listdir(modelpath):
 
 
 
-    if not modeldict['epoch'] in range(10,20):
+    if not modeldict['epoch'] in [1,2,5,8,10,12,15,20,25]:
         continue
 
 

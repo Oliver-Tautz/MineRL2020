@@ -146,17 +146,28 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
     return int_to_vector_dict, key_lookup
 
 
-def transform_int_to_actions(ints, camera_noise_threshhold=camera_noise_threshhold,no_actions=30):
+
+
+
+
+def transform_to_actions(inputs, camera_noise_threshhold=camera_noise_threshhold, no_actions=30, use_vecs = False):
 
     key_lookup = load_obj(f"{key_to_index_filename}_{no_actions}")
-    int_to_vector_dict = load_obj(f"{int_to_vec_filename}_{no_actions}")
+
 
     actions = defaultdict(lambda: [])
 
 
-    vecs = []
-    for i in ints:
-        vecs.append(int_to_vector_dict[i])
+    # transform from descrete ints
+    if not use_vecs:
+        int_to_vector_dict = load_obj(f"{int_to_vec_filename}_{no_actions}")
+        vecs = []
+        for i in inputs:
+            vecs.append(int_to_vector_dict[i])
+
+    else:
+    # transform from  multilabel vecs
+        vecs = [inputs]
 
     for vec in vecs:
         for index in key_lookup.keys():

@@ -23,7 +23,7 @@ from model import Model
 import torch
 import cv2
 from record_episode import EpisodeRecorder
-from descrete_actions_transform import transform_actions, transform_onehot_to_actions, transform_int_to_actions
+from descrete_actions_transform import transform_actions, transform_onehot_to_actions, transform_to_actions
 
 import sys
 
@@ -48,6 +48,7 @@ parser.add_argument('--save-vids', help="save videos of eval", action="store_tru
 parser.add_argument('--max-steps', help="max steps per episode", type=int, default=1000)
 parser.add_argument('--sequence-len', help="reset states after how many steps?!", type=int, default=1000)
 parser.add_argument('--num-threads', help="how many eval threads?", type=int, default=1)
+parser.add_argument('--multilabel-prediction', help="model predicts multilabel and not discrete", action="store_true")
 
 args = parser.parse_args()
 
@@ -61,6 +62,8 @@ save_vids = args.save_vids
 max_steps = args.max_steps
 test_epochs = args.test_epochs
 num_threads = args.num_threads
+multilabel = args.multilabel_prediction
+manual_frameskip = True
 
 torch.set_num_threads(no_cpu)
 
@@ -71,18 +74,19 @@ print(MINERL_GYM_ENV)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-
 # not tested seeds. Probably instant death
-seeds = [ 303544, 744421, 816128, 406373, 99999, 88888, 76543, 927113, 873766, 11342, 82666,
+seeds = [303544, 744421, 816128, 406373, 99999, 88888, 76543, 927113, 873766, 11342, 82666,
          76543]
 
-pos =  [ {'x': 50, 'y': 50, 'z': 50},
-       {'x': 50, 'y': 50, 'z': 50}, {'x': 50, 'y': 50, 'z': 50}, {'x': 50, 'y': 50, 'z': 50}, {'x': 50, 'y': 50, 'z': 50},
+pos = [{'x': 50, 'y': 50, 'z': 50},
+       {'x': 50, 'y': 50, 'z': 50}, {'x': 50, 'y': 50, 'z': 50}, {'x': 50, 'y': 50, 'z': 50},
+       {'x': 50, 'y': 50, 'z': 50},
        {'x': 50, 'y': 50, 'z': 50}, {'x': 50, 'y': 50, 'z': 50}]
 
 # tested seeds.
-seeds = [2,12345, 45678]
-pos = [{'x': 100, 'y': 100, 'z': 80},{'x': 60, 'y': 60, 'z': 60},{'x': 1700, 'y': 80, 'z': 1060}]
+seeds = [2, 12345, 45678]
+pos = [{'x': 100, 'y': 100, 'z': 80}, {'x': 60, 'y': 60, 'z': 60}, {'x': 1700, 'y': 80, 'z': 1060}]
+
 
 def get_model_info_from_name(name):
     if name.split('/')[-1].split('.')[-1] != 'tm':
@@ -111,7 +115,7 @@ def get_model_info_from_name(name):
     masks_regex = re.compile(r'_with-masks=(False|True)_')
     with_masks = masks_regex.search(name).group()
     with_masks = (re.compile(r'(False|True)').search(with_masks).group())
-    
+
     lstm_regex = re.compile(r'_with-lstm=(False|True)_')
     with_lstm = lstm_regex.search(name).group()
     with_lstm = re.compile(r'(False|True)').search(with_lstm).group()
@@ -120,7 +124,7 @@ def get_model_info_from_name(name):
         with_masks = True
     else:
         with_masks = False
-        
+
     if with_lstm == 'True':
         with_lstm = True
     else:
@@ -144,6 +148,15 @@ def main():
 
     def thread_eval_on_env(models, env, seed):
 
+        # manual frameskip setup
+
+        action_names = {0: 'attack', 1: 'back', 2: 'forward', 3: 'jump', 4: 'left', 5: 'right', 6: 'sneak', 7: 'sprint',
+                        8: 'pitch_positive', 9: 'pitch_negative', 10: 'yaw_positive', 11: 'yaw_negative'}
+
+
+        frameskips =np.array([24,3,5,1,3,3,1,3,3,3,3,3])
+
+
         er = EpisodeRecorder()
 
         for modeldict in models:
@@ -153,16 +166,15 @@ def main():
             epoch = modeldict['epoch']
             print(f"loading model {modeldict['name']}")
 
-
-
             print(f"testing on seed {seed} ")
             model = Model(deviceStr=device, verbose=verbose, no_classes=modeldict['no_classes'],
-                          with_masks=modeldict['with_masks'], mode='eval',with_lstm=modeldict['with_lstm'])
-            model.load_state_dict(torch.load(os.path.join(modelpath, modeldict['name']), map_location=device),strict=False)
+                          with_masks=modeldict['with_masks'], mode='eval', with_lstm=modeldict['with_lstm'])
+            model.load_state_dict(torch.load(os.path.join(modelpath, modeldict['name']), map_location=device),
+                                  strict=False)
 
-            if torch.equal(model.logits_mean,torch.zeros(modeldict['no_classes'])):
+            if torch.equal(model.logits_mean, torch.zeros(modeldict['no_classes'])):
                 compute_logits_mean(model)
-                torch.save_to_state_dict(model.state_dict(),os.path.join(modelpath, modeldict['name']))
+                torch.save_to_state_dict(model.state_dict(), os.path.join(modelpath, modeldict['name']))
                 print(f"mean_computed")
                 continue
 
@@ -179,21 +191,68 @@ def main():
                 state = model.get_zero_state(1, device)
 
                 rewards = []
+
+
+                ## manual frameskips
+
+                if manual_frameskip:
+                    framecount_per_action = np.zeros(12)
+                    current_action = np.zeros(12)
+
+
                 for step in range(max_steps):
 
                     pov = torch.tensor(obs['pov'], device=device, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
                     pov = pov.transpose(0, 1).transpose(2, 4).transpose(3, 4).contiguous()
-                    s, p, state = model.sample(pov, additional_info_dummy, state,mean_substract=True)
-                    action = transform_int_to_actions([int(s)], no_actions=modeldict['no_classes'])
 
-                    print(int(s))
+                    if not multilabel:
+                        s, p, state = model.sample(pov, additional_info_dummy, state, mean_substract=True)
+                        action = transform_to_actions([int(s)], no_actions=modeldict['no_classes'])
+
+                    else:
+
+
+                        s, p, state = model.sample_multilabel(pov, additional_info_dummy, state, mean_substract=False)
+
+                        if manual_frameskip:
+                            # check if framskip over for all actions. Use long and not bool for more computation possibilities
+                            mask = (framecount_per_action >= frameskips)
+
+                            # reset skipped actions
+                            current_action = np.logical_and(current_action,~mask).astype(np.long)
+
+                            # get rid of -1's.
+                            current_action [current_action < 0] = 0
+
+                            # update current action with sampled action
+                            current_action = np.logical_or(current_action,s)
+
+
+                            print(f'framecount:{framecount_per_action}')
+                            print(f'sampled:{s}')
+                            print(f'current:{current_action}')
+
+                            # reset framseskips that reached threshold
+                            framecount_per_action[mask] = 0
+
+                            # add executed aciton to count
+                            framecount_per_action += current_action
+
+                            s = current_action
+
+                        action = transform_to_actions(s, no_actions=modeldict['no_classes'], use_vecs=True)
+
+                    # print(int(s))
                     obs, reward, done, _ = env.step(action)
 
                     rewards.append(reward)
                     er.record_frame(obs['pov'])
 
                     act_logger_lock.acquire()
-                    action_logger.log([modeldict['name'], modeldict['epoch'], seed, int(p), int(s), step, reward])
+                    if multilabel:
+                        action_logger.log([modeldict['name'], modeldict['epoch'], seed, p, s, step, reward])
+                    else:
+                        action_logger.log([modeldict['name'], modeldict['epoch'], seed, int(p), int(s), step, reward])
                     act_logger_lock.release()
 
                     if done:
@@ -214,7 +273,6 @@ def main():
                     [modeldict['name'], modeldict['epoch'], seed, np.mean(rewards), np.std(rewards), np.var(rewards),
                      np.sum(rewards)])
                 reward_logger_lock.release()
-
 
     rewards_logger = SimpleLogger(f'eval/{model_name}/rewards.csv',
                                   ['modelname', 'epoch', 'seed', 'reward_mean', 'reward_sdt', 'reward_var',
@@ -245,14 +303,14 @@ def main():
     envs = []
     for seed, posit in zip(seeds, pos):
 
-    #    set_env_pos(posit)
+        #    set_env_pos(posit)
         set_env_pos(None)
 
         env = gym.make(MINERL_GYM_ENV)
         env.seed(seed)
         envs.append(env)
 
-        p = Process(target=thread_eval_on_env, args=(models,env,seed,))
+        p = Process(target=thread_eval_on_env, args=(models, env, seed,))
         threads.append(p)
         print('starting thread!')
         p.start()
@@ -264,7 +322,7 @@ def main():
             for i in range(len(envs)):
                 del envs[i]
 
-            envs  = []
+            envs = []
             threads = []
 
     for thread in threads:
@@ -284,11 +342,10 @@ def compute_logits_mean(model):
         logits, _ = model.forward(pov, torch.zeros(10), model.get_zero_state(1, device='cpu'))
         logits_list.append(logits)
 
-    logits = torch.cat(logits,dim=0)
-    logits = torch.mean(logits,dim=0)
+    logits = torch.cat(logits, dim=0)
+    logits = torch.mean(logits, dim=0)
 
     print(logits_list)
-
 
 
 if __name__ == "__main__":
