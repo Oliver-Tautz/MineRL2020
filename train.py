@@ -340,6 +340,10 @@ def multilabel_loss(label,prediction):
     # maybe use sum? weights?
     loss = torch.nn.BCEWithLogitsLoss(reduction='mean')
 
+    if not skip_sequences:
+        label = label.view(-1)
+        prediction  = prediction.view(-1)
+
     return loss(prediction,label)
 
 def categorical_loss_one_action(label, prediction, position):

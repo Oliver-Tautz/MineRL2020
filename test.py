@@ -51,7 +51,6 @@ parser.add_argument('--sequence-len', help="reset states after how many steps?!"
 parser.add_argument('--num-threads', help="how many eval threads?", type=int, default=1)
 parser.add_argument('--multilabel-prediction', help="model predicts multilabel and not discrete", action="store_true")
 parser.add_argument('--manual-frameskip', help="use manual framskip for predictions", action="store_true")
-
 parser.add_argument('--accumulate-prob', help="accumulate probabilities over number of actions", type = int, default=0)
 
 args = parser.parse_args()
@@ -325,7 +324,7 @@ def main():
 
         modeldict = get_model_info_from_name(modelname_epoch)
 
-        if modeldict['epoch'] % test_epochs != 0:
+        if modeldict['epoch'] not in [6,7,8,9,10]:
             continue
 
         models.append(modeldict)
