@@ -341,8 +341,8 @@ def multilabel_loss(label,prediction):
     loss = torch.nn.BCEWithLogitsLoss(reduction='mean')
 
     if not skip_sequences:
-        label = label.view(-1)
-        prediction  = prediction.view(-1)
+        label = label.reshape((np.product(label.shape[0:2]), label.shape[2]))
+        prediction = prediction.reshape((np.product(prediction.shape[0:2]), prediction.shape[2]))
 
     return loss(prediction,label)
 
@@ -365,6 +365,11 @@ def categorical_loss_one_action(label, prediction, position):
 def accuracy(label, prediction):
 
     if multilabel:
+        if not skip_sequences:
+            label = label.reshape((np.product(label.shape[0:2]), label.shape[2]))
+            prediction = prediction.reshape((np.product(prediction.shape[0:2]), prediction.shape[2]))
+            return (np.logical_and.reduce(label.cpu() == prediction.cpu(), axis=1).sum() / len(label))
+
         return (np.logical_and.reduce(label.cpu()==prediction.cpu(),axis=(1,2))).sum()/len(label)
 
 
