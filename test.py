@@ -52,6 +52,8 @@ parser.add_argument('--num-threads', help="how many eval threads?", type=int, de
 parser.add_argument('--multilabel-prediction', help="model predicts multilabel and not discrete", action="store_true")
 parser.add_argument('--manual-frameskip', help="use manual framskip for predictions", action="store_true")
 parser.add_argument('--accumulate-prob', help="accumulate probabilities over number of actions", type = int, default=0)
+parser.add_argument('--reduce-multilabel', help="Reduce multilabel prediction to 7 important actions", action="store_true")
+
 
 args = parser.parse_args()
 
@@ -68,7 +70,7 @@ num_threads = args.num_threads
 multilabel = args.multilabel_prediction
 manual_frameskip = args.manual_frameskip
 accumulate_probs = args.accumulate_prob
-
+reduce_multilabel = args.reduce_multilabel
 torch.set_num_threads(no_cpu)
 
 # All the evaluations will be evaluated on MineRLObtainDiamondVectorObf-v0 environment
@@ -238,7 +240,7 @@ def main():
 
                     if not multilabel:
                         s, p, state = model.sample(pov, additional_info_dummy, state, mean_substract=True)
-                        action = transform_to_actions([int(s)], no_actions=modeldict['no_classes'])
+                        action = transform_to_actions([int(s)], no_actions=modeldict['no_classes'],)
 
                     else:
 
@@ -276,7 +278,7 @@ def main():
 
                             s = current_action
 
-                        action = transform_to_actions(s, no_actions=modeldict['no_classes'], use_vecs=True)
+                        action = transform_to_actions(s, no_actions=modeldict['no_classes'], use_vecs=True,reduced_vecs=reduce_multilabel)
 
                     # print(int(s))
                     obs, reward, done, _ = env.step(action)
