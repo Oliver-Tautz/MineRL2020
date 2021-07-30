@@ -31,7 +31,9 @@ class MineDataset(Dataset):
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
                  no_classes=30, random_sequences=50000, device='cuda', return_float=True, min_reward=0, min_variance=0,
-                 max_overlap=10,ros=False,multilabel_actions=False):
+                 max_overlap=10,ros=False,multilabel_actions=False,clean_samples=False):
+
+        self.clean_samples=clean_samples
 
         self.max_overlap = max_overlap
         self.ros = ros
@@ -148,7 +150,6 @@ class MineDataset(Dataset):
             self.len = len(self.random_sequences)
 
 
-
         if self.ros:
             self.len = len(self.ros_indexes)
 
@@ -166,7 +167,16 @@ class MineDataset(Dataset):
         if self.with_masks:
             del (self.replays_masks)
 
-
+        no_samples_without_cleaning = len(self.samples)
+        cleaned = 0
+        if self.clean_samples:
+            for i, (pov,act,reward) in (reversed(list(enumerate(self.samples)))):
+                rewards = [s[2] for s in self.samples[i-25:i+100]]
+                rewardsum = sum(rewards)
+                if rewardsum < self.min_reward:
+                    self.samples.pop(i)
+                    cleaned+=1
+        self.__print(f'cleaned {cleaned} samples from dataset with {no_samples_without_cleaning} because vicinity reward < {self.min_reward}')
 
         if self.ros:
             # split dataset by class
@@ -242,7 +252,7 @@ class MineDataset(Dataset):
                             # get new samples from pool, bu at max 3 times its own size!
                             number_of_samples_for_compound_level = min(int(number_of_new_samples*1/(2**compound_number)),3*sample_pool_size)
 
-                            self.__print(f'chose {number_of_samples_for_compound_level} from {sample_pool_size} samples')
+                            self.__print(f'chose {number_of_samples_for_compound_level} from {sample_pool_size} samples for class {c}')
                             split_by_class[c].extend(np.random.choice(oversampling_pool[c][compound_number], number_of_samples_for_compound_level))
 
                 self.ros_indexes = np.random.permutation(reduce(lambda x, y: x + y, split_by_class.values(), []))
@@ -481,6 +491,8 @@ class MineDataset(Dataset):
 
 
 
+# [[0.43203875 0.01666584 0.4586578  0.0600334  0.06072781 0.05551973
+#   0.01125936 0.05024552 0.19117768 0.25987467 0.19243424 0.21895409]]
 
 
 if __name__ == '__main__':
@@ -488,13 +500,14 @@ if __name__ == '__main__':
     torch.set_printoptions(threshold=10_000)
 
     full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=-1, map_to_zero=False,
-                           with_masks=False, no_classes=12, no_replays=10,
-                            device='cpu', ros=True,multilabel_actions=True)
+                           with_masks=False, no_classes=12, no_replays=30,
+                            device='cpu', ros=True,multilabel_actions=True,clean_samples=True,min_reward=4)
 
     acts = []
     for pov,act in full_set:
         acts.append(act)
 
+    print(f"number of samples = {len(acts)}")
     acts= np.stack(acts)
     acts = np.mean(acts,axis =0)
     print(acts)

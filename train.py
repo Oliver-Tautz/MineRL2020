@@ -420,7 +420,7 @@ def main():
     full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=seq_len, map_to_zero=map_to_zero,
                            with_masks=with_masks, no_classes=no_classes, no_replays=no_replays,
                            random_sequences=no_sequences, min_variance=min_var, min_reward=min_reward, device=deviceStr,
-                           max_overlap=max_overlap,ros=ros,multilabel_actions=multilabel)
+                           max_overlap=max_overlap,ros=ros,multilabel_actions=multilabel,clean_samples=True)
 
     no_sequences = len(full_set)
     val_split = 0.2
