@@ -13,6 +13,8 @@ import sys
 from functools import reduce
 
 
+
+
 class MineDataset(Dataset):
 
     # root_dir          = path to minecraft replays
@@ -31,7 +33,7 @@ class MineDataset(Dataset):
 
     def __init__(self, root_dir, sequence_length=100, with_masks=False, map_to_zero=True, cpus=3, no_replays=300,
                  no_classes=30, random_sequences=50000, device='cuda', return_float=True, min_reward=0, min_variance=0,
-                 max_overlap=10,ros=False,multilabel_actions=False,clean_samples=False):
+                 max_overlap=10,ros=False,multilabel_actions=False,clean_samples=False,reduce_multilabel = False):
 
         self.clean_samples=clean_samples
 
@@ -98,11 +100,11 @@ class MineDataset(Dataset):
             self.original_act[i] = act
             if not multilabel_actions:
                 self.replays_act[i] = torch.tensor(
-                    transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes,multilabel_actions=multilabel_actions), dtype=torch.long)
+                    transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes,multilabel_actions=multilabel_actions), dtype=torch.float32)
             else:
                 self.replays_act[i] = torch.tensor(
                     transform_actions(act, map_to_zero=map_to_zero, get_ints=True, no_classes=no_classes,
-                                      multilabel_actions=multilabel_actions), dtype=torch.float32)
+                                      multilabel_actions=multilabel_actions,reduce_actions=reduce_multilabel), dtype=torch.float32)
             self.replays_reward[i] = reward
 
             if with_masks:
@@ -167,6 +169,8 @@ class MineDataset(Dataset):
         if self.with_masks:
             del (self.replays_masks)
 
+
+        ## clean sampled here
         no_samples_without_cleaning = len(self.samples)
         cleaned = 0
         if self.clean_samples:
@@ -178,6 +182,7 @@ class MineDataset(Dataset):
                     cleaned+=1
         self.__print(f'cleaned {cleaned} samples from dataset with {no_samples_without_cleaning} because vicinity reward < {self.min_reward}')
 
+        ## ros here
         if self.ros:
             # split dataset by class
             # this seems to work
@@ -501,7 +506,7 @@ if __name__ == '__main__':
 
     full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=-1, map_to_zero=False,
                            with_masks=False, no_classes=12, no_replays=30,
-                            device='cpu', ros=True,multilabel_actions=True,clean_samples=True,min_reward=4)
+                            device='cpu', ros=True,multilabel_actions=True,clean_samples=True,min_reward=4,reduce_multilabel=True)
 
     acts = []
     for pov,act in full_set:

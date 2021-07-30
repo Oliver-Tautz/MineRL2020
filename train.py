@@ -27,6 +27,7 @@ from torch.utils.data import DataLoader, random_split
 import matplotlib.pyplot as plt
 import torch.nn.functional
 from sklearn.metrics import hamming_loss
+from sklearn.model_selection import train_test_split
 
 import argparse
 from datetime import datetime
@@ -57,6 +58,8 @@ parser.add_argument('--skip-sequences', help="wheight loss for under/overreprese
 parser.add_argument('--ros', help="use ros for CNN model", action="store_true")
 parser.add_argument('--use-multilabel-prediction', help="Dont predict discrete actions but compound actions. ", action="store_true")
 
+parser.add_argument('--reduce-multilabel', help="Reduce multilabel prediction to 7 important actions", action="store_true")
+
 args = parser.parse_args()
 
 # there are 448480 unique steps in the dataset.
@@ -82,6 +85,7 @@ skip_lstm = args.skip_lstm
 skip_sequences = args.skip_sequences
 ros = args.ros
 multilabel = args.use_multilabel_prediction
+reduced_multilabel = True
 
 # ensure reproducability
 
@@ -409,6 +413,14 @@ def compute_class_weights(mineDs):
 
     return torch.nn.functional.pad(weights, (0, no_classes - len(weights)), mode='constant', value=1)
 
+# not needed. Current train/val split is sufficient ...
+def multilabel_to_class(dataset):
+    samples = torch.stack([x[1].squeeze() for x in dataset])
+    uniques = torch.unique(samples, dim=0)
+    uniques_mapped = {str(n): s for (s, n) in zip(range(len(uniques)), uniques)}
+    labels = [uniques_mapped[str(s)] for s in samples]
+
+    return labels
 
 def main():
     global no_sequences
@@ -420,7 +432,7 @@ def main():
     full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=seq_len, map_to_zero=map_to_zero,
                            with_masks=with_masks, no_classes=no_classes, no_replays=no_replays,
                            random_sequences=no_sequences, min_variance=min_var, min_reward=min_reward, device=deviceStr,
-                           max_overlap=max_overlap,ros=ros,multilabel_actions=multilabel,clean_samples=True)
+                           max_overlap=max_overlap,ros=ros,multilabel_actions=multilabel,clean_samples=True,reduce_multilabel=reduced_multilabel)
 
     no_sequences = len(full_set)
     val_split = 0.2
@@ -437,6 +449,7 @@ def main():
 
     train_set, val_set = random_split(full_set, [train_size, val_size],
                                       generator=torch.Generator().manual_seed(42))
+    #train_set, val_set = train_test_split(full_set,test_size=val_size,train_size=train_size,shuffle=True,stratify=multilabel_to_class(full_set))
 
     if no_shuffle:
         train_loader = DataLoader(train_set, batch_size=batchsize,

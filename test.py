@@ -88,8 +88,8 @@ pos = [{'x': 50, 'y': 50, 'z': 50},
        {'x': 50, 'y': 50, 'z': 50}, {'x': 50, 'y': 50, 'z': 50}]
 
 # tested seeds.
-seeds = [2, 12345, 45678]
-pos = [{'x': 100, 'y': 100, 'z': 80}, {'x': 60, 'y': 60, 'z': 60}, {'x': 1700, 'y': 80, 'z': 1060}]
+seeds = [2, 2, 2]
+pos = [{'x': -39, 'y': 59, 'z': 221}, {'x': -161, 'y': 60, 'z': 230}, {'x': -166, 'y': 63, 'z': 210}]
 
 
 def get_model_info_from_name(name):
@@ -167,6 +167,8 @@ def main():
     mp4_lock = Lock()
 
     def thread_eval_on_env(models, env, seed):
+
+        env.make_interactive(port=6666, realtime=True)
 
         # manual frameskip setup
 
@@ -338,7 +340,7 @@ def main():
     for seed, posit in zip(seeds, pos):
 
         #    set_env_pos(posit)
-        set_env_pos(None)
+        set_env_pos(posit)
 
         env = gym.make(MINERL_GYM_ENV)
         env.seed(seed)
@@ -354,6 +356,7 @@ def main():
             for thread in threads:
                 thread.join()
             for i in range(len(envs)):
+                envs[i].close()
                 del envs[i]
 
             envs = []

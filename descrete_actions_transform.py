@@ -5,11 +5,13 @@ from collections import defaultdict
 import os
 import minerl
 
-verb=False
+verb = False
+
 
 def verb_print(*strings):
     if verb:
         print(strings)
+
 
 # This dict maps integers to actions in 0/1 encoding
 int_to_vec_filename = 'int_to_vec_dict'
@@ -33,11 +35,10 @@ def load_obj(name):
         return pickle.load(f)
 
 
-
 # Wrapper function for using directory as input
 
-def save_frequent_actions_and_mapping_for_dir(folders, no_discrete_actions=30, camera_noise_threshhold=camera_noise_threshhold):
-
+def save_frequent_actions_and_mapping_for_dir(folders, no_discrete_actions=30,
+                                              camera_noise_threshhold=camera_noise_threshhold):
     def concat_actions(actlist):
         if actlist:
             start = actlist.pop()
@@ -53,12 +54,11 @@ def save_frequent_actions_and_mapping_for_dir(folders, no_discrete_actions=30, c
     loader = minerl.data.make('MineRLTreechop-v0', data_dir='./data', num_workers=4)
     actions = defaultdict(lambda: [])
 
-
     for folder in folders:
-        replays=(os.listdir(folder))
+        replays = (os.listdir(folder))
 
-        for f in tqdm(replays, desc='loading actions for clustering',position=0,leave=True):
-            d = loader._load_data_pyfunc(os.path.join(folder,f), -1, None)
+        for f in tqdm(replays, desc='loading actions for clustering', position=0, leave=True):
+            d = loader._load_data_pyfunc(os.path.join(folder, f), -1, None)
             obs, act, reward, nextobs, done = d
 
             for key in act.keys():
@@ -69,12 +69,9 @@ def save_frequent_actions_and_mapping_for_dir(folders, no_discrete_actions=30, c
 
     camera_actions = actions['camera']
 
+    save_frequent_actions_and_mapping(actions, no_discrete_actions=no_discrete_actions,
+                                      camera_noise_threshhold=camera_noise_threshhold)
 
-
-
-
-
-    save_frequent_actions_and_mapping(actions,no_discrete_actions=no_discrete_actions, camera_noise_threshhold=camera_noise_threshhold)
 
 # Takes dict of discrete actions from Treechop-v0 environment
 # and returns one hot encoded actions with ndim = no_discrete_actions.
@@ -104,7 +101,7 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
     # verb_print('one_hot_dimensionality: ', one_hot_encoding_size)
 
     vectors = []
-    for i in tqdm(range(no_sampled_actions), desc='get_action_vectors',position=0,leave=True):
+    for i in tqdm(range(no_sampled_actions), desc='get_action_vectors', position=0, leave=True):
         action_vector = np.zeros(array_dimensionality)
 
         for key in actions.keys():
@@ -141,22 +138,28 @@ def save_frequent_actions_and_mapping(actions, no_discrete_actions=30, camera_no
     int_to_vector_dict = dict(enumerate(frequent_uniques))
 
     save_obj(int_to_vector_dict, f'{int_to_vec_filename}_{no_discrete_actions}')
-    save_obj(key_lookup,f'{key_to_index_filename}_{no_discrete_actions}')
+    save_obj(key_lookup, f'{key_to_index_filename}_{no_discrete_actions}')
 
     return int_to_vector_dict, key_lookup
 
 
+def fill_zeros(vecs,restore_cols):
+    dimension = len(vecs.shape)
+
+    if dimension == 1:
+        for col in restore_cols:
+            vecs= np.insert(vecs, col, 0, axis=0)
+
+    else:
+        for col in restore_cols:
+            vecs= np.insert(vecs, col, 0, axis=1)
+    return vecs
 
 
-
-
-def transform_to_actions(inputs, camera_noise_threshhold=camera_noise_threshhold, no_actions=30, use_vecs = False):
-
+def transform_to_actions(inputs, camera_noise_threshhold=camera_noise_threshhold, no_actions=30, use_vecs=False,reduced_vecs=False):
     key_lookup = load_obj(f"{key_to_index_filename}_{no_actions}")
 
-
     actions = defaultdict(lambda: [])
-
 
     # transform from descrete ints
     if not use_vecs:
@@ -166,8 +169,14 @@ def transform_to_actions(inputs, camera_noise_threshhold=camera_noise_threshhold
             vecs.append(int_to_vector_dict[i])
 
     else:
-    # transform from  multilabel vecs
-        vecs = [inputs]
+        # transform from  multilabel vecs\
+        if reduced_vecs:
+            vecs = [fill_zeros(inputs)]
+        else:
+            vecs = [inputs]
+
+
+
 
     for vec in vecs:
         for index in key_lookup.keys():
@@ -222,40 +231,35 @@ def transform_to_actions(inputs, camera_noise_threshhold=camera_noise_threshhold
     return actions
 
 
-def transform_onehot_to_actions(X,camera_noise_threshhold=camera_noise_threshhold,no_classes=30):
-
+def transform_onehot_to_actions(X, camera_noise_threshhold=camera_noise_threshhold, no_classes=30):
     key_lookup = load_obj(f'{key_to_index_filename}_{no_classes}')
     int_to_vector_dict = load_obj(f'{int_to_vec_filename}_{no_classes}')
 
-    actions = defaultdict(lambda :[])
+    actions = defaultdict(lambda: [])
     ints = onehot_to_int(X)
 
     vecs = []
     for i in ints:
         vecs.append(int_to_vector_dict[i])
 
-
     for vec in vecs:
         for index in key_lookup.keys():
             if vec[index] == 1:
                 actions[key_lookup[index]].append(1)
-            elif vec[index] ==0:
-                 actions[key_lookup[index]].append(0)
+            elif vec[index] == 0:
+                actions[key_lookup[index]].append(0)
             else:
                 actions[key_lookup[index]].append(0)
                 print("Warning! Trying to convert non binary values to actions.")
 
-    
     pitch_positive = actions.pop('pitch_positive')
     pitch_negative = actions.pop('pitch_negative')
     yaw_positive = actions.pop('yaw_positive')
     yaw_negative = actions.pop('yaw_negative')
-    
 
     pitch_action = []
 
-    
-    for pos, neg in zip(pitch_positive,pitch_negative):
+    for pos, neg in zip(pitch_positive, pitch_negative):
         if pos and neg:
             print("Warning, both camera directions at the same timestep!")
             pitch_action.append(2)
@@ -282,31 +286,49 @@ def transform_onehot_to_actions(X,camera_noise_threshhold=camera_noise_threshhol
     pitch_action = np.array(pitch_action)
     yaw_action = np.array(yaw_action)
 
-    camera_action = np.column_stack((pitch_action,yaw_action))
-    actions['camera']=camera_action
+    camera_action = np.column_stack((pitch_action, yaw_action))
+    actions['camera'] = camera_action
 
     for key in actions.keys():
         actions[key] = np.array(actions[key])
 
-
     return actions
 
 
+action_names = {0: 'attack', 1: 'back', 2: 'forward', 3: 'jump', 4: 'left', 5: 'right', 6: 'sneak', 7: 'sprint',
+                8: 'pitch_positive', 9: 'pitch_negative', 10: 'yaw_positive', 11: 'yaw_negative'}
+
+keep_cols = [0, 2, 3, 8, 9, 10, 11]
+restore_cols = [1, 4, 5, 6, 7, ]
 
 
-def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_threshhold=camera_noise_threshhold,get_ints=False,multilabel_actions=False):
+def get_cols(arr, cols):
+
+    dimension = len(arr.shape)
+
+    if dimension == 1:
+        return arr[np.array(cols)]
+
+    arrcols = []
+    for col in cols:
+        arrcols.append(arr[:, col])
+
+    return np.column_stack(arrcols)
+
+
+def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_threshhold=camera_noise_threshhold,
+                      get_ints=False, multilabel_actions=False, reduce_actions=False):
     pitch_positive, pitch_negative, yaw_positive, yaw_negative = discreticize_camera_action(actions['camera'],
                                                                                             camera_noise_threshhold)
 
-
     actions = actions.copy()
 
+    # if mappings dont exist yet, make them!
 
-    #if mappings dont exist yet, make them!
-
-    if not os.path.isfile(f'obj/{key_to_index_filename}_{no_classes}.pkl') or not os.path.isfile(f'obj/{int_to_vec_filename}_{no_classes}.pkl'):
+    if not os.path.isfile(f'obj/{key_to_index_filename}_{no_classes}.pkl') or not os.path.isfile(
+            f'obj/{int_to_vec_filename}_{no_classes}.pkl'):
         print('descrete actions transform: no precomputed actions found! Computing new...')
-        save_frequent_actions_and_mapping_for_dir(['data/MineRLTreechop-v0/train'],no_discrete_actions=no_classes)
+        save_frequent_actions_and_mapping_for_dir(['data/MineRLTreechop-v0/train'], no_discrete_actions=no_classes)
 
     # this could be done only once ...
 
@@ -320,7 +342,6 @@ def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_thr
 
     no_sampled_actions = len(actions['pitch_positive'])
     actions.pop('camera')
-
 
     index_lookup = {key: ix for (ix, key) in key_lookup.items()}
 
@@ -345,7 +366,11 @@ def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_thr
     # print('means: ',np.mean(X,axis=0))
 
     if multilabel_actions:
-        return X
+        if reduce_actions:
+            return get_cols(X, keep_cols)
+        else:
+
+            return X
 
     no_discrete_actions = len(int_to_vector_dict.values())
     frequent_uniques = list(int_to_vector_dict.values())
@@ -372,19 +397,18 @@ def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_thr
             else:
                 no_mapped += 1
                 smallest_dist = 1000000
-                for i,unique in enumerate(frequent_uniques):
+                for i, unique in enumerate(frequent_uniques):
 
                     # only map 1->0 but not 0->1 ! This way we dont brak the distribution
-                    dist = np.sum(np.where(x-unique==-1,1000,x-unique))
+                    dist = np.sum(np.where(x - unique == -1, 1000, x - unique))
                     if dist < smallest_dist:
                         smallest_dist = dist
                         smallest_ix = i
                 mapped_vectors.append(frequent_uniques[smallest_ix])
 
-
     mapped_vectors = np.array(mapped_vectors)
 
-    verb_print("{}% of actions mapped".format(no_mapped / no_sampled_actions*100))
+    verb_print("{}% of actions mapped".format(no_mapped / no_sampled_actions * 100))
 
     int_to_vector_dict = dict(enumerate(frequent_uniques))
 
@@ -397,7 +421,6 @@ def transform_actions(actions, no_classes=30, map_to_zero=True, camera_noise_thr
         return integer_values
     else:
         return int_to_one_hot(integer_values, no_discrete_actions)
-
 
 
 def discreticize_camera_action(camera_actions, noise_threshhold):
@@ -425,12 +448,13 @@ def discreticize_camera_action(camera_actions, noise_threshhold):
     return pitch_positive, pitch_negative, yaw_positive, yaw_negative
 
 
-
 def int_to_one_hot(scalar_array, no_classes):
     return np.eye(no_classes)[scalar_array]
 
+
 def onehot_to_int(onehot_array):
-    return np.argmax(onehot_array,axis=1)
+    return np.argmax(onehot_array, axis=1)
+
 
 def in_for_np_array(array, list_of_arrays):
     in_list = False
@@ -453,4 +477,4 @@ def get_int_from_vector(int_to_array_dict, vector, zero_index):
 
 if __name__ == '__main__':
     pass
-    #save_frequent_actions_and_mapping_for_dir(['data/MineRLTreechop-v0/train','data/MineRLTreechop-v0/val'])
+    # save_frequent_actions_and_mapping_for_dir(['data/MineRLTreechop-v0/train','data/MineRLTreechop-v0/val'])
