@@ -170,7 +170,7 @@ def main():
 
     def thread_eval_on_env(models, env, seed):
 
-        env.make_interactive(port=6666, realtime=True)
+        #env.make_interactive(port=6666, realtime=True)
 
         # manual frameskip setup
 

@@ -85,7 +85,7 @@ skip_lstm = args.skip_lstm
 skip_sequences = args.skip_sequences
 ros = args.ros
 multilabel = args.use_multilabel_prediction
-reduced_multilabel = True
+reduced_multilabel = args.reduce_multilabel
 
 # ensure reproducability
 
