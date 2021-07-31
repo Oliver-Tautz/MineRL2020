@@ -79,3 +79,9 @@ for batch in os.listdir(batchdir):
             plt.savefig(f'{batchdir}/{batch}/{filename}_acc.pdf')
             plt.clf()
 
+            if 'multilabel' in file:
+                sp.plot_line('epoch', ['hamming', 'val_hamming'])
+                filename = file.split('.csv')[0]
+                sp.set_title(wrap_string(filename, 50))
+                plt.savefig(f'{batchdir}/{batch}/{filename}_hamming.pdf')
+                plt.clf()

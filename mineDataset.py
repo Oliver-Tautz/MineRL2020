@@ -506,7 +506,7 @@ if __name__ == '__main__':
 
     full_set = MineDataset('data/MineRLTreechop-v0/train', sequence_length=-1, map_to_zero=False,
                            with_masks=False, no_classes=12, no_replays=30,
-                            device='cpu', ros=True,multilabel_actions=True,clean_samples=True,min_reward=4,reduce_multilabel=True)
+                            device='cpu', ros=False,multilabel_actions=True,clean_samples=True,min_reward=4,reduce_multilabel=True)
 
     acts = []
     for pov,act in full_set:
